@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>the Big Dipper isn't a thing — standard deviation</title>
+  <meta name="description" content="Seven stars. Seven completely different distances from Earth. One very convincing optical illusion you've been looking at your whole life.">
+  <meta property="og:title" content="the Big Dipper isn't a thing">
+  <meta property="og:description" content="Seven stars. Seven completely different distances. One very convincing optical illusion.">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    .anim-year-display {
+      font-size: 20px;
+      font-weight: 500;
+      font-family: var(--font-mono);
+      color: var(--color-text-primary);
+    }
+    .anim-controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 0.85rem;
+    }
+    .star-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 1.5rem 0;
+    }
+    .star-table th {
+      text-align: left;
+      padding: 7px 10px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--color-text-tertiary);
+      font-weight: 500;
+      border-bottom: 0.5px solid var(--color-border);
+      font-family: var(--font-sans);
+    }
+    .star-table td {
+      padding: 9px 10px;
+      border-bottom: 0.5px solid var(--color-border);
+      color: var(--color-text-primary);
+      font-family: var(--font-sans);
+    }
+    .star-table tr:last-child td { border-bottom: none; }
+    .star-table .num { font-family: var(--font-mono); font-size: 12px; color: var(--color-text-secondary); }
+    .star-table .sname { font-weight: 500; }
+    .tag-group { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; color: var(--color-accent); }
+    .tag-solo  { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; color: var(--color-accent-warm); }
+    .view-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 0.75rem; }
+    canvas { display: block; max-width: 100%; }
+    .speed-row { display: flex; align-items: center; gap: 10px; margin: 0.5rem 0; }
+    .speed-row label { font-size: 12px; color: var(--color-text-secondary); min-width: 110px; }
+    .speed-row input { flex: 1; accent-color: var(--color-accent); }
+    .speed-row .sv { font-size: 12px; font-family: var(--font-mono); color: var(--color-text-tertiary); min-width: 70px; text-align: right; }
+    select { accent-color: var(--color-accent); }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container inner">
+      <a class="wordmark" href="/standard-deviation/"><span class="sigma">σ</span> standard deviation</a>
+      <nav class="site-nav">
+        <a href="/standard-deviation/">archive</a>
+        <a href="https://standardlydeviated.substack.com/about">about</a>
+        <a href="https://standardlydeviated.substack.com">substack</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <!-- ARTICLE HEADER -->
+      <header class="article-header reveal">
+        <div class="kicker">astronomy · vol. 01</div>
+        <h1 class="article-title">the Big Dipper isn't a thing</h1>
+        <p class="article-dek">Seven stars. Seven completely different distances from Earth. One very convincing optical illusion you've been looking at your whole life.</p>
+        <div class="article-byline">
+          <span>standard deviation</span>
+          <span class="byline-dot"></span>
+          <span>~8 min read</span>
+          <span class="byline-dot"></span>
+          <span>data: HYG star catalog</span>
+          <span class="byline-dot"></span>
+          <span><a href="https://standardlydeviated.substack.com" style="color:var(--color-accent);text-decoration:none">subscribe</a></span>
+        </div>
+      </header>
+
+      <!-- BODY INTRO -->
+      <div class="article-body">
+        <div class="reveal">
+          <p>At some point when you were a child, someone pointed at the sky and showed you the Big Dipper. You found it. You felt accomplished. You filed it away under "things I know about the night sky," which for most people is a short list, and the Big Dipper has been on it ever since.</p>
+          <p>The thing is, the Big Dipper is not a thing. Not in any meaningful physical sense. It is seven unrelated stars that happen to occupy a similar patch of sky when viewed from a very specific location in the galaxy — our location — at a very specific moment in cosmic time — right now. Move a few light-years in any direction, or come back in fifty thousand years, and it won't look like a dipper at all. It will look like seven unrelated stars, which is what it is.</p>
+        </div>
+
+        <div class="pull-quote reveal">The shape exists entirely in our heads. The sky is just providing the dots.</div>
+
+        <div class="reveal">
+          <p>This is not a new observation. Astronomers have known it for a long time. But knowing it abstractly and seeing it are different things, which is what charts are for.</p>
+          <p>The seven stars of the Big Dipper span roughly 210 light-years from the nearest to the farthest. If you could stand at Dubhe, the outermost star on the bowl's right edge, and look toward Alkaid at the tip of the handle, you would need a telescope to find the other five. They are between 84 and 210 light-years away from each other in 3D space. They just don't look it from here.</p>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE 1: 3D STAR MAP -->
+      <div class="interactive reveal">
+        <div class="interactive-header">
+          <div class="section-label">01 — drag to rotate the actual 3D positions</div>
+        </div>
+        <div class="interactive-body">
+          <canvas id="c3d" height="300" style="background:#070714;border-radius:8px;width:100%;cursor:grab" role="img" aria-label="3D scatter of Big Dipper stars — drag to rotate"></canvas>
+          <div class="legend" style="margin-top:.75rem">
+            <span><div class="legend-dot" style="background:#8b85e8"></div>Ursa Major moving group</span>
+            <span><div class="legend-dot" style="background:#e8855a"></div>unrelated stars</span>
+          </div>
+          <div class="info-box" id="info3d">Drag to rotate. Hover a star to see when its light left.</div>
+        </div>
+      </div>
+
+      <!-- BODY MID -->
+      <div class="article-body">
+        <div class="reveal">
+          <p>Five of the seven stars form a loose physical association — born from the same gas cloud roughly 500 million years ago, still moving through the galaxy together. Astronomers call it the Ursa Major Moving Group. The other two, Dubhe and Alkaid, are unaffiliated. They wandered into the frame and are currently wandering back out. The fact that they complete the shape so tidily is the universe being temporarily convenient.</p>
+          <p>The table below is the one worth sitting with for a moment.</p>
+        </div>
+      </div>
+
+      <!-- STAR TABLE -->
+      <div class="reveal">
+        <table class="star-table">
+          <thead>
+            <tr>
+              <th>star</th>
+              <th>position</th>
+              <th>distance (ly)</th>
+              <th>light left Earth in</th>
+              <th>group</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="sname">Megrez</td><td>bowl / handle join</td><td class="num">58</td><td class="num">~1968</td><td class="tag-group">moving group</td></tr>
+            <tr><td class="sname">Mizar</td><td>handle middle</td><td class="num">78</td><td class="num">~1948</td><td class="tag-group">moving group</td></tr>
+            <tr><td class="sname">Merak</td><td>bowl bottom right</td><td class="num">79</td><td class="num">~1947</td><td class="tag-group">moving group</td></tr>
+            <tr><td class="sname">Alioth</td><td>handle base</td><td class="num">81</td><td class="num">~1945</td><td class="tag-group">moving group</td></tr>
+            <tr><td class="sname">Phecda</td><td>bowl bottom left</td><td class="num">84</td><td class="num">~1942</td><td class="tag-group">moving group</td></tr>
+            <tr><td class="sname">Dubhe</td><td>bowl top right</td><td class="num">124</td><td class="num">~1902</td><td class="tag-solo">unrelated</td></tr>
+            <tr><td class="sname">Alkaid</td><td>handle tip</td><td class="num">210</td><td class="num">~1816</td><td class="tag-solo">unrelated</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- BODY AFTER TABLE -->
+      <div class="article-body">
+        <div class="reveal">
+          <p>The "light left Earth in" column is what makes this strange. When you look at the Big Dipper tonight, you are not looking at it at one moment in time. You are looking at a collage. The light from Megrez left in 1968. The light from Alkaid left in 1816, when Napoleon had just been exiled to Saint Helena and the US had seventeen states. These two pieces of light, which reach your eye simultaneously and appear to be part of the same object, departed their sources 152 years apart.</p>
+          <p>Your brain helpfully stitches it into a single coherent picture. This is very kind of your brain and also completely wrong.</p>
+        </div>
+
+        <div class="pull-quote reveal">You are not seeing the Big Dipper. You are seeing several different pasts at once, arranged into a shape by coincidence and perceived as a whole by a brain that really prefers things to have shapes.</div>
+      </div>
+
+      <!-- INTERACTIVE 2: LIGHT TIMELINE -->
+      <div class="interactive reveal">
+        <div class="interactive-header">
+          <div class="section-label">02 — what year did this light leave its star?</div>
+        </div>
+        <div class="interactive-body">
+          <div class="ctrl-row">
+            <label>drag through time</label>
+            <input type="range" id="yearSlider" min="0" max="6" step="1" value="0">
+            <span class="ctrl-val" id="yearVal">Megrez (nearest)</span>
+          </div>
+          <div id="tlWrap" style="background:#070714;border-radius:8px;padding:1rem 1.25rem"></div>
+          <div class="info-box" id="tlInfo" style="background:var(--color-surface)">Move the slider through each star from nearest to farthest.</div>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE 3: PERSPECTIVE -->
+      <div class="interactive reveal">
+        <div class="interactive-header">
+          <div class="section-label">03 — the shape from here vs. from somewhere else</div>
+        </div>
+        <div class="interactive-body">
+          <div class="view-btns">
+            <button class="btn active" onclick="setView('earth')" id="vb-earth">from Earth</button>
+            <button class="btn" onclick="setView('side')" id="vb-side">side profile</button>
+            <button class="btn" onclick="setView('alkaid')" id="vb-alkaid">from Alkaid</button>
+            <button class="btn" onclick="setView('top')" id="vb-top">top-down</button>
+          </div>
+          <canvas id="cPersp" height="260" style="background:#070714;border-radius:8px;width:100%" role="img" aria-label="Big Dipper viewed from different vantage points"></canvas>
+          <div class="info-box" id="perspInfo">You are here. The shape is entirely a consequence of where you're standing.</div>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE 4: DISTANCE COMPARATOR -->
+      <div class="interactive reveal">
+        <div class="interactive-header">
+          <div class="section-label">04 — how far apart are they from each other?</div>
+        </div>
+        <div class="interactive-body">
+          <div class="ctrl-row">
+            <label>compare</label>
+            <select id="starA">
+              <option value="0">Megrez</option><option value="1">Mizar</option><option value="2">Merak</option>
+              <option value="3">Alioth</option><option value="4">Phecda</option><option value="5">Dubhe</option><option value="6">Alkaid</option>
+            </select>
+            <span style="color:var(--color-text-tertiary);font-size:13px">→</span>
+            <select id="starB">
+              <option value="0">Megrez</option><option value="1">Mizar</option><option value="2">Merak</option>
+              <option value="3">Alioth</option><option value="4">Phecda</option><option value="5">Dubhe</option><option value="6" selected>Alkaid</option>
+            </select>
+          </div>
+          <div class="stat-row" id="distStats"></div>
+          <canvas id="cDist" height="160" style="width:100%;display:block;border-radius:8px" role="img" aria-label="Bar chart comparing star distances"></canvas>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE 5: TRAVEL CALCULATOR -->
+      <div class="interactive reveal">
+        <div class="interactive-header">
+          <div class="section-label">05 — how long would it take you to get there?</div>
+        </div>
+        <div class="interactive-body">
+          <div class="your-number">
+            <div class="yn-label">travel calculator</div>
+            <div class="yn-prompt">Pick a star and a method of travel.</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:.85rem">
+              <select id="ynStar" style="font-size:13px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border);background:var(--color-surface);color:var(--color-text-primary)">
+                <option value="58">Megrez (58 ly)</option><option value="78">Mizar (78 ly)</option>
+                <option value="79">Merak (79 ly)</option><option value="81">Alioth (81 ly)</option>
+                <option value="84">Phecda (84 ly)</option><option value="124">Dubhe (124 ly)</option>
+                <option value="210" selected>Alkaid (210 ly)</option>
+              </select>
+              <select id="ynSpeed" style="font-size:13px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border);background:var(--color-surface);color:var(--color-text-primary)">
+                <option value="walk">walking (3 mph)</option>
+                <option value="car">highway driving (70 mph)</option>
+                <option value="plane">commercial flight (575 mph)</option>
+                <option value="iss">ISS orbital speed (17,500 mph)</option>
+                <option value="nh">New Horizons probe (36,000 mph)</option>
+                <option value="parker">Parker Solar Probe (430,000 mph)</option>
+                <option value="light">speed of light</option>
+              </select>
+            </div>
+            <div class="yn-result" id="ynResult"></div>
+          </div>
+          <div class="stat-row" id="ynStats"></div>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE 6: STELLAR MOTION -->
+      <div class="interactive reveal">
+        <div class="interactive-header">
+          <div class="section-label">06 — the Big Dipper across 100,000 years</div>
+        </div>
+        <div class="interactive-body">
+          <div class="anim-controls">
+            <button class="btn" id="btnPlay" onclick="toggleAnim()"><i class="ti ti-player-play" aria-hidden="true"></i> play</button>
+            <button class="btn" onclick="jumpTo(0)">reset to now</button>
+            <button class="btn" onclick="jumpTo(-50000)">−50k yr</button>
+            <button class="btn" onclick="jumpTo(50000)">+50k yr</button>
+            <span class="anim-year-display" id="animYrDisp">year 2026</span>
+          </div>
+          <div class="ctrl-row">
+            <label>scrub through time</label>
+            <input type="range" id="timeSlider" min="-50000" max="50000" step="500" value="0">
+            <span class="ctrl-val" id="timeValDisp">0 yr</span>
+          </div>
+          <div class="speed-row">
+            <label>speed</label>
+            <input type="range" id="speedSlider" min="1" max="10" step="1" value="3">
+            <span class="sv" id="speedDisp">3×</span>
+          </div>
+          <canvas id="cAnim" height="300" style="background:#070714;border-radius:8px;width:100%" role="img" aria-label="Stellar motion animation of Big Dipper over 100,000 years"></canvas>
+          <div class="legend" style="margin-top:.75rem">
+            <span><div class="legend-dot" style="background:#8b85e8"></div>moving group (drift together)</span>
+            <span><div class="legend-dot" style="background:#e8855a"></div>Dubhe &amp; Alkaid (go their own way)</span>
+            <span><div class="legend-dot" style="background:rgba(255,255,255,0.18)"></div>current position (ghost)</span>
+          </div>
+          <div class="info-box" id="animInfo">Press play or drag the scrubber. Watch Dubhe and Alkaid drift away from the group.</div>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE 7: YOUR NUMBER -->
+      <div class="interactive reveal">
+        <div class="interactive-header">
+          <div class="section-label">07 — your number</div>
+        </div>
+        <div class="interactive-body">
+          <div class="your-number">
+            <div class="yn-label">your number</div>
+            <div class="yn-prompt">Enter your birth year to find the star whose light is your age.</div>
+            <input type="number" id="birthYear" min="1816" max="2025" value="1985" placeholder="year">
+            <div class="yn-result" id="yourNumberResult"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BODY CLOSE -->
+      <div class="article-body">
+        <div class="reveal">
+          <p>This is, for what it's worth, true of everything you see in the night sky. Every star is a different distance. Every point of light is a different age of information. The sky is not a picture. It is a palimpsest — layers written over layers, none of them from the same time.</p>
+          <p>The Big Dipper is just a particularly clear example because we named it and put it on children's bedroom walls and made it the first thing we point to when we want to teach someone where north is. It has earned enough cultural weight that finding out it's an illusion feels like a meaningful discovery rather than an obvious consequence of how light and space work.</p>
+          <p>It is, in fact, both.</p>
+        </div>
+      </div>
+
+      <hr class="article-divider reveal">
+
+      <!-- DATA PROVENANCE -->
+      <div class="reveal">
+        <div class="provenance">
+          <div class="prov-toggle" onclick="toggleProv()" aria-expanded="false" aria-controls="provBody">
+            <span><i class="ti ti-database" aria-hidden="true" style="font-size:15px;margin-right:6px"></i>data provenance</span>
+            <i class="ti ti-chevron-down" id="provChev" aria-hidden="true" style="font-size:15px;transition:transform .2s"></i>
+          </div>
+          <div class="prov-body" id="provBody" role="region">
+            <div class="prov-row"><div class="prov-key">primary source</div><div class="prov-val"><a href="https://github.com/astronexus/HYG-Database" target="_blank" rel="noopener">HYG Star Database v3.4</a> — David Nash, 2023</div></div>
+            <div class="prov-row"><div class="prov-key">what it is</div><div class="prov-val">Hipparcos + Yale Bright Star + Gliese catalogs combined. 119,614 stars. Public domain.</div></div>
+            <div class="prov-row"><div class="prov-key">distances</div><div class="prov-val">Hipparcos parallax (ESA, 1989–1993). ly = 3.26156 × (1/parallax_arcsec)</div></div>
+            <div class="prov-row"><div class="prov-key">proper motion</div><div class="prov-val">Hipparcos μα, μδ in mas/yr. Positions projected ±50,000 yr at constant velocity (approximation).</div></div>
+            <div class="prov-row"><div class="prov-key">moving group</div><div class="prov-val">UMa Moving Group per Soderblom &amp; Mayor (1993), confirmed Gaia DR3.</div></div>
+            <div class="prov-row"><div class="prov-key">last verified</div><div class="prov-val">June 2026</div></div>
+            <div class="prov-row"><div class="prov-key">notebook</div><div class="prov-val"><a href="../../notebooks/big-dipper.ipynb">big-dipper.ipynb</a> · <a href="#">view on GitHub Gist →</a></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RELATED QUESTIONS -->
+      <div class="reveal" style="margin-top:1.5rem">
+        <div class="section-label">what this made me wonder next</div>
+        <div class="related-questions">
+          <div class="related-item">
+            <div class="related-q">If the Big Dipper is an illusion, what about Orion? How many of its stars are actually near each other in 3D space?</div>
+            <i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i>
+          </div>
+          <div class="related-item">
+            <div class="related-q">How many of the stars visible to the naked eye tonight are already dead — gone supernova — and we just don't know yet because the light hasn't arrived?</div>
+            <i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i>
+          </div>
+          <div class="related-item">
+            <div class="related-q">Does any other planet in our solar system have a night sky with recognizable patterns — or is Earth's just lucky geometry?</div>
+            <i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUBSCRIBE FOOTER -->
+      <div class="substack-cta reveal" style="margin-top:2rem">
+        <span>next piece: when is the Cascadia earthquake, statistically.</span>
+        <a href="https://standardlydeviated.substack.com">subscribe to find out →</a>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>σ standard deviation · <a href="https://standardlydeviated.substack.com">@standardlydeviated</a></span>
+      <span><a href="/standard-deviation/">← all articles</a></span>
+    </div>
+  </footer>
+
+  <script src="../../assets/js/scroll-reveal.js"></script>
+  <script>
+  // ---- star data ----
+  const STARS = [
+    {name:'Megrez',dist:58, group:true, ra:183.8,dec:57.0,x3:0,y3:0,z3:0},
+    {name:'Mizar', dist:78, group:true, ra:200.9,dec:54.9,x3:0,y3:0,z3:0},
+    {name:'Merak', dist:79, group:true, ra:165.5,dec:56.4,x3:0,y3:0,z3:0},
+    {name:'Alioth',dist:81, group:true, ra:193.5,dec:55.9,x3:0,y3:0,z3:0},
+    {name:'Phecda',dist:84, group:true, ra:178.5,dec:53.7,x3:0,y3:0,z3:0},
+    {name:'Dubhe', dist:124,group:false,ra:165.9,dec:61.8,x3:0,y3:0,z3:0},
+    {name:'Alkaid',dist:210,group:false,ra:206.9,dec:49.3,x3:0,y3:0,z3:0},
+  ];
+  const CONN = [[0,3],[3,1],[1,4],[4,2],[2,5],[5,0],[0,6]];
+  const NOW = 2026;
+  const LY_TO_MI = 5.879e12;
+
+  STARS.forEach(s=>{
+    const ra=s.ra*Math.PI/180, dec=s.dec*Math.PI/180;
+    s.x3=s.dist*Math.cos(dec)*Math.cos(ra);
+    s.y3=s.dist*Math.cos(dec)*Math.sin(ra);
+    s.z3=s.dist*Math.sin(dec);
+  });
+
+  function sc(s,a){return s.group?`rgba(139,133,232,${a})`:`rgba(232,133,90,${a})`;}
+
+  // ---- 3D map ----
+  let rot={x:.3,y:-.4},drag3=false,last3={x:0,y:0},hov3=null;
+  const c3=document.getElementById('c3d');
+
+  function proj3(sx,sy,sz,W,H){
+    const cx=Math.cos(rot.x),sx2=Math.sin(rot.x),cy=Math.cos(rot.y),sy2=Math.sin(rot.y);
+    const x=sx*cy+sz*sy2;
+    const y=sx*sx2*(-sy2)+sy*cx+sz*sx2*cy;
+    const z=sx*cx*(-sy2)+sy*(-sx2)+sz*cx*cy;
+    const fov=320,s2=fov/(fov+z+50);
+    return{px:W/2+x*s2*1.1,py:H/2-y*s2*1.1,z};
+  }
+
+  function draw3d(){
+    c3.width=c3.parentElement.offsetWidth||640;
+    const W=c3.width,H=c3.height,ctx=c3.getContext('2d');
+    ctx.fillStyle='#070714';ctx.fillRect(0,0,W,H);
+    for(let i=0;i<60;i++){ctx.fillStyle=`rgba(255,255,255,${(i*7%1)*.12+.02})`;ctx.beginPath();ctx.arc((i*137%1)*W,(i*89%1)*H,(i*3%1)*.7+.2,0,Math.PI*2);ctx.fill();}
+    const ep=proj3(-170,0,30,W,H);
+    const pts=STARS.map(s=>({...s,...proj3(s.x3,s.y3,s.z3,W,H)}));
+    CONN.forEach(([a,b])=>{ctx.strokeStyle='rgba(180,180,255,0.18)';ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(pts[a].px,pts[a].py);ctx.lineTo(pts[b].px,pts[b].py);ctx.stroke();ctx.setLineDash([]);});
+    pts.forEach(s=>{
+      const r=hov3===s.name?8:5;
+      ctx.fillStyle=sc(s,1);ctx.beginPath();ctx.arc(s.px,s.py,r,0,Math.PI*2);ctx.fill();
+      if(hov3===s.name){ctx.strokeStyle=sc(s,.5);ctx.lineWidth=2;ctx.beginPath();ctx.arc(s.px,s.py,r+4,0,Math.PI*2);ctx.stroke();}
+      ctx.fillStyle='rgba(255,255,255,.75)';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.fillText(s.name,s.px+8,s.py+4);
+    });
+    ctx.fillStyle='rgba(100,200,255,.9)';ctx.beginPath();ctx.arc(ep.px,ep.py,4,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(100,200,255,.6)';ctx.font='10px sans-serif';ctx.fillText('Earth',ep.px+6,ep.py+4);
+  }
+
+  c3.addEventListener('mousedown',e=>{drag3=true;last3={x:e.offsetX,y:e.offsetY};});
+  c3.addEventListener('mousemove',e=>{
+    if(drag3){rot.y+=(e.offsetX-last3.x)*.008;rot.x+=(e.offsetY-last3.y)*.008;last3={x:e.offsetX,y:e.offsetY};draw3d();}
+    const W=c3.width,H=c3.height;let hit=null;
+    STARS.forEach(s=>{const p=proj3(s.x3,s.y3,s.z3,W,H);if(Math.hypot(p.px-e.offsetX,p.py-e.offsetY)<12)hit=s;});
+    const EVENTS={Megrez:'1968 — Apollo 8 had just orbited the Moon',Mizar:'1948 — Gandhi assassinated, Israel founded',Merak:'1947 — CIA formed, first transistor built',Alioth:'1945 — WWII ended, UN founded',Phecda:'1942 — Battle of Midway, Manhattan Project underway',Dubhe:'1902 — Wright brothers still two years from flight',Alkaid:'1816 — Napoleon on Saint Helena, no photographs yet existed'};
+    if(hit){hov3=hit.name;document.getElementById('info3d').innerHTML=`<span class="highlight">${hit.name}</span> — ${hit.dist} light-years. Light arrived tonight departed in <strong>${NOW-hit.dist}</strong>. ${EVENTS[hit.name]||''}`;c3.style.cursor='pointer';}
+    else{hov3=null;document.getElementById('info3d').textContent='Drag to rotate. Hover a star to see when its light departed.';c3.style.cursor='grab';}
+    draw3d();
+  });
+  c3.addEventListener('mouseup',()=>drag3=false);
+  c3.addEventListener('mouseleave',()=>{drag3=false;hov3=null;draw3d();});
+  draw3d();
+
+  // ---- light timeline ----
+  const TL=[ ...STARS].sort((a,b)=>a.dist-b.dist);
+  const YN=['Megrez (nearest)','Mizar','Merak','Alioth','Phecda','Dubhe','Alkaid (farthest)'];
+  function buildTL(idx){
+    const wrap=document.getElementById('tlWrap');wrap.innerHTML='';
+    const max=220;
+    TL.forEach((s,i)=>{
+      const active=i<=idx,pct=Math.round((s.dist/max)*100);
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:10px;margin-bottom:8px';
+      row.innerHTML=`<div style="min-width:60px;font-size:11px;color:${active?sc(s,1):'rgba(255,255,255,.25)'};font-weight:${active?500:400}">${s.name}</div>
+      <div style="flex:1;height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden"><div style="height:100%;width:${active?pct:0}%;background:${sc(s,.85)};border-radius:3px;transition:width .25s"></div></div>
+      <div style="font-size:11px;font-family:var(--font-mono);color:${active?'rgba(255,255,255,.8)':'rgba(255,255,255,.2)'};min-width:36px;text-align:right">${active?NOW-s.dist:''}</div>`;
+      wrap.appendChild(row);
+    });
+    const s=TL[idx];
+    const infos=['The light from Megrez — the nearest at 58 ly — left in 1968. It has been traveling since before many of your devices were manufactured.','Mizar: 1948. Light that departed when Gandhi was assassinated and the UN was newly formed.',`Merak: 1947. The CIA was founded that year. The transistor was invented. This light has been moving since.`,'Alioth: 1945. World War II ended. The atomic bomb had just been used twice.','Phecda: 1942. The Manhattan Project was underway. The Battle of Stalingrad had just begun. This light predates almost every living person.','Dubhe: 1902. The Wright Brothers were still two years from their first flight.','Alkaid — 210 light-years away — last left its star in 1816. Napoleon was alive. No one had ever seen a photograph. That light is arriving in your eye at the same moment as Megrez\'s 1968 light. Your brain calls it all one thing.'];
+    document.getElementById('tlInfo').textContent=infos[idx];
+    document.getElementById('yearVal').textContent=YN[idx];
+  }
+  document.getElementById('yearSlider').addEventListener('input',function(){buildTL(+this.value);});
+  buildTL(0);
+
+  // ---- perspective ----
+  let currentView='earth';
+  const VIEWS={
+    earth:{label:'from Earth — the familiar shape',desc:'This is what you know. It looks like a dipper. That is because you are standing in one very specific spot in the galaxy.',fn:(s)=>({px:320+(s.ra-183)*.048*320,py:130-(s.dec-55)*.09*200})},
+    side:{label:'side profile — depth revealed',desc:'Each position shows actual depth from Earth. The stars range from 58 to 210 light-years away. The "flat" sky you see is a projection of this volume.',fn:(s,i)=>({px:60+i*86,py:130-(s.dist/220)*180+40})},
+    alkaid:{label:'from Alkaid — no dipper visible',desc:'From Alkaid, 210 light-years away at the handle tip, the other six stars are scattered and unrecognizable as a pattern. No dipper exists from here.',fn:(s)=>({px:320+(s.x3-STARS[6].x3)*.8,py:130-(s.y3-STARS[6].y3)*.8})},
+    top:{label:'top-down — above the galactic plane',desc:'Seen from above the plane of the Milky Way, the stars spread across a wide volume of space with no obvious arrangement.',fn:(s)=>({px:320+(s.x3+40)*.7,py:130+s.y3*.7})}
+  };
+  function drawPersp(){
+    const cv=document.getElementById('cPersp');cv.width=cv.parentElement.offsetWidth||640;
+    const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+    ctx.fillStyle='#070714';ctx.fillRect(0,0,W,H);
+    for(let i=0;i<50;i++){ctx.fillStyle=`rgba(255,255,255,${(i*7%1)*.1+.02})`;ctx.beginPath();ctx.arc((i*113%1)*W,(i*79%1)*H,(i*3%1)*.6,0,Math.PI*2);ctx.fill();}
+    const v=VIEWS[currentView];
+    const pts=STARS.map((s,i)=>({...s,...v.fn(s,i)}));
+    CONN.forEach(([a,b])=>{ctx.strokeStyle='rgba(200,200,255,.2)';ctx.lineWidth=1;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(pts[a].px,pts[a].py);ctx.lineTo(pts[b].px,pts[b].py);ctx.stroke();ctx.setLineDash([]);});
+    pts.forEach(s=>{ctx.fillStyle=sc(s,1);ctx.beginPath();ctx.arc(s.px,s.py,5,0,Math.PI*2);ctx.fill();ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.fillText(s.name,s.px+7,s.py+4);});
+    ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.fillText(v.label,12,H-12);
+    document.getElementById('perspInfo').textContent=v.desc;
+  }
+  function setView(v){
+    currentView=v;
+    ['earth','side','alkaid','top'].forEach(k=>document.getElementById('vb-'+k).classList.toggle('active',k===v));
+    drawPersp();
+  }
+  drawPersp();
+
+  // ---- distance comparator ----
+  function dist3d(a,b){return Math.round(Math.sqrt(Math.pow(a.x3-b.x3,2)+Math.pow(a.y3-b.y3,2)+Math.pow(a.z3-b.z3,2)));}
+  function updateDist(){
+    const a=STARS[+document.getElementById('starA').value],b=STARS[+document.getElementById('starB').value];
+    const d=dist3d(a,b);
+    document.getElementById('distStats').innerHTML=`
+      <div class="stat-card"><div class="s-label">distance apart</div><div class="s-value">${d} ly</div><div class="s-sub">${a.name} → ${b.name}</div></div>
+      <div class="stat-card"><div class="s-label">light travel time</div><div class="s-value">${d} yrs</div><div class="s-sub">to cross the gap</div></div>
+      <div class="stat-card"><div class="s-label">appear to be</div><div class="s-value">neighbors</div><div class="s-sub">they are not</div></div>`;
+    const cv=document.getElementById('cDist');cv.width=cv.parentElement.offsetWidth||640;
+    const W=cv.width,H=160,ctx=cv.getContext('2d');
+    ctx.fillStyle='#070714';ctx.fillRect(0,0,W,H);
+    const max=Math.max(d,a.dist,b.dist)+20;
+    const bars=[{l:`${a.name} from Earth`,v:a.dist,c:sc(a,.85)},{l:`${b.name} from Earth`,v:b.dist,c:sc(b,.85)},{l:'gap between them',v:d,c:'rgba(100,200,255,.8)'}];
+    const pad={l:130,r:20,t:14,b:14},cw=W-pad.l-pad.r,bh=30;
+    bars.forEach((bar,i)=>{
+      const y=pad.t+i*(bh+10),bw=Math.round((bar.v/max)*cw);
+      ctx.fillStyle='rgba(255,255,255,.06)';ctx.beginPath();ctx.roundRect(pad.l,y,cw,bh,3);ctx.fill();
+      ctx.fillStyle=bar.c;ctx.beginPath();ctx.roundRect(pad.l,y,bw,bh,3);ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,.55)';ctx.font='11px sans-serif';ctx.textAlign='right';ctx.fillText(bar.l,pad.l-8,y+bh*.72);
+      ctx.fillStyle='rgba(255,255,255,.85)';ctx.textAlign='left';ctx.fillText(bar.v+' ly',pad.l+bw+6,y+bh*.72);
+    });
+  }
+  document.getElementById('starA').addEventListener('change',updateDist);
+  document.getElementById('starB').addEventListener('change',updateDist);
+  updateDist();
+
+  // ---- travel calculator ----
+  const SPEEDS={walk:{mph:3,label:'walking'},car:{mph:70,label:'driving'},plane:{mph:575,label:'flight'},iss:{mph:17500,label:'the ISS'},nh:{mph:36000,label:'New Horizons'},parker:{mph:430000,label:'Parker Solar Probe'},light:{mph:670616629,label:'light'}};
+  function fmtY(y){if(y<1)return Math.round(y*365)+' days';if(y<1000)return Math.round(y).toLocaleString()+' years';if(y<1e6)return(y/1000).toFixed(1)+'K years';if(y<1e9)return(y/1e6).toFixed(1)+' million years';return(y/1e9).toFixed(2)+' billion years';}
+  function calcTravel(){
+    const ly=+document.getElementById('ynStar').value,sk=document.getElementById('ynSpeed').value,sp=SPEEDS[sk];
+    const miles=ly*LY_TO_MI,hours=miles/sp.mph,years=hours/8760;
+    const sname=document.getElementById('ynStar').selectedOptions[0].text.split(' ')[0];
+    const note=sk==='light'?`That is, by definition, ${ly} years — exactly how old the light in your eye from ${sname} is right now.`:years>1e9?`The Sun will have died. Earth will not exist. You will have had time to evolve into something unrecognizable approximately ${Math.round(years/2e6).toLocaleString()} times.`:years>1e6?`Every human civilization that has ever existed would fit in a rounding error on this timeline.`:years>10000?`The last ice age ended 11,700 years ago. You have not left yet.`:`This is the most reasonable number on this list, which says something about the other numbers.`;
+    document.getElementById('ynResult').innerHTML=`At ${sp.mph.toLocaleString()} mph via ${sp.label}, the trip to <strong>${sname}</strong> takes:<span class="yn-big">${fmtY(years)}</span>${note}`;
+    document.getElementById('ynStats').innerHTML=`<div class="stat-card"><div class="s-label">miles to ${sname}</div><div class="s-value">${Math.round(miles/1e9).toLocaleString()}B</div><div class="s-sub">miles</div></div><div class="stat-card"><div class="s-label">travel time</div><div class="s-value">${fmtY(years)}</div><div class="s-sub">at ${sp.mph.toLocaleString()} mph</div></div><div class="stat-card"><div class="s-label">arrival year</div><div class="s-value">${years>1e8?'∞':years>1e7?'yr '+(2026+Math.round(years)/1e6).toFixed(0)+'M':'yr '+(2026+Math.round(years)).toLocaleString()}</div><div class="s-sub">if you left tonight</div></div>`;
+  }
+  document.getElementById('ynStar').addEventListener('change',calcTravel);
+  document.getElementById('ynSpeed').addEventListener('change',calcTravel);
+  calcTravel();
+
+  // ---- stellar motion animator ----
+  const SMSTARS=[
+    {name:'Megrez',bx:0,  by:0,  pmx:.10,pmy:-.08,group:true},
+    {name:'Mizar', bx:60, by:40, pmx:.12,pmy:-.07,group:true},
+    {name:'Merak', bx:-80,by:-40,pmx:.09,pmy:-.09,group:true},
+    {name:'Alioth',bx:30, by:60, pmx:.11,pmy:-.08,group:true},
+    {name:'Phecda',bx:-50,by:-60,pmx:.10,pmy:-.08,group:true},
+    {name:'Dubhe', bx:-90,by:80, pmx:-.38,pmy:-.21,group:false},
+    {name:'Alkaid',bx:130,by:-50,pmx:-.11,pmy:-.48,group:false},
+  ];
+  let animY=0,playing=false,raf=null,lastTS=null;
+  function spos(s,yr){return{x:s.bx+s.pmx*yr*.004,y:s.by+s.pmy*yr*.004};}
+  function drawAnim(yr){
+    const cv=document.getElementById('cAnim');cv.width=cv.parentElement.offsetWidth||640;
+    const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+    ctx.fillStyle='#070714';ctx.fillRect(0,0,W,H);
+    for(let i=0;i<70;i++){ctx.fillStyle=`rgba(255,255,255,${(i*7%1)*.12+.02})`;ctx.beginPath();ctx.arc((i*137%1)*W,(i*97%1)*H,(i*1.3%1)*.7+.15,0,Math.PI*2);ctx.fill();}
+    const cx=W/2,cy=H/2,scale=1.55;
+    const nowPts=SMSTARS.map(s=>{const p=spos(s,0);return{px:cx+p.x*scale,py:cy-p.y*scale};});
+    if(yr!==0){
+      CONN.forEach(([a,b])=>{ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=1;ctx.setLineDash([2,5]);ctx.beginPath();ctx.moveTo(nowPts[a].px,nowPts[a].py);ctx.lineTo(nowPts[b].px,nowPts[b].py);ctx.stroke();ctx.setLineDash([]);});
+      nowPts.forEach(p=>{ctx.fillStyle='rgba(255,255,255,.12)';ctx.beginPath();ctx.arc(p.px,p.py,3,0,Math.PI*2);ctx.fill();});
+    }
+    const curPts=SMSTARS.map(s=>{const p=spos(s,yr);return{px:cx+p.x*scale,py:cy-p.y*scale,name:s.name,group:s.group};});
+    CONN.forEach(([a,b])=>{ctx.strokeStyle='rgba(180,180,255,.22)';ctx.lineWidth=1.2;ctx.setLineDash([4,5]);ctx.beginPath();ctx.moveTo(curPts[a].px,curPts[a].py);ctx.lineTo(curPts[b].px,curPts[b].py);ctx.stroke();ctx.setLineDash([]);});
+    if(yr!==0){SMSTARS.forEach((s,i)=>{const n=nowPts[i],t=curPts[i];ctx.strokeStyle=s.group?'rgba(139,133,232,.25)':'rgba(232,133,90,.3)';ctx.lineWidth=1;ctx.setLineDash([2,4]);ctx.beginPath();ctx.moveTo(n.px,n.py);ctx.lineTo(t.px,t.py);ctx.stroke();ctx.setLineDash([]);});}
+    curPts.forEach(s=>{
+      ctx.fillStyle=s.group?'#8b85e8':'#e8855a';ctx.beginPath();ctx.arc(s.px,s.py,5.5,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='rgba(255,255,255,.3)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(s.px,s.py,5.5,0,Math.PI*2);ctx.stroke();
+      ctx.fillStyle='rgba(255,255,255,.78)';ctx.font='11px sans-serif';ctx.textAlign='left';
+      ctx.fillText(s.name,s.px+(s.px>W-80?-65:8),s.py+(s.py<20?18:4));
+    });
+    const yr2026=2026+Math.round(yr);
+    document.getElementById('animYrDisp').textContent=yr===0?'year 2026 (now)':`year ${yr2026.toLocaleString()}`;
+    document.getElementById('timeValDisp').textContent=yr===0?'0 yr':(yr>0?'+':'')+Math.round(yr).toLocaleString()+' yr';
+    document.getElementById('timeSlider').value=yr;
+    const descs=[{t:-40000,d:'50,000 years ago this shape did not exist. Dubhe was far higher, Alkaid much further left. The five moving-group stars approached from a different angle entirely.'},{t:-15000,d:'The shape is recognizable but strained — Alkaid and Dubhe are visibly out of position. The dipper is forming but not there yet.'},{t:-2000,d:'For roughly the last 10,000 years the dipper has looked approximately like this. Long enough for every human civilization to navigate by it without knowing it was temporary.'},{t:5000,d:'This is now. The five purple stars were born together 500 million years ago. The two orange ones are strangers who wandered into frame.'},{t:20000,d:'Alkaid is beginning to peel away toward the lower left. Dubhe drifts upward. The handle is elongating and curving the wrong way.'},{t:40000,d:'The dipper shape is badly distorted. A navigator in this era would not recognize it. They would find north some other way.'},{t:50001,d:'50,000 years from now the seven stars are scattered across the sky with no recognizable pattern. The shape that guided sailors and lost hikers for all of recorded history is gone. Nothing replaced it.'}];
+    const d=descs.find(d=>yr<=d.t)||descs[descs.length-1];
+    document.getElementById('animInfo').textContent=d.d;
+  }
+  function jumpTo(yr){stopAnim();animY=yr;drawAnim(yr);}
+  function toggleAnim(){if(playing)stopAnim();else startAnim();}
+  function startAnim(){
+    playing=true;lastTS=null;
+    document.getElementById('btnPlay').innerHTML='<i class="ti ti-player-pause" aria-hidden="true"></i> pause';
+    if(animY>=50000)animY=-50000;
+    function step(ts){
+      if(!lastTS)lastTS=ts;
+      const el=ts-lastTS;lastTS=ts;
+      const spd=+document.getElementById('speedSlider').value;
+      animY=Math.min(50000,animY+el*4*spd);
+      drawAnim(animY);
+      if(animY<50000&&playing)raf=requestAnimationFrame(step);else stopAnim();
+    }
+    raf=requestAnimationFrame(step);
+  }
+  function stopAnim(){playing=false;if(raf)cancelAnimationFrame(raf);document.getElementById('btnPlay').innerHTML='<i class="ti ti-player-play" aria-hidden="true"></i> play';}
+  document.getElementById('timeSlider').addEventListener('input',function(){stopAnim();animY=+this.value;drawAnim(animY);});
+  document.getElementById('speedSlider').addEventListener('input',function(){document.getElementById('speedDisp').textContent=this.value+'×';});
+  drawAnim(0);
+
+  // ---- your number ----
+  function calcYN(){
+    const yr=+document.getElementById('birthYear').value;
+    if(!yr||yr<1816||yr>2025){document.getElementById('yourNumberResult').innerHTML='Enter a year between 1816 and 2025.';return;}
+    const age=NOW-yr;
+    const match=STARS.reduce((best,s)=>{return Math.abs((NOW-s.dist)-yr)<Math.abs((NOW-best.dist)-yr)?s:best;},STARS[0]);
+    const lyear=NOW-match.dist;
+    const ctx2=yr<=1865?'the Civil War was still being fought':yr<=1902?'no one had flown an airplane yet':yr<=1929?'before the Great Depression':yr<=1945?'World War II was happening':yr<=1969?'before the moon landing':yr<=1989?'the Berlin Wall was still standing':yr<=2001?'before smartphones':yr<=2010?'before Instagram':yr<=2020?'before a global pandemic':'recently';
+    document.getElementById('yourNumberResult').innerHTML=`You were born in <strong>${yr}</strong> — ${age} years ago.<span class="yn-big">${match.name}</span>That star's light left in <strong>${lyear}</strong>, when ${ctx2}. It has been traveling for as long as you have been alive. It arrived in your eye tonight, at the same moment as light from stars that left decades before and after. Your brain filed it all under "the Big Dipper."`;
+  }
+  document.getElementById('birthYear').addEventListener('input',calcYN);
+  calcYN();
+
+  // ---- data provenance ----
+  function toggleProv(){
+    const b=document.getElementById('provBody'),c=document.getElementById('provChev');
+    const open=b.classList.toggle('open');
+    c.style.transform=open?'rotate(180deg)':'';
+  }
+  </script>
+</body>
+</html>

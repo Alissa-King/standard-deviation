@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>standard deviation</title>
+  <meta name="description" content="departing from the norm, on purpose, with charts.">
+  <meta property="og:title" content="σ standard deviation">
+  <meta property="og:description" content="departing from the norm, on purpose, with charts.">
+  <meta property="og:url" content="https://alissa-king.github.io/standard-deviation/">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    .hero {
+      padding: 4rem 0 3rem;
+      border-bottom: 0.5px solid var(--color-border);
+    }
+    .hero-sigma {
+      font-size: 48px;
+      color: var(--color-accent);
+      font-family: var(--font-serif);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .hero-title {
+      font-family: var(--font-serif);
+      font-size: clamp(28px, 5vw, 40px);
+      font-weight: normal;
+      letter-spacing: -0.5px;
+      color: var(--color-text-primary);
+      margin-bottom: 0.5rem;
+    }
+    .hero-sub {
+      font-family: var(--font-serif);
+      font-size: 16px;
+      font-style: italic;
+      color: var(--color-text-secondary);
+    }
+    .articles-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2rem 0 1rem;
+    }
+    .articles-label {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--color-text-tertiary);
+    }
+    .article-list { padding-bottom: 3rem; }
+    .article-entry {
+      display: grid;
+      grid-template-columns: 1fr 80px;
+      gap: 1.5rem;
+      padding: 1.25rem 0;
+      border-bottom: 0.5px solid var(--color-border);
+      align-items: start;
+      text-decoration: none;
+      color: inherit;
+      transition: opacity 0.15s;
+    }
+    .article-entry:hover { opacity: 0.75; }
+    .article-entry:last-child { border-bottom: none; }
+    .ae-cat {
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--color-accent);
+      margin-bottom: 5px;
+    }
+    .ae-title {
+      font-family: var(--font-serif);
+      font-size: 17px;
+      color: var(--color-text-primary);
+      line-height: 1.35;
+      margin-bottom: 6px;
+    }
+    .ae-desc {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+    .ae-meta {
+      font-size: 12px;
+      color: var(--color-text-tertiary);
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .ae-thumb {
+      width: 80px;
+      height: 60px;
+      border-radius: 8px;
+      background: var(--color-surface);
+      border: 0.5px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .substack-cta {
+      background: var(--color-surface);
+      border: 0.5px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+    }
+    .substack-cta span {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+    }
+    .substack-cta a {
+      font-size: 13px;
+      padding: 7px 18px;
+      border-radius: 20px;
+      background: var(--color-accent);
+      color: #0a0a0f;
+      text-decoration: none;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container inner">
+      <a class="wordmark" href="/standard-deviation/"><span class="sigma">σ</span> standard deviation</a>
+      <nav class="site-nav">
+        <a href="/standard-deviation/">archive</a>
+        <a href="https://standardlydeviated.substack.com/about">about</a>
+        <a href="https://standardlydeviated.substack.com">substack</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <div class="hero reveal">
+        <div class="hero-sigma">σ</div>
+        <div class="hero-title">standard deviation</div>
+        <div class="hero-sub">departing from the norm, on purpose, with charts.</div>
+      </div>
+
+      <div class="articles-header reveal">
+        <div class="articles-label">interactive articles</div>
+      </div>
+
+      <div class="article-list">
+
+        <a class="article-entry reveal" href="articles/01-big-dipper/">
+          <div>
+            <div class="ae-cat">astronomy</div>
+            <div class="ae-title">the Big Dipper isn't a thing</div>
+            <div class="ae-desc">Seven stars. Seven completely different distances from Earth. One very convincing optical illusion you've been looking at your whole life.</div>
+            <div class="ae-meta">
+              <span>vol. 01</span>
+              <span>·</span>
+              <span>~8 min</span>
+              <span>·</span>
+              <span>3D map · time slider · your number</span>
+            </div>
+          </div>
+          <div class="ae-thumb">
+            <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" width="80" height="60">
+              <rect width="80" height="60" fill="#070714"/>
+              <circle cx="24" cy="18" r="3" fill="#8b85e8" opacity="0.9"/>
+              <circle cx="38" cy="14" r="3" fill="#8b85e8" opacity="0.9"/>
+              <circle cx="52" cy="18" r="3" fill="#8b85e8" opacity="0.9"/>
+              <circle cx="52" cy="32" r="3" fill="#8b85e8" opacity="0.9"/>
+              <circle cx="38" cy="32" r="3" fill="#8b85e8" opacity="0.9"/>
+              <circle cx="22" cy="32" r="3" fill="#e8855a" opacity="0.9"/>
+              <circle cx="62" cy="24" r="3" fill="#e8855a" opacity="0.9"/>
+              <line x1="24" y1="18" x2="38" y2="14" stroke="rgba(180,180,255,0.25)" stroke-width="0.8"/>
+              <line x1="38" y1="14" x2="52" y2="18" stroke="rgba(180,180,255,0.25)" stroke-width="0.8"/>
+              <line x1="52" y1="18" x2="52" y2="32" stroke="rgba(180,180,255,0.25)" stroke-width="0.8"/>
+              <line x1="52" y1="32" x2="38" y2="32" stroke="rgba(180,180,255,0.25)" stroke-width="0.8"/>
+              <line x1="38" y1="32" x2="22" y2="32" stroke="rgba(180,180,255,0.25)" stroke-width="0.8"/>
+              <line x1="24" y1="18" x2="22" y2="32" stroke="rgba(180,180,255,0.25)" stroke-width="0.8"/>
+              <line x1="24" y1="18" x2="62" y2="24" stroke="rgba(180,180,255,0.25)" stroke-width="0.8"/>
+            </svg>
+          </div>
+        </a>
+
+        <!-- future articles slot in here -->
+        <div class="article-entry reveal" style="opacity:0.35;pointer-events:none;cursor:default">
+          <div>
+            <div class="ae-cat">earth &amp; disaster</div>
+            <div class="ae-title">when is the Big One, statistically</div>
+            <div class="ae-desc">The Cascadia fault hasn't ruptured in over 300 years. Here's what "overdue" actually means for a geologic event, and what the recurrence data says.</div>
+            <div class="ae-meta"><span>coming soon</span></div>
+          </div>
+          <div class="ae-thumb" style="background:#0d1a12;border-color:rgba(255,255,255,0.05)">
+            <i class="ti ti-clock" style="color:rgba(255,255,255,0.15);font-size:22px" aria-hidden="true"></i>
+          </div>
+        </div>
+
+        <div class="article-entry reveal" style="opacity:0.35;pointer-events:none;cursor:default">
+          <div>
+            <div class="ae-cat">water &amp; infrastructure</div>
+            <div class="ae-title">what actually happens after you flush</div>
+            <div class="ae-desc">A Sankey diagram, a chemistry timeline, and the full lifecycle of wastewater from your bathroom to the river.</div>
+            <div class="ae-meta"><span>coming soon</span></div>
+          </div>
+          <div class="ae-thumb" style="background:#0a1420;border-color:rgba(255,255,255,0.05)">
+            <i class="ti ti-clock" style="color:rgba(255,255,255,0.15);font-size:22px" aria-hidden="true"></i>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="substack-cta reveal">
+        <span>new pieces by email when they're ready. no schedule. no filler.</span>
+        <a href="https://standardlydeviated.substack.com">subscribe on substack →</a>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>σ standard deviation · <a href="https://standardlydeviated.substack.com">@standardlydeviated</a></span>
+      <span>code: MIT · text: all rights reserved</span>
+    </div>
+  </footer>
+
+  <script src="assets/js/scroll-reveal.js"></script>
+</body>
+</html>
