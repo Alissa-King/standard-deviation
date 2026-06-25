@@ -153,7 +153,6 @@
 
 <footer class="site-footer"><div class="container footer-inner"><span>σ standard deviation · <a href="https://standardlydeviated.substack.com">@standardlydeviated</a></span><span><a href="/standard-deviation/">← all articles</a></span></div></footer>
 <script src="../../assets/js/scroll-reveal.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
 const WAIT_CATS=[
   {id:'commute',label:'commuting',icon:'ti-car',default:27,color:'#8b85e8',note:'The most-measured waiting. Average US one-way commute: 27 min. 9% of workers exceed 60 min each way.'},
@@ -201,32 +200,36 @@ function updateWaitingTotals(){
   document.getElementById('waitingInfo').textContent=`At ${totalMin} minutes of daily waiting, you lose ${annualHrs.toLocaleString()} hours per year — ${annualDays} full days. Over a 40-year adult life: ${lifeYrs} years spent waiting.`;
 }
 
-let waitChart=null;
 function drawWaitingChart(){
-  const totalMin=Object.values(waitVals).reduce((a,b)=>a+b,0);
-  if(totalMin===0)return;
-  const canvas=document.getElementById('cWaiting');
-  if(waitChart)waitChart.destroy();
-  waitChart=new Chart(canvas,{
-    type:'bar',
-    data:{
-      labels:WAIT_CATS.map(c=>c.label),
-      datasets:[{
-        label:'annual hours',
-        data:WAIT_CATS.map(c=>Math.round(waitVals[c.id]/60*365)),
-        backgroundColor:WAIT_CATS.map(c=>c.color+'cc'),
-        borderColor:WAIT_CATS.map(c=>c.color),
-        borderWidth:1,
-      }]
-    },
-    options:{
-      indexAxis:'y',responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} hours/year (${Math.round(ctx.raw/24*10)/10} days)`}}},
-      scales:{
-        x:{title:{display:true,text:'hours per year',color:'rgba(160,160,160,.7)',font:{size:11}},grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'rgba(160,160,160,.6)'}},
-        y:{grid:{display:false},ticks:{color:'rgba(160,160,160,.6)',font:{size:11}}},
-      }
-    }
+  const cv=document.getElementById('cWaiting');
+  cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#0a0a0f';ctx.fillRect(0,0,W,H);
+  const pad={l:130,r:55,t:12,b:24};
+  const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  const maxHrs=Math.max(1,...WAIT_CATS.map(c=>Math.round(waitVals[c.id]/60*365)))*1.15;
+  const rowH=Math.floor(ch/WAIT_CATS.length);
+  const bh=Math.max(8,rowH-5);
+  // grid lines
+  [0.25,0.5,0.75,1].forEach(f=>{
+    const x=pad.l+f*cw;
+    ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=0.5;
+    ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,pad.t+ch);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.25)';ctx.font='9px sans-serif';ctx.textAlign='center';
+    ctx.fillText(Math.round(f*maxHrs)+'hr',x,pad.t+ch+14);
+  });
+  ctx.fillStyle='rgba(255,255,255,.2)';ctx.font='9px sans-serif';ctx.textAlign='center';
+  ctx.fillText('hours per year',pad.l+cw/2,H-2);
+  WAIT_CATS.forEach((cat,i)=>{
+    const hrs=Math.round(waitVals[cat.id]/60*365);
+    const bw=Math.round((hrs/maxHrs)*cw);
+    const y=pad.t+i*rowH+(rowH-bh)/2;
+    ctx.fillStyle='rgba(255,255,255,.05)';
+    ctx.beginPath();ctx.roundRect(pad.l,y,cw,bh,2);ctx.fill();
+    if(bw>0){ctx.fillStyle=cat.color+'bb';ctx.beginPath();ctx.roundRect(pad.l,y,bw,bh,2);ctx.fill();}
+    ctx.fillStyle='rgba(255,255,255,.65)';ctx.font='11px sans-serif';ctx.textAlign='right';
+    ctx.fillText(cat.label,pad.l-8,y+bh*0.72);
+    if(hrs>0){ctx.fillStyle='rgba(255,255,255,.75)';ctx.textAlign='left';ctx.fillText(hrs+'hr',pad.l+bw+5,y+bh*0.72);}
   });
 }
 updateWaitingTotals();
