@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>what actually happens after you flush — standard deviation</title>
+  <meta name="description" content="From toilet to river in 24 hours. The chemistry, the biology, the infrastructure, and the surprisingly elegant engineering of making wastewater disappear.">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    .stage-nav { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:.85rem; }
+    .stage-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; margin-top:3px; }
+    .pathogen-row { display:flex; align-items:center; gap:10px; padding:.5rem 0; border-bottom:0.5px solid var(--color-border); }
+    .pathogen-row:last-child { border-bottom:none; }
+    .pathogen-name { font-size:13px; min-width:140px; color:var(--color-text-primary); }
+    .removal-bg { flex:1; height:8px; background:rgba(255,255,255,.07); border-radius:4px; overflow:hidden; }
+    .removal-bar { height:100%; border-radius:4px; transition:width .5s ease; }
+    .removal-pct { font-size:12px; font-family:var(--font-mono); min-width:44px; text-align:right; color:var(--color-text-secondary); }
+    .chem-card { background:var(--color-background-secondary); border:0.5px solid var(--color-border); border-radius:8px; padding:.75rem 1rem; }
+    .chem-name { font-size:13px; font-weight:500; color:var(--color-text-primary); margin-bottom:3px; }
+    .chem-role { font-size:11px; color:var(--color-text-tertiary); }
+    .flow-stage { border-left:2px solid var(--color-border); padding:.75rem 0 .75rem 1.25rem; margin-left:.75rem; position:relative; }
+    .flow-stage::before { content:''; position:absolute; left:-6px; top:1rem; width:10px; height:10px; border-radius:50%; background:var(--color-accent); }
+    .flow-stage.active::before { background:#5dcaa5; }
+    .stage-time { font-size:11px; font-family:var(--font-mono); color:var(--color-text-tertiary); }
+    .stage-title { font-size:14px; font-weight:500; color:var(--color-text-primary); margin:.2rem 0 .3rem; }
+    .stage-desc { font-size:13px; color:var(--color-text-secondary); line-height:1.6; }
+    canvas { display:block; max-width:100%; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container inner">
+    <a class="wordmark" href="/standard-deviation/"><span class="sigma">σ</span> standard deviation</a>
+    <nav class="site-nav">
+      <a href="/standard-deviation/">archive</a>
+      <a href="https://standardlydeviated.substack.com/about">about</a>
+      <a href="https://standardlydeviated.substack.com">substack</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<div class="container">
+
+  <header class="article-header reveal">
+    <div class="kicker">water &amp; infrastructure · vol. 03</div>
+    <h1 class="article-title">what actually happens after you flush</h1>
+    <p class="article-dek">From toilet to river in roughly 24 hours. The chemistry, the biology, and the surprisingly elegant engineering of making wastewater not be wastewater anymore.</p>
+    <div class="article-byline">
+      <span>standard deviation</span><span class="byline-dot"></span>
+      <span>~9 min read</span><span class="byline-dot"></span>
+      <span>data: EPA, NACWA, local utility reports</span><span class="byline-dot"></span>
+      <a href="https://standardlydeviated.substack.com" style="color:var(--color-accent);text-decoration:none">subscribe</a>
+    </div>
+  </header>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The flush is a remarkably incurious moment. You do a thing, water fills the bowl, the water leaves, and you think about something else. What happens next involves roughly a dozen distinct physical and chemical processes, hundreds of species of bacteria, several thousand gallons of infrastructure, and a surprising amount of what can only be described as careful biological negotiation. It ends with water clean enough to return to the river, which is usually where your drinking water came from in the first place.</p>
+      <p>The system that makes this possible is called a wastewater treatment plant, and it is one of the more underappreciated feats of civil engineering in the built environment. It works. Every day. For millions of people. Using processes that were mostly figured out in the early twentieth century and have been refined but not fundamentally changed since.</p>
+    </div>
+    <div class="pull-quote reveal">The goal of wastewater treatment is not to purify water. It's to reduce the concentration of harmful things to a level the receiving environment can handle — and to do it fast enough, at scale, to keep up with what 300 million Americans flush every day.</div>
+    <div class="reveal">
+      <p>What you flush contains, in rough order of volume: water (99.9% of the total), dissolved solids, suspended solids, organic matter, nitrogen compounds, phosphorus compounds, pathogens (bacteria, viruses, protozoa), pharmaceuticals, microplastics, heavy metals in trace amounts, and whatever else you put down the drain. The treatment process addresses all of these, with varying degrees of success and by very different mechanisms.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 1: ANIMATED FLOW -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">01 — follow the water: press play to trace the journey</div>
+    </div>
+    <div class="interactive-body">
+      <div class="anim-controls" style="display:flex;gap:8px;align-items:center;margin-bottom:.85rem">
+        <button class="btn active" id="btnFlowPlay" onclick="toggleFlow()"><i class="ti ti-player-play" aria-hidden="true"></i> play</button>
+        <button class="btn" onclick="resetFlow()">reset</button>
+        <span style="font-size:13px;color:var(--color-text-secondary);margin-left:4px" id="flowStageLabel">press play to begin</span>
+      </div>
+      <canvas id="cFlow" height="200" style="width:100%;border-radius:8px;background:#070d14" role="img" aria-label="Animated flow diagram showing wastewater moving through treatment stages from toilet to river"></canvas>
+      <div class="info-box" id="flowInfo" style="margin-top:.75rem">The journey from your toilet to the river takes between 6 and 36 hours depending on the plant design, flow volume, and what the water contains.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The first stage is called primary treatment, and it is exactly as simple as it sounds: you slow the water down and let gravity do the work. Wastewater enters large settling tanks — typically 10 to 15 feet deep, sometimes hundreds of feet across — where the flow slows enough that heavy solids sink to the bottom and lighter material like grease and oil floats to the top. Mechanical scrapers sweep the sludge from the bottom continuously. Skimmers remove the floating material. What remains in the middle is the effluent that moves to secondary treatment.</p>
+      <p>Primary treatment removes roughly 50–70% of suspended solids and 25–40% of biological oxygen demand, which is the measure of how much oxygen the organic matter in the water would consume if released into a river. BOD is the number that kills fish. It's also the number that secondary treatment is specifically designed to attack.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 2: STAGE-BY-STAGE EXPLORER -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">02 — explore each treatment stage</div>
+    </div>
+    <div class="interactive-body">
+      <div class="stage-nav" id="stageNav">
+        <button class="btn active" onclick="setStage(0)" id="st-0">screening</button>
+        <button class="btn" onclick="setStage(1)" id="st-1">primary</button>
+        <button class="btn" onclick="setStage(2)" id="st-2">secondary</button>
+        <button class="btn" onclick="setStage(3)" id="st-3">nitrification</button>
+        <button class="btn" onclick="setStage(4)" id="st-4">tertiary</button>
+        <button class="btn" onclick="setStage(5)" id="st-5">disinfection</button>
+        <button class="btn" onclick="setStage(6)" id="st-6">discharge</button>
+      </div>
+      <div id="stageContent"></div>
+      <canvas id="cStage" height="220" style="width:100%;border-radius:8px;background:#070d14;margin-top:.75rem" role="img" aria-label="Visual diagram of the current wastewater treatment stage showing removal rates and processes"></canvas>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>Secondary treatment is where the biology happens. The effluent from primary treatment enters a large aeration basin, where it is mixed with air and a dense population of microorganisms — bacteria, primarily, supplemented by protozoa and other microscopic organisms that eat what the bacteria produce. This community is called activated sludge, and it has been working in wastewater treatment plants since 1914, when the process was first demonstrated in Manchester, England.</p>
+      <p>The organisms in activated sludge consume organic matter and convert it to carbon dioxide, water, and new bacterial biomass. The aeration provides the oxygen they need to do this aerobically — which is faster and cleaner than anaerobic decomposition, and doesn't produce the hydrogen sulfide and methane that give sewage its characteristic quality. After several hours in the aeration basin, the mixed liquor — the technical term for aerated wastewater — moves to a secondary clarifier, where the microbial biomass settles out and is either returned to the aeration basin to maintain the bacterial population or removed as secondary sludge.</p>
+    </div>
+    <div class="pull-quote reveal">The bacteria doing this work are not engineered organisms. They're wild microbes that colonize the plant from the wastewater itself, and operators manage them by controlling aeration rates, retention times, and the ratio of food to microorganism — a metric called F/M ratio that sounds agricultural because it essentially is.</div>
+  </div>
+
+  <!-- INTERACTIVE 3: PATHOGEN REMOVAL -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">03 — what gets removed at each stage and by how much</div>
+    </div>
+    <div class="interactive-body">
+      <div class="ctrl-row">
+        <label>treatment level</label>
+        <input type="range" id="treatLevel" min="0" max="3" step="1" value="2">
+        <span class="ctrl-val" id="treatLevelVal">secondary treatment</span>
+      </div>
+      <div id="pathogenList" style="margin:.75rem 0"></div>
+      <div class="stat-row" id="treatStats"></div>
+      <div class="info-box" id="pathogenInfo">Secondary treatment removes 95%+ of BOD and suspended solids, but only 1–2 log reduction of viruses. Disinfection is what finishes the job on pathogens.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>Nitrogen is the problem that took the longest to solve. It enters wastewater primarily as ammonia from urine. Ammonia in surface water is toxic to aquatic life and contributes to algal blooms — the process called eutrophication, where excess nutrients cause explosive algae growth that depletes oxygen and kills everything else. Secondary treatment doesn't remove nitrogen. You need a third stage, called nitrification-denitrification, where ammonia is first converted to nitrite and then to nitrate by one class of bacteria, then the nitrate is converted to nitrogen gas and released to the atmosphere by a second class of bacteria under low-oxygen conditions. Two steps, two bacterial communities, opposite oxygen requirements, carefully managed in sequence.</p>
+      <p>The chemistry of this is elegant in the way that ecological solutions often are — the organisms that do each step evolved to fill exactly this niche, and the engineering is largely a matter of creating the right conditions for them to do what they would do anyway. The wastewater treatment plant is, among other things, a very large and carefully managed ecosystem.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 4: CHEMISTRY WHAT'S ADDED -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">04 — chemicals added during treatment and why</div>
+    </div>
+    <div class="interactive-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin:.5rem 0" id="chemGrid"></div>
+      <div class="info-box" id="chemInfo" style="margin-top:.75rem">Click a chemical to learn what it does and why it's added. Most of what makes water safe is biology, not chemistry — but the chemistry is essential at the margins.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>Disinfection is the last step before the water returns to the environment, and it is the step that is most visible in your daily life — because the residual chlorine in your tap water is, in many systems, the same chlorine used to disinfect wastewater, just applied at the beginning of the distribution chain rather than the end. In wastewater treatment, disinfection is typically accomplished by chlorination, UV irradiation, or ozone treatment, each of which works differently and has different tradeoffs in terms of cost, effectiveness against different pathogens, and byproduct formation.</p>
+      <p>Chlorine is cheap and leaves a measurable residual in the water, which provides ongoing protection. UV is effective against chlorine-resistant pathogens like Cryptosporidium but leaves no residual. Ozone is extremely effective and produces no chlorine byproducts but dissipates quickly and is expensive to generate. Most large plants use a combination.</p>
+      <p>What comes out the other end is called treated effluent, and it is released to the receiving water body — a river, a bay, the ocean — under a permit issued by the EPA under the Clean Water Act that specifies the allowable concentrations of dozens of parameters. Monitoring is continuous. Violations are recorded. The system is not perfect, and combined sewer overflows — events where storm water overwhelms the system and raw sewage bypasses treatment — remain a significant problem in older cities with combined storm and sanitary sewer systems. But the baseline is remarkable: water that entered the plant as sewage leaves as something a river can accommodate.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 5: MASS BALANCE SANKEY -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">05 — where does everything go? the mass balance</div>
+    </div>
+    <div class="interactive-body">
+      <div class="ctrl-row">
+        <label>input volume</label>
+        <input type="range" id="flowVol" min="1" max="100" step="1" value="50">
+        <span class="ctrl-val" id="flowVolVal">50 million gallons/day</span>
+      </div>
+      <canvas id="cSankey" height="300" style="width:100%;border-radius:8px;background:#070d14" role="img" aria-label="Sankey diagram showing how wastewater input splits into treated effluent, biosolids, and other outputs through the treatment process"></canvas>
+      <div class="info-box" id="sankeyInfo" style="margin-top:.75rem">A typical large plant takes in 50–100 million gallons per day. About 95–97% leaves as treated effluent. The rest becomes biosolids — which are either composted, applied to farmland as fertilizer, or sent to landfill.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The solids that accumulate through the treatment process — the primary sludge, the waste activated sludge — are processed separately in a stream called the solids handling process. The sludge is thickened, then anaerobically digested, which both stabilizes it and produces methane that many plants capture to generate electricity. A significant portion of modern wastewater treatment plants are energy-neutral or better for this reason: the organic matter you flush contains enough chemical energy, harvested by the right microbes under the right conditions, to run the plant that processes it. This is not a coincidence. It is, at some level, the point.</p>
+      <p>What's left after digestion is called biosolids — a regulated material that is, depending on its quality classification, land-applied as fertilizer, composted, or landfilled. The nitrogen and phosphorus that were a problem in the water become nutrients in the soil. The mass of organic matter that entered as waste exits as something a farmer can use. The system is not perfectly closed, but it is more circular than most people who use it every day realize.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 6: YOUR NUMBER -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">06 — your number</div>
+    </div>
+    <div class="interactive-body">
+      <div class="your-number">
+        <div class="yn-label">your number</div>
+        <div class="yn-prompt">Enter the population of your city to see what your local plant is processing right now.</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:.85rem">
+          <input type="number" id="cityPop" min="10000" max="10000000" value="175000" placeholder="population" style="width:130px;font-size:14px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(255,255,255,.1));background:var(--color-surface,#111);color:var(--color-text-primary);font-family:var(--font-mono)">
+          <select id="cityType" style="font-size:13px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(255,255,255,.1));background:var(--color-surface,#111);color:var(--color-text-primary)">
+            <option value="us">US average (80 gal/person/day)</option>
+            <option value="eu">European average (55 gal/person/day)</option>
+            <option value="high">High-use (120 gal/person/day)</option>
+          </select>
+        </div>
+        <div class="yn-result" id="yourNumFlush"></div>
+      </div>
+      <div class="stat-row" id="flushStats"></div>
+    </div>
+  </div>
+
+  <hr class="article-divider reveal">
+
+  <div class="reveal">
+    <div class="provenance">
+      <div class="prov-toggle" onclick="toggleProv()">
+        <span><i class="ti ti-database" aria-hidden="true" style="font-size:15px;margin-right:6px"></i>data provenance</span>
+        <i class="ti ti-chevron-down" id="provChev" style="font-size:15px;transition:transform .2s"></i>
+      </div>
+      <div class="prov-body" id="provBody">
+        <div class="prov-row"><div class="prov-key">process data</div><div class="prov-val">EPA Primer for Municipal Wastewater Treatment Systems (EPA 832-R-04-001)</div></div>
+        <div class="prov-row"><div class="prov-key">removal rates</div><div class="prov-val">Metcalf &amp; Eddy, Wastewater Engineering (5th ed.). Standard industry reference values.</div></div>
+        <div class="prov-row"><div class="prov-key">pathogen data</div><div class="prov-val">WHO Guidelines for the Safe Use of Wastewater (2006). Log removal values per treatment stage.</div></div>
+        <div class="prov-row"><div class="prov-key">flow statistics</div><div class="prov-val">NACWA (National Association of Clean Water Agencies) 2024 annual survey. 14,780 US plants treating ~34B gal/day.</div></div>
+        <div class="prov-row"><div class="prov-key">per-capita use</div><div class="prov-val">EPA WaterSense, 2023: 80 gal/person/day average US indoor + outdoor residential</div></div>
+        <div class="prov-row"><div class="prov-key">last verified</div><div class="prov-val">June 2026</div></div>
+        <div class="prov-row"><div class="prov-key">notebook</div><div class="prov-val"><a href="#">flush.ipynb →</a></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reveal" style="margin-top:1.5rem">
+    <div class="section-label">what this made me wonder next</div>
+    <div class="related-questions">
+      <div class="related-item">
+        <div class="related-q">What happens to pharmaceuticals — antidepressants, hormones, antibiotics — that pass through wastewater treatment? Where do they go and what do they do when they get there?</div>
+        <i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i>
+      </div>
+      <div class="related-item">
+        <div class="related-q">How do combined sewer overflow events work, and which US cities still have combined systems that dump raw sewage into rivers during heavy rain?</div>
+        <i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i>
+      </div>
+      <div class="related-item">
+        <div class="related-q">What does a PFAS-contaminated water supply actually look like in the treatment data — and why are conventional treatment plants not designed to remove it?</div>
+        <i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="substack-cta reveal" style="margin-top:2rem">
+    <span>next piece coming soon — subscribe to get it.</span>
+    <a href="https://standardlydeviated.substack.com">subscribe →</a>
+  </div>
+
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <span>σ standard deviation · <a href="https://standardlydeviated.substack.com">@standardlydeviated</a></span>
+    <span><a href="/standard-deviation/">← all articles</a></span>
+  </div>
+</footer>
+
+<script src="../../assets/js/scroll-reveal.js"></script>
+<script>
+const STAGES = [
+  {id:0,name:'screening & grit removal',time:'0–30 min',col:'#5dcaa5',
+   desc:'Bar screens catch rags, wipes, plastics. Grit chambers slow the flow so sand and gravel settle. This protects pumps and equipment downstream. Everything caught here goes to landfill.',
+   removes:'large solids, grit, rags',removes_pct:10,bod_removal:5,tss_removal:15,
+   what:'Mechanical bar screens (1–2 cm spacing) and grit chambers. Screenings are compacted and landfilled.'},
+  {id:1,name:'primary clarification',time:'1–3 hr',col:'#e8855a',
+   desc:'Large circular tanks, 10–15 ft deep. Flow slows, heavy solids sink, oils float. Scrapers sweep continuously. Removes 50–70% of suspended solids.',
+   removes:'settling solids, oils, grease',removes_pct:30,bod_removal:30,tss_removal:60,
+   what:'Gravity settling. Primary sludge pumped to anaerobic digesters. Scum removed by surface skimmers.'},
+  {id:2,name:'secondary treatment (activated sludge)',time:'4–8 hr',col:'#8b85e8',
+   desc:'Aeration basins where billions of bacteria consume organic matter using oxygen. The mixed liquor then settles in secondary clarifiers. This is the biological heart of the plant.',
+   removes:'dissolved organics, BOD',removes_pct:85,bod_removal:90,tss_removal:90,
+   what:'Activated sludge process. F/M ratio ~0.2–0.4 kg BOD/kg MLSS/day. HRT 4–8 hrs. SRT 5–15 days.'},
+  {id:3,name:'nitrification / denitrification',time:'6–12 hr',col:'#ffcc44',
+   desc:'Two-step nitrogen removal. Ammonia → nitrite → nitrate (aerobic). Nitrate → nitrogen gas (anoxic). Without this, ammonia in the receiving water kills fish and fuels algal blooms.',
+   removes:'ammonia, nitrogen compounds',removes_pct:90,bod_removal:95,tss_removal:92,
+   what:'Nitrifying bacteria (Nitrosomonas, Nitrobacter) then denitrifying bacteria under anoxic conditions. Carbon source sometimes added.'},
+  {id:4,name:'tertiary treatment',time:'1–2 hr',col:'#4488ff',
+   desc:'Filtration through sand, membrane, or disc filters. Removes remaining suspended solids and turbidity. Required before UV disinfection and for Class A reuse water.',
+   removes:'fine solids, turbidity',removes_pct:95,bod_removal:97,tss_removal:98,
+   what:'Media filtration or membrane bioreactor (MBR). Coagulants (alum, ferric chloride) may be added for phosphorus removal.'},
+  {id:5,name:'disinfection',time:'30 min–2 hr',col:'#ff8844',
+   desc:'UV irradiation, chlorination, or ozone destroys remaining pathogens. UV has no residual but is effective against Cryptosporidium. Chlorine leaves a residual but forms disinfection byproducts.',
+   removes:'pathogens, viruses, bacteria',removes_pct:99.9,bod_removal:97,tss_removal:98,
+   what:'UV: 40–100 mJ/cm². Chlorine: 5–10 mg/L contact time 30 min. Dechlorination with sodium bisulfite before discharge.'},
+  {id:6,name:'discharge to receiving water',time:'ongoing',col:'#5dcaa5',
+   desc:'Treated effluent enters the river, bay, or ocean under an NPDES permit specifying max concentrations of BOD, TSS, ammonia, pathogens, and dozens of other parameters. Monitoring is continuous.',
+   removes:'(release to environment)',removes_pct:99.9,bod_removal:97,tss_removal:98,
+   what:'NPDES permit compliance. Continuous flow monitoring. Quarterly grab samples for metals, priority pollutants. Annual bioassay testing.'},
+];
+
+let currentStage = 0;
+function setStage(i){
+  currentStage=i;
+  STAGES.forEach((_,k)=>document.getElementById('st-'+k).classList.toggle('active',k===i));
+  const s=STAGES[i];
+  document.getElementById('stageContent').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:.75rem">
+      <div class="stat-card"><div class="s-label">stage</div><div class="s-value" style="font-size:14px">${s.name}</div></div>
+      <div class="stat-card"><div class="s-label">typical duration</div><div class="s-value" style="font-size:15px">${s.time}</div></div>
+      <div class="stat-card"><div class="s-label">cumulative BOD removal</div><div class="s-value" style="font-size:15px">${s.bod_removal}%</div></div>
+    </div>
+    <div class="info-box">${s.desc}</div>
+    <div style="margin-top:.5rem;font-size:12px;color:var(--color-text-tertiary)">${s.what}</div>`;
+  drawStageChart(s);
+}
+
+function drawStageChart(s){
+  const cv=document.getElementById('cStage');
+  cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#070d14';ctx.fillRect(0,0,W,H);
+  const metrics=[
+    {label:'BOD removed',val:s.bod_removal,max:100,col:'#e8855a'},
+    {label:'Suspended solids',val:s.tss_removal,max:100,col:'#8b85e8'},
+    {label:'Cumulative treatment',val:s.removes_pct,max:100,col:'#5dcaa5'},
+  ];
+  const pad={l:140,r:40,t:20,b:20};
+  const cw=W-pad.l-pad.r;
+  const bh=40,gap=20;
+  metrics.forEach((m,i)=>{
+    const y=pad.t+i*(bh+gap);
+    const bw=Math.round((m.val/m.max)*cw);
+    ctx.fillStyle='rgba(255,255,255,.05)';ctx.beginPath();ctx.roundRect(pad.l,y,cw,bh,4);ctx.fill();
+    ctx.fillStyle=m.col+'99';ctx.beginPath();ctx.roundRect(pad.l,y,bw,bh,4);ctx.fill();
+    ctx.fillStyle=m.col;ctx.beginPath();ctx.roundRect(pad.l,y,Math.min(bw,8),bh,i===0?[4,0,0,4]:4);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.6)';ctx.font='12px sans-serif';ctx.textAlign='right';ctx.fillText(m.label,pad.l-10,y+bh*.65);
+    ctx.fillStyle='rgba(255,255,255,.85)';ctx.font='500 14px sans-serif';ctx.textAlign='left';ctx.fillText(m.val+'%',pad.l+bw+8,y+bh*.65);
+  });
+  ctx.fillStyle='rgba(255,255,255,.35)';ctx.font='10px sans-serif';ctx.textAlign='center';
+  const stageX=Math.round((s.id/6)*cw)+pad.l;
+  ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+  ctx.beginPath();ctx.moveTo(stageX,H-20);ctx.lineTo(stageX,H-8);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillText('you are here',stageX,H-4);
+}
+setStage(0);
+
+let flowPlaying=false,flowStep=0,flowRAF=null,flowTS=null;
+const FLOW_STAGES_ANIM=[
+  {label:'your toilet',x:.05,col:'#8b85e8'},
+  {label:'collection sewer',x:.18,col:'#8b85e8'},
+  {label:'screening',x:.30,col:'#5dcaa5'},
+  {label:'primary settling',x:.43,col:'#e8855a'},
+  {label:'aeration basin',x:.56,col:'#8b85e8'},
+  {label:'disinfection',x:.70,col:'#ffcc44'},
+  {label:'river',x:.88,col:'#4488ff'},
+];
+const FLOW_DESCS=[
+  'You flush. 1.6 gallons (modern low-flow) enter the collection system.',
+  'Gravity or pump stations move wastewater through pipes to the treatment plant — often miles away.',
+  'Bar screens remove rags and solids. Grit chambers slow the flow for sand to settle.',
+  'In large circular tanks, heavy solids sink and are scraped to sludge hoppers. Oils are skimmed.',
+  'Billions of bacteria consume dissolved organic matter over 4–8 hours, supplied with air.',
+  'UV light or chlorine destroys remaining pathogens. The water is now safe to release.',
+  'Treated effluent enters the receiving water body, cleaner than it entered the plant.',
+];
+let flowProgress=0;
+
+function drawFlow(progress){
+  const cv=document.getElementById('cFlow');
+  cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#070d14';ctx.fillRect(0,0,W,H);
+  const y=H/2;
+  ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=8;
+  ctx.beginPath();ctx.moveTo(W*.04,y);ctx.lineTo(W*.92,y);ctx.stroke();
+  const filled=Math.min(W*.88,W*.04+progress*(W*.88));
+  ctx.strokeStyle='rgba(93,202,165,.4)';ctx.lineWidth=6;
+  ctx.beginPath();ctx.moveTo(W*.04,y);ctx.lineTo(filled,y);ctx.stroke();
+  FLOW_STAGES_ANIM.forEach((s,i)=>{
+    const sx=s.x*W;
+    const reached=progress>=(s.x-0.04)/0.88;
+    ctx.fillStyle=reached?s.col:'rgba(255,255,255,.15)';
+    ctx.beginPath();ctx.arc(sx,y,reached?9:6,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=reached?'rgba(255,255,255,.85)':'rgba(255,255,255,.3)';
+    ctx.font=`${reached?'500 ':''}11px sans-serif`;ctx.textAlign='center';
+    const ly=i%2===0?y-22:y+28;
+    ctx.fillText(s.label,sx,ly);
+    if(i%2===0){ctx.strokeStyle=reached?s.col+'66':'rgba(255,255,255,.1)';ctx.lineWidth=1;ctx.setLineDash([2,2]);ctx.beginPath();ctx.moveTo(sx,y-9);ctx.lineTo(sx,y-14);ctx.stroke();ctx.setLineDash([]);}
+    else{ctx.strokeStyle=reached?s.col+'66':'rgba(255,255,255,.1)';ctx.lineWidth=1;ctx.setLineDash([2,2]);ctx.beginPath();ctx.moveTo(sx,y+9);ctx.lineTo(sx,y+18);ctx.stroke();ctx.setLineDash([]);}
+  });
+  const activeIdx=Math.min(FLOW_STAGES_ANIM.length-1,Math.floor(progress*FLOW_STAGES_ANIM.length));
+  document.getElementById('flowStageLabel').textContent=FLOW_STAGES_ANIM[activeIdx].label;
+  document.getElementById('flowInfo').textContent=FLOW_DESCS[activeIdx];
+}
+
+function toggleFlow(){
+  if(flowPlaying)stopFlow();else startFlow();
+}
+function startFlow(){
+  flowPlaying=true;flowTS=null;
+  document.getElementById('btnFlowPlay').innerHTML='<i class="ti ti-player-pause" aria-hidden="true"></i> pause';
+  if(flowProgress>=1)flowProgress=0;
+  function step(ts){
+    if(!flowTS)flowTS=ts;
+    const el=ts-flowTS;flowTS=ts;
+    flowProgress=Math.min(1,flowProgress+el*0.0006);
+    drawFlow(flowProgress);
+    if(flowProgress<1&&flowPlaying)flowRAF=requestAnimationFrame(step);else stopFlow();
+  }
+  flowRAF=requestAnimationFrame(step);
+}
+function stopFlow(){
+  flowPlaying=false;if(flowRAF)cancelAnimationFrame(flowRAF);
+  document.getElementById('btnFlowPlay').innerHTML='<i class="ti ti-player-play" aria-hidden="true"></i> play';
+}
+function resetFlow(){stopFlow();flowProgress=0;drawFlow(0);document.getElementById('flowStageLabel').textContent='press play to begin';document.getElementById('flowInfo').textContent='The journey from your toilet to the river takes between 6 and 36 hours depending on the plant design, flow volume, and what the water contains.';}
+drawFlow(0);
+
+const PATHOGENS=[
+  {name:'E. coli',primary:1,secondary:2.5,tertiary:3.5,disinfection:6,unit:'log reduction'},
+  {name:'Fecal coliforms',primary:1,secondary:2,tertiary:3,disinfection:6,unit:'log reduction'},
+  {name:'Cryptosporidium',primary:0.5,secondary:1,tertiary:2.5,disinfection:4,unit:'log reduction'},
+  {name:'Hepatitis A virus',primary:0.5,secondary:1.5,tertiary:2.5,disinfection:5,unit:'log reduction'},
+  {name:'Rotavirus',primary:0.5,secondary:2,tertiary:3,disinfection:6,unit:'log reduction'},
+  {name:'Giardia',primary:1,secondary:2,tertiary:3,disinfection:5,unit:'log reduction'},
+];
+const TREAT_LEVELS=['primary only','primary + secondary','+ tertiary','+ disinfection'];
+const TREAT_KEYS=['primary','secondary','tertiary','disinfection'];
+
+function updatePathogens(){
+  const lv=+document.getElementById('treatLevel').value;
+  document.getElementById('treatLevelVal').textContent=TREAT_LEVELS[lv];
+  const key=TREAT_KEYS[lv];
+  const list=document.getElementById('pathogenList');
+  list.innerHTML='';
+  PATHOGENS.forEach(p=>{
+    const logRed=p[key];
+    const pctRemoved=Math.min(99.9999,(1-Math.pow(10,-logRed))*100);
+    const row=document.createElement('div');row.className='pathogen-row';
+    const col=logRed>=5?'#5dcaa5':logRed>=3?'#8b85e8':logRed>=2?'#ffcc44':'#e8855a';
+    row.innerHTML=`<div class="pathogen-name">${p.name}</div>
+      <div class="removal-bg"><div class="removal-bar" style="width:${Math.round(pctRemoved/100*100)}%;background:${col}"></div></div>
+      <div class="removal-pct">${logRed} log</div>`;
+    list.appendChild(row);
+  });
+  const info=['Primary treatment alone gives you 0.5–1 log reduction of pathogens — meaning 10-fold reduction. Not enough to safely discharge or reuse.',
+    'Secondary treatment adds biological treatment for 1.5–2.5 additional log reduction. Most plants stop here for conventional discharge.',
+    'Tertiary filtration adds another log and improves turbidity — required before UV disinfection and for recycled water permits.',
+    'Disinfection provides the final 2–4 log reduction. At 6 log total, you\'ve reduced E. coli from millions per 100mL to essentially none.'][lv];
+  document.getElementById('pathogenInfo').textContent=info;
+  document.getElementById('treatStats').innerHTML=`
+    <div class="stat-card"><div class="s-label">treatment level</div><div class="s-value" style="font-size:14px">${TREAT_LEVELS[lv]}</div></div>
+    <div class="stat-card"><div class="s-label">E. coli reduction</div><div class="s-value">${PATHOGENS[0][key]} log</div><div class="s-sub">${(1-Math.pow(10,-PATHOGENS[0][key]))*100 > 99.99?'99.99%':((1-Math.pow(10,-PATHOGENS[0][key]))*100).toFixed(1)+'%'} removed</div></div>
+    <div class="stat-card"><div class="s-label">Crypto reduction</div><div class="s-value">${PATHOGENS[2][key]} log</div><div class="s-sub">most chlorine-resistant</div></div>`;
+}
+document.getElementById('treatLevel').addEventListener('input',updatePathogens);
+updatePathogens();
+
+const CHEMS=[
+  {name:'ferric chloride',role:'phosphorus removal',col:'#e8855a',desc:'FeCl₃ reacts with dissolved phosphate to form insoluble iron phosphate, which settles out in clarifiers. Prevents algal blooms in receiving waters. Added before primary or secondary clarification.'},
+  {name:'sodium hypochlorite',role:'disinfection',col:'#ffcc44',desc:'Common bleach (NaOCl). Reacts with water to form hypochlorous acid (HOCl), which oxidizes cell membranes and DNA of pathogens. Residual provides ongoing protection in distribution systems.'},
+  {name:'sodium bisulfite',role:'dechlorination',col:'#8b85e8',desc:'Added after chlorination before discharge. Reacts instantly with residual chlorine to form sodium chloride and sulfate — harmless to aquatic life. Prevents toxic chlorine residual from entering the river.'},
+  {name:'methanol / acetate',role:'carbon source for denitrification',col:'#5dcaa5',desc:'Denitrifying bacteria need a carbon source under anoxic conditions to reduce nitrate to nitrogen gas. When influent BOD is too low, methanol or acetate is added as supplemental carbon.'},
+  {name:'polymer (coagulant aid)',role:'sludge thickening',col:'#4488ff',desc:'Long-chain polyelectrolytes cause fine suspended particles to aggregate into larger flocs that settle faster. Used in primary clarifiers and for sludge dewatering before digestion.'},
+  {name:'lime / caustic soda',role:'pH adjustment',col:'#ff8844',desc:'pH control is critical for biological treatment (optimal 6.5–8.5) and for phosphorus precipitation. Lime also used for biosolids stabilization in Class B treatment.'},
+];
+const chemGrid=document.getElementById('chemGrid');
+CHEMS.forEach(c=>{
+  const card=document.createElement('div');
+  card.className='chem-card';card.style.cursor='pointer';card.style.borderLeft=`3px solid ${c.col}`;
+  card.innerHTML=`<div class="chem-name">${c.name}</div><div class="chem-role">${c.role}</div>`;
+  card.addEventListener('click',()=>{ document.getElementById('chemInfo').innerHTML=`<strong style="color:${c.col}">${c.name}</strong> — ${c.desc}`; });
+  chemGrid.appendChild(card);
+});
+
+function drawSankey(){
+  const vol=+document.getElementById('flowVol').value;
+  document.getElementById('flowVolVal').textContent=vol+' million gallons/day';
+  const effluent=Math.round(vol*0.96);
+  const biosolids=Math.round(vol*0.02);
+  const biogas=Math.round(vol*0.01);
+  const other=vol-effluent-biosolids-biogas;
+  const cv=document.getElementById('cSankey');
+  cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#070d14';ctx.fillRect(0,0,W,H);
+  const mainH=Math.round((effluent/vol)*(H-60));
+  const bioH=Math.max(8,Math.round((biosolids/vol)*(H-60)));
+  const bgasH=Math.max(6,Math.round((biogas/vol)*(H-60)));
+  const otherH=Math.max(4,H-60-mainH-bioH-bgasH);
+  const flows=[
+    {label:'treated effluent',pct:Math.round(effluent/vol*100),h:mainH,col:'#4488ff',desc:'→ river / ocean'},
+    {label:'biosolids',pct:Math.round(biosolids/vol*100),h:bioH,col:'#e8855a',desc:'→ land application / landfill'},
+    {label:'biogas (methane)',pct:Math.round(biogas/vol*100),h:bgasH,col:'#ffcc44',desc:'→ plant electricity / heat'},
+    {label:'misc losses',pct:Math.round(other/vol*100)+1,h:otherH,col:'rgba(100,100,100,.5)',desc:'→ evaporation, screenings'},
+  ];
+  const inX=W*.12,outX=W*.82;
+  ctx.fillStyle='rgba(93,202,165,.25)';
+  ctx.beginPath();ctx.roundRect(inX-30,30,60,H-60,6);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='500 13px sans-serif';ctx.textAlign='center';
+  ctx.fillText('influent',inX,22);
+  ctx.fillText(vol+' MGD',inX,H-46);
+  let outY=30;
+  flows.forEach(f=>{
+    const midY=outY+f.h/2;
+    const cp1x=(inX+outX)/2-20,cp2x=(inX+outX)/2+20;
+    ctx.fillStyle=f.col+'44';
+    ctx.beginPath();ctx.moveTo(inX+30,30);ctx.lineTo(outX-30,outY);ctx.lineTo(outX-30,outY+f.h);ctx.lineTo(inX+30,H-30);ctx.closePath();ctx.fill();
+    ctx.fillStyle=f.col;
+    ctx.beginPath();ctx.roundRect(outX-30,outY,60,f.h,4);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.75)';ctx.font='11px sans-serif';ctx.textAlign='left';
+    if(f.h>14){
+      ctx.fillText(f.label,outX+36,midY-5);
+      ctx.fillStyle='rgba(255,255,255,.45)';ctx.font='10px sans-serif';
+      ctx.fillText(f.pct+'% · '+f.desc,outX+36,midY+8);
+    }
+    outY+=f.h;
+  });
+  document.getElementById('sankeyInfo').textContent=`At ${vol} MGD: ${effluent} MGD becomes treated effluent (${Math.round(effluent/vol*100)}%), ${biosolids} MGD becomes biosolids (${Math.round(biosolids/vol*100)}%), and ${biogas} MGD of methane is captured for energy (${Math.round(biogas/vol*100)}%). The US treats roughly 34,000 MGD nationally across 14,780 plants.`;
+}
+document.getElementById('flowVol').addEventListener('input',drawSankey);
+drawSankey();
+
+function calcFlushNum(){
+  const pop=+document.getElementById('cityPop').value||175000;
+  const type=document.getElementById('cityType').value;
+  const gppd=type==='us'?80:type==='eu'?55:120;
+  const mgd=Math.round(pop*gppd/1000000*10)/10;
+  const gallonsPerFlush=1.6;
+  const flushesPerDay=Math.round(pop*5);
+  const BOD_per_person=0.17;
+  const BOD_total=Math.round(pop*BOD_per_person);
+  const energyKwh=Math.round(mgd*1000*0.12);
+  document.getElementById('yourNumFlush').innerHTML=`A city of <strong>${pop.toLocaleString()}</strong> people generates:<span class="yn-big">${mgd} million gallons per day</span>That's ${(mgd*1000000/flushesPerDay).toFixed(1)} gallons per flush event, ${flushesPerDay.toLocaleString()} flushes per day, and ${BOD_total.toLocaleString()} lbs of biological oxygen demand entering the plant every 24 hours. The plant treating this needs roughly <strong>${energyKwh.toLocaleString()} kWh/day</strong> to operate — which ${Math.round(energyKwh*.35/energyKwh*100)}% of modern plants partially offset by generating electricity from the methane produced during sludge digestion.`;
+  document.getElementById('flushStats').innerHTML=`
+    <div class="stat-card"><div class="s-label">flow rate</div><div class="s-value">${mgd} MGD</div><div class="s-sub">million gal/day</div></div>
+    <div class="stat-card"><div class="s-label">daily flushes</div><div class="s-value">${Math.round(flushesPerDay/1000)}K</div><div class="s-sub">est. 5/person/day</div></div>
+    <div class="stat-card"><div class="s-label">BOD load</div><div class="s-value">${BOD_total.toLocaleString()}</div><div class="s-sub">lbs/day entering plant</div></div>
+    <div class="stat-card"><div class="s-label">energy demand</div><div class="s-value">${energyKwh.toLocaleString()}</div><div class="s-sub">kWh/day to treat</div></div>`;
+}
+document.getElementById('cityPop').addEventListener('input',calcFlushNum);
+document.getElementById('cityType').addEventListener('change',calcFlushNum);
+calcFlushNum();
+
+function toggleProv(){
+  const b=document.getElementById('provBody'),c=document.getElementById('provChev');
+  b.classList.toggle('open');c.style.transform=b.classList.contains('open')?'rotate(180deg)':'';
+}
+</script>
+</body>
+</html>

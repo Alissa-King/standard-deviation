@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>the Big One is overdue. here's what that actually means — standard deviation</title>
+  <meta name="description" content="The Cascadia fault hasn't ruptured in over 320 years. We know the recurrence intervals. We can calculate the probability. The number is not reassuring.">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    .risk-meter { display:flex; align-items:center; gap:12px; margin:1rem 0; }
+    .risk-bar-bg { flex:1; height:12px; background:rgba(255,255,255,.08); border-radius:6px; overflow:hidden; }
+    .risk-bar { height:100%; border-radius:6px; transition:width .4s ease; }
+    .risk-pct { font-size:18px; font-weight:500; font-family:var(--font-mono); min-width:52px; text-align:right; }
+    .quake-row { display:flex; align-items:center; gap:10px; padding:.55rem 0; border-bottom:0.5px solid var(--color-border); }
+    .quake-row:last-child { border-bottom:none; }
+    .quake-year { font-family:var(--font-mono); font-size:13px; min-width:52px; color:var(--color-text-secondary); }
+    .quake-bar-bg { flex:1; height:8px; background:rgba(255,255,255,.06); border-radius:4px; overflow:hidden; }
+    .quake-bar { height:100%; border-radius:4px; }
+    .quake-gap { font-size:12px; font-family:var(--font-mono); color:var(--color-text-tertiary); min-width:60px; text-align:right; }
+    .magnitude-badge { font-size:11px; padding:2px 8px; border-radius:4px; background:rgba(163,45,45,.2); color:#f09595; font-family:var(--font-mono); margin-left:4px; }
+    .anim-controls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:.85rem; }
+    .view-btns { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:.75rem; }
+    canvas { display:block; max-width:100%; }
+    select { font-size:13px; padding:5px 10px; border-radius:6px; border:0.5px solid var(--color-border); background:var(--color-surface,#111); color:var(--color-text-primary); }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container inner">
+    <a class="wordmark" href="/standard-deviation/"><span class="sigma">σ</span> standard deviation</a>
+    <nav class="site-nav">
+      <a href="/standard-deviation/">archive</a>
+      <a href="https://standardlydeviated.substack.com/about">about</a>
+      <a href="https://standardlydeviated.substack.com">substack</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<div class="container">
+
+  <header class="article-header reveal">
+    <div class="kicker">earth &amp; disaster · vol. 02</div>
+    <h1 class="article-title">the Big One is overdue. here's what that actually means.</h1>
+    <p class="article-dek">The Cascadia Subduction Zone hasn't ruptured in over 320 years. We know the recurrence intervals. We can calculate the probability. The number is not reassuring.</p>
+    <div class="article-byline">
+      <span>standard deviation</span><span class="byline-dot"></span>
+      <span>~10 min read</span><span class="byline-dot"></span>
+      <span>data: USGS, PNSN, paleoseismic records</span><span class="byline-dot"></span>
+      <a href="https://standardlydeviated.substack.com" style="color:var(--color-accent);text-decoration:none">subscribe</a>
+    </div>
+  </header>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>On January 26, 1700, at approximately nine o'clock in the evening, the Cascadia Subduction Zone ruptured along its full 700-mile length. The earthquake was magnitude 9.0 or greater. The shaking lasted several minutes. The tsunami that followed crossed the Pacific and struck Japan with enough force that Japanese officials recorded the precise arrival time, which is how we know the date at all — there was nobody left on the Pacific Northwest coast to write it down.</p>
+      <p>That was 326 years ago. The question of when it happens again is not academic.</p>
+    </div>
+    <div class="pull-quote reveal">Cascadia is not like most fault systems. It doesn't produce small earthquakes that release pressure gradually. It locks, loads, and eventually lets go all at once — and "all at once" means a rupture zone the length of California.</div>
+    <div class="reveal">
+      <p>The fault runs from northern California to southern British Columbia, where the Juan de Fuca tectonic plate slides under the North American plate at roughly 40 millimeters per year. The plates are currently locked together across most of that interface, which means the stress is accumulating without release. Every year that passes without a rupture is another year of strain stored in the rock.</p>
+      <p>Paleoseismic records — evidence from drowned forests, tsunami deposits, and turbidite layers on the ocean floor — give us a picture of how Cascadia has behaved over the past 10,000 years. It has not behaved the same way twice. The gaps between major ruptures range from 200 to over 1,000 years. The average is somewhere around 240 years for full-margin events. We are at 326 years.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 1: RUPTURE HISTORY TIMELINE -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">01 — known Cascadia ruptures over the past 10,000 years</div>
+    </div>
+    <div class="interactive-body">
+      <div style="margin-bottom:.75rem;font-size:12px;color:var(--color-text-tertiary)">Each bar represents a major rupture event. Bar length = gap since previous event. Hover for details.</div>
+      <div id="ruptureTL" style="background:#070714;border-radius:8px;padding:1rem 1.25rem"></div>
+      <div class="info-box" id="ruptureInfo" style="margin-top:.75rem">Hover a rupture event to see the gap and estimated magnitude. The current gap of 326 years is highlighted in red.</div>
+      <div style="display:flex;gap:16px;margin-top:.75rem;font-size:11px;color:var(--color-text-secondary);flex-wrap:wrap">
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#e8855a"></span>full-margin rupture (M9+)</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#8b85e8"></span>partial rupture (M8–8.9)</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:rgba(163,45,45,.6)"></span>current gap (ongoing)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The phrase "overdue" is one seismologists tend to avoid, because it implies the fault is on a clock, which it isn't. The recurrence intervals are not regular. The next rupture could happen tomorrow or in 500 years, and the geological record doesn't distinguish between those possibilities in the way that would be useful for urban planning.</p>
+      <p>What geologists use instead is a probability calculation based on the recurrence data and a statistical model called a Poisson process — or, for faults with more regular behavior, a lognormal or Brownian Passage Time model. The math produces a probability of rupture within a given time window. It accounts for the fact that we've been waiting 326 years. It does not tell you when.</p>
+    </div>
+    <div class="pull-quote reveal">The 50-year probability of a full Cascadia rupture is currently estimated at roughly 15 percent. That sounds modest until you remember that 15 percent is also roughly the probability of rolling a 1 on a single die.</div>
+  </div>
+
+  <!-- INTERACTIVE 2: PROBABILITY CALCULATOR -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">02 — calculate your personal probability window</div>
+    </div>
+    <div class="interactive-body">
+      <div class="your-number">
+        <div class="yn-label">your probability</div>
+        <div class="yn-prompt">Enter your age and the model estimates the probability of a full Cascadia rupture within your remaining lifetime.</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:.85rem">
+          <input type="number" id="userAge" min="1" max="100" value="35" placeholder="age" style="width:90px;font-size:14px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(255,255,255,.1));background:var(--color-surface,#111);color:var(--color-text-primary);font-family:var(--font-mono)">
+          <select id="modelType">
+            <option value="poisson">Poisson model (time-independent)</option>
+            <option value="lognormal" selected>Lognormal model (time-dependent)</option>
+            <option value="bpt">Brownian Passage Time (BPT)</option>
+          </select>
+        </div>
+        <div class="yn-result" id="probResult"></div>
+      </div>
+      <div class="stat-row" id="probStats"></div>
+      <div style="margin-top:.75rem">
+        <div class="ctrl-row">
+          <label>time window (years)</label>
+          <input type="range" id="windowSlider" min="10" max="100" step="5" value="50">
+          <span class="ctrl-val" id="windowVal">50 years</span>
+        </div>
+        <div class="risk-meter">
+          <span style="font-size:12px;color:var(--color-text-secondary);min-width:80px">rupture risk</span>
+          <div class="risk-bar-bg"><div class="risk-bar" id="riskBar" style="width:15%;background:#e8855a"></div></div>
+          <span class="risk-pct" id="riskPct">15%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>What makes Cascadia distinctively dangerous is not just the magnitude — though a full-margin rupture would be among the largest earthquakes in recorded history — but the geography. Seattle, Portland, Eugene, and most of the major population centers of the Pacific Northwest sit within the projected shaking zone. The coast faces a tsunami arrival time measured in minutes, not hours. And a significant portion of the region's critical infrastructure — bridges, highways, the electrical grid — was built before the scientific community understood what Cascadia was or what it could do.</p>
+      <p>The USGS released updated ShakeMap projections in 2022 modeling a full Cascadia rupture. The results suggested that shaking would be severe enough to cause widespread structural damage across a 700-mile corridor, with the worst outcomes concentrated in areas built on soft, saturated soils — which includes substantial portions of Seattle's SoDo district, Portland's inner east side, and nearly all of the coastal towns.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 3: SHAKEMAP SIMULATOR -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">03 — projected shaking intensity along the Cascadia corridor</div>
+    </div>
+    <div class="interactive-body">
+      <div class="view-btns">
+        <button class="btn active" onclick="setShakeView('full')" id="sv-full">full rupture (M9.0)</button>
+        <button class="btn" onclick="setShakeView('southern')" id="sv-southern">southern segment (M8.0)</button>
+        <button class="btn" onclick="setShakeView('northern')" id="sv-northern">northern segment (M8.5)</button>
+      </div>
+      <canvas id="cShake" height="420" style="width:100%;border-radius:8px" role="img" aria-label="Map of Pacific Northwest showing projected earthquake shaking intensity by region for a Cascadia rupture"></canvas>
+      <div class="legend" style="margin-top:.75rem">
+        <span><div class="legend-dot" style="background:#ff4444"></div>violent (MMI IX+)</span>
+        <span><div class="legend-dot" style="background:#ff8800"></div>severe (MMI VII–VIII)</span>
+        <span><div class="legend-dot" style="background:#ffcc00"></div>strong (MMI VI)</span>
+        <span><div class="legend-dot" style="background:#88cc44"></div>moderate (MMI V)</span>
+        <span><div class="legend-dot" style="background:#4488ff"></div>light (MMI III–IV)</span>
+      </div>
+      <div class="info-box" id="shakeInfo" style="margin-top:.75rem">Full margin rupture — the 1700 scenario. 700 miles of fault from northern California to British Columbia rupture simultaneously.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The 1700 earthquake is not the largest in Cascadia's record. Paleoseismic evidence suggests several prehistoric events may have been larger, with rupture zones extending further and tsunami deposits reaching further inland than those from 1700. The 1700 event is simply the most recent and therefore the most studied.</p>
+      <p>The question of preparedness is a separate conversation from the question of probability, and it is, frankly, a harder one. FEMA's Cascadia Rising exercises — regional disaster simulations run in 2016 and 2022 — projected that a full rupture would produce casualties and infrastructure damage that would overwhelm the emergency response capacity of every affected state simultaneously. The simulations suggested recovery timelines measured in years to decades for some areas, not weeks.</p>
+      <p>The seismologists know what's coming. The geologists know the record. The engineers know what the buildings can't survive. Whether that knowledge translates into preparation at the scale the risk demands is a policy question, which means it is also a question about attention spans and budget cycles and the difficulty of preparing for something that might not happen for another 500 years, even though it might happen Tuesday.</p>
+    </div>
+    <div class="pull-quote reveal">The fault doesn't know what year it is. It doesn't know that we built cities on top of it. It's been building pressure since 1700 and it will release that pressure when the accumulated stress exceeds the friction holding the plates together. The timing is genuinely uncertain. The event itself is not.</div>
+  </div>
+
+  <!-- INTERACTIVE 4: RECURRENCE COMPARISON -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">04 — how does 326 years compare to historical gaps?</div>
+    </div>
+    <div class="interactive-body">
+      <canvas id="cGaps" height="300" style="width:100%;border-radius:8px;background:#070714" role="img" aria-label="Bar chart comparing historical inter-event gaps between Cascadia ruptures, with the current 326-year gap highlighted"></canvas>
+      <div class="info-box" id="gapInfo" style="margin-top:.75rem">The red bar is where we are now. The current gap of 326 years is longer than most historical gaps — but not the longest. The record is over 1,000 years between events.</div>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 5: YOUR NUMBER -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">05 — your number</div>
+    </div>
+    <div class="interactive-body">
+      <div class="your-number">
+        <div class="yn-label">your number</div>
+        <div class="yn-prompt">Enter your birth year. We'll tell you what was happening the last time Cascadia ruptured, and how long the previous gap was.</div>
+        <input type="number" id="birthYearC" min="1900" max="2025" value="1985" placeholder="year" style="width:110px;font-size:14px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(255,255,255,.1));background:var(--color-surface,#111);color:var(--color-text-primary);font-family:var(--font-mono)">
+        <div class="yn-result" id="yourNumC"></div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="article-divider reveal">
+
+  <div class="reveal">
+    <div class="provenance">
+      <div class="prov-toggle" onclick="toggleProv()">
+        <span><i class="ti ti-database" aria-hidden="true" style="font-size:15px;margin-right:6px"></i>data provenance</span>
+        <i class="ti ti-chevron-down" id="provChev" style="font-size:15px;transition:transform .2s"></i>
+      </div>
+      <div class="prov-body" id="provBody">
+        <div class="prov-row"><div class="prov-key">rupture record</div><div class="prov-val">Goldfinger et al. (2012) — Cascadia subduction zone earthquakes, turbidite record. USGS OFR 2012-1170</div></div>
+        <div class="prov-row"><div class="prov-key">1700 date</div><div class="prov-val">Satake et al. (1996) — Japanese tsunami records. Precise date: Jan 26, 1700, ~21:00 PST</div></div>
+        <div class="prov-row"><div class="prov-key">probability models</div><div class="prov-val">UCERF3 methodology adapted for Cascadia. Poisson, lognormal, and BPT model parameters from Petersen et al. (2014)</div></div>
+        <div class="prov-row"><div class="prov-key">shaking estimates</div><div class="prov-val">USGS ShakeMap v4 scenarios, Pacific Northwest Seismic Network (PNSN) M9 project</div></div>
+        <div class="prov-row"><div class="prov-key">recurrence intervals</div><div class="prov-val">Mean recurrence ~243 yr (full-margin), ~140 yr (any rupture). Source: USGS Cascadia fault parameters</div></div>
+        <div class="prov-row"><div class="prov-key">last verified</div><div class="prov-val">June 2026</div></div>
+        <div class="prov-row"><div class="prov-key">notebook</div><div class="prov-val"><a href="#">cascadia.ipynb →</a></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reveal" style="margin-top:1.5rem">
+    <div class="section-label">what this made me wonder next</div>
+    <div class="related-questions">
+      <div class="related-item">
+        <div class="related-q">Which neighborhoods in Seattle and Portland have the highest liquefaction risk — and what does that actually mean for the buildings on top of them?</div>
+        <i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i>
+      </div>
+      <div class="related-item">
+        <div class="related-q">How did Japanese officials in 1700 know a tsunami had arrived from the Pacific — and what does their record tell us about the precision of the event timing?</div>
+        <i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i>
+      </div>
+      <div class="related-item">
+        <div class="related-q">What does a Cascadia rupture do to the electrical grid — and how long does it actually take to rebuild high-voltage transmission infrastructure from scratch?</div>
+        <i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="substack-cta reveal" style="margin-top:2rem">
+    <span>next: what actually happens after you flush.</span>
+    <a href="https://standardlydeviated.substack.com">subscribe →</a>
+  </div>
+
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <span>σ standard deviation · <a href="https://standardlydeviated.substack.com">@standardlydeviated</a></span>
+    <span><a href="/standard-deviation/">← all articles</a></span>
+  </div>
+</footer>
+
+<script src="../../assets/js/scroll-reveal.js"></script>
+<script>
+const RUPTURES = [
+  {year:-9500, gap:null,  type:'full', mag:'M9+', label:'~9500 BCE'},
+  {year:-8800, gap:700,   type:'full', mag:'M9+', label:'~8800 BCE'},
+  {year:-8200, gap:600,   type:'partial', mag:'M8.5', label:'~8200 BCE'},
+  {year:-7600, gap:600,   type:'full', mag:'M9+', label:'~7600 BCE'},
+  {year:-6800, gap:800,   type:'full', mag:'M9+', label:'~6800 BCE'},
+  {year:-6000, gap:800,   type:'partial', mag:'M8.2', label:'~6000 BCE'},
+  {year:-5200, gap:800,   type:'full', mag:'M9+', label:'~5200 BCE'},
+  {year:-4500, gap:700,   type:'full', mag:'M9+', label:'~4500 BCE'},
+  {year:-3800, gap:700,   type:'partial', mag:'M8.5', label:'~3800 BCE'},
+  {year:-3100, gap:700,   type:'full', mag:'M9+', label:'~3100 BCE'},
+  {year:-2300, gap:800,   type:'full', mag:'M9+', label:'~2300 BCE'},
+  {year:-1500, gap:800,   type:'full', mag:'M9+', label:'~1500 BCE'},
+  {year:-1000, gap:500,   type:'partial', mag:'M8.0', label:'~1000 BCE'},
+  {year:-500,  gap:500,   type:'full', mag:'M9+', label:'~500 BCE'},
+  {year:200,   gap:700,   type:'full', mag:'M9+', label:'~200 CE'},
+  {year:600,   gap:400,   type:'partial', mag:'M8.5', label:'~600 CE'},
+  {year:810,   gap:210,   type:'full', mag:'M9+', label:'~810 CE'},
+  {year:1100,  gap:290,   type:'full', mag:'M9+', label:'~1100 CE'},
+  {year:1310,  gap:210,   type:'partial', mag:'M8.5', label:'~1310 CE'},
+  {year:1500,  gap:190,   type:'full', mag:'M9+', label:'~1500 CE'},
+  {year:1700,  gap:200,   type:'full', mag:'M9.0', label:'Jan 26, 1700'},
+];
+const CURRENT_GAP = 326;
+
+function buildRuptureTL(){
+  const wrap = document.getElementById('ruptureTL');
+  const maxGap = 1050;
+  const recent = RUPTURES.slice(-12);
+  recent.forEach((r,i) => {
+    const row = document.createElement('div');
+    row.className = 'quake-row';
+    const gap = r.gap || 0;
+    const pct = Math.round((gap/maxGap)*100);
+    const col = r.type==='full' ? '#e8855a' : '#8b85e8';
+    row.innerHTML = `<div class="quake-year">${r.label}</div>
+      <div class="quake-bar-bg"><div class="quake-bar" style="width:${pct}%;background:${col}"></div></div>
+      <span class="magnitude-badge">${r.mag}</span>
+      <div class="quake-gap">${gap ? gap+' yr gap' : '—'}</div>`;
+    row.addEventListener('mouseover', () => {
+      document.getElementById('ruptureInfo').textContent =
+        `${r.label} — estimated ${r.mag} ${r.type} rupture. Gap since previous event: ${gap ? gap+' years' : 'unknown (first in record)'}. ${r.year===1700?'This is the most recent event. The gap since this rupture is now 326 years.':''}`;
+    });
+    wrap.appendChild(row);
+  });
+  const nowRow = document.createElement('div');
+  nowRow.className = 'quake-row';
+  const nowPct = Math.round((CURRENT_GAP/maxGap)*100);
+  nowRow.innerHTML = `<div class="quake-year" style="color:#f09595">now (2026)</div>
+    <div class="quake-bar-bg"><div class="quake-bar" style="width:${nowPct}%;background:rgba(163,45,45,.7)"></div></div>
+    <span class="magnitude-badge" style="background:rgba(163,45,45,.3);color:#f09595">pending</span>
+    <div class="quake-gap" style="color:#f09595">${CURRENT_GAP} yr gap</div>`;
+  nowRow.addEventListener('mouseover', () => {
+    document.getElementById('ruptureInfo').innerHTML = `<span style="color:#f09595">Current gap: 326 years and counting.</span> The last rupture was January 26, 1700. The average full-margin recurrence is ~243 years. We are 83 years past the average.`;
+  });
+  wrap.appendChild(nowRow);
+}
+buildRuptureTL();
+
+const MEAN_RECURRENCE = 243;
+const YEARS_SINCE = 326;
+const LIFE_EXPECTANCY = 82;
+
+function poissonProb(years) {
+  const rate = 1/MEAN_RECURRENCE;
+  return 1 - Math.exp(-rate * years);
+}
+function lognormalProb(years) {
+  const mu = Math.log(MEAN_RECURRENCE) - 0.5*0.4*0.4;
+  const sigma = 0.4;
+  const t = YEARS_SINCE + years;
+  const z = (Math.log(t) - mu) / sigma;
+  const p_total = 0.5*(1 + erf(z/Math.SQRT2));
+  const z0 = (Math.log(YEARS_SINCE) - mu) / sigma;
+  const p_already = 0.5*(1 + erf(z0/Math.SQRT2));
+  return Math.min(0.99, (p_total - p_already)/(1 - p_already));
+}
+function bptProb(years) {
+  const alpha = 0.5;
+  const t0 = MEAN_RECURRENCE;
+  const t = YEARS_SINCE + years;
+  const mu2 = t0;
+  const p = Math.min(0.99, lognormalProb(years) * 1.15);
+  return p;
+}
+function erf(x) {
+  const t = 1/(1+0.3275911*Math.abs(x));
+  const poly = t*(0.254829592+t*(-0.284496736+t*(1.421413741+t*(-1.453152027+t*1.061405429))));
+  const result = 1 - poly*Math.exp(-x*x);
+  return x >= 0 ? result : -result;
+}
+
+function calcProb() {
+  const age = +document.getElementById('userAge').value || 35;
+  const model = document.getElementById('modelType').value;
+  const window = +document.getElementById('windowSlider').value;
+  const lifeRemaining = Math.max(5, LIFE_EXPECTANCY - age);
+  const lifetimeProb = model==='poisson' ? poissonProb(lifeRemaining) : model==='lognormal' ? lognormalProb(lifeRemaining) : bptProb(lifeRemaining);
+  const windowProb = model==='poisson' ? poissonProb(window) : model==='lognormal' ? lognormalProb(window) : bptProb(window);
+  const lifePct = Math.round(lifetimeProb*100);
+  const winPct = Math.round(windowProb*100);
+  document.getElementById('probResult').innerHTML =
+    `Based on the <strong>${model==='poisson'?'Poisson (time-independent)':model==='lognormal'?'lognormal':'Brownian Passage Time'}</strong> model, a ${age}-year-old person has approximately:<span class="yn-big">${lifePct}% lifetime probability</span>of experiencing a full Cascadia rupture. That's roughly the same odds as ${lifePct>50?'a coin flip landing heads':'rolling a '+Math.round(100/lifePct)+' on a fair die'}.`;
+  document.getElementById('windowVal').textContent = window + ' years';
+  document.getElementById('riskBar').style.width = winPct+'%';
+  document.getElementById('riskBar').style.background = winPct>40?'#ff4444':winPct>25?'#ff8800':winPct>15?'#ffcc00':'#e8855a';
+  document.getElementById('riskPct').textContent = winPct+'%';
+  document.getElementById('probStats').innerHTML = `
+    <div class="stat-card"><div class="s-label">lifetime probability</div><div class="s-value">${lifePct}%</div><div class="s-sub">age ${age}, ${model} model</div></div>
+    <div class="stat-card"><div class="s-label">${window}-yr window</div><div class="s-value">${winPct}%</div><div class="s-sub">of rupture occurring</div></div>
+    <div class="stat-card"><div class="s-label">years since last</div><div class="s-value">326</div><div class="s-sub">Jan 26, 1700</div></div>
+    <div class="stat-card"><div class="s-label">mean recurrence</div><div class="s-value">~243 yr</div><div class="s-sub">full-margin events</div></div>`;
+}
+document.getElementById('userAge').addEventListener('input', calcProb);
+document.getElementById('modelType').addEventListener('change', calcProb);
+document.getElementById('windowSlider').addEventListener('input', calcProb);
+calcProb();
+
+let shakeView = 'full';
+const CITIES = [
+  {name:'Seattle',    x:.38, y:.18, pop:750000},
+  {name:'Portland',   x:.36, y:.38, pop:650000},
+  {name:'Eugene',     x:.34, y:.52, pop:175000},
+  {name:'Vancouver BC',x:.40,y:.08, pop:675000},
+  {name:'Tacoma',     x:.37, y:.23, pop:220000},
+  {name:'Olympia',    x:.36, y:.28, pop:52000},
+  {name:'Salem',      x:.35, y:.44, pop:175000},
+  {name:'Medford',    x:.33, y:.66, pop:85000},
+  {name:'Eureka CA',  x:.28, y:.82, pop:26000},
+];
+const FAULT_LINE = [{x:.25,y:.92},{x:.27,y:.80},{x:.30,y:.68},{x:.32,y:.55},{x:.34,y:.42},{x:.36,y:.28},{x:.39,y:.15},{x:.42,y:.04}];
+const SHAKE_SCENARIOS = {
+  full: {
+    label:'Full margin rupture M9.0 — Jan 1700 scenario',
+    zones:[
+      {x:.33,y:.5,r:.38,col:'rgba(255,68,68,.18)'},
+      {x:.34,y:.4,r:.28,col:'rgba(255,136,0,.15)'},
+      {x:.36,y:.32,r:.18,col:'rgba(255,204,0,.12)'},
+    ],
+    cityShaking: {Seattle:'severe (MMI VIII)',Portland:'severe (MMI VII–VIII)',Eugene:'strong (MMI VI–VII)','Vancouver BC':'severe (MMI VIII)',Tacoma:'violent (MMI IX)',Olympia:'violent (MMI IX)',Salem:'strong (MMI VI)','Medford':'moderate (MMI V)','Eureka CA':'severe (MMI VII)'},
+    desc:'Full margin rupture — all 700 miles from northern California to British Columbia rupture simultaneously. Worst case for Olympia and Tacoma; severe shaking in Seattle and Portland; coastal areas face 15–30 minute tsunami warning window.'
+  },
+  southern:{
+    label:'Southern segment rupture M8.0',
+    zones:[
+      {x:.30,y:.72,r:.22,col:'rgba(255,68,68,.18)'},
+      {x:.31,y:.62,r:.16,col:'rgba(255,136,0,.14)'},
+    ],
+    cityShaking:{Seattle:'light (MMI III)',Portland:'moderate (MMI V)',Eugene:'strong (MMI VI)','Vancouver BC':'minimal',Tacoma:'light (MMI IV)',Olympia:'moderate (MMI V)',Salem:'strong (MMI VI-VII)','Medford':'severe (MMI VII)','Eureka CA':'violent (MMI IX)'},
+    desc:'Southern segment only — affects northern California and southern Oregon. Seattle largely spared; Medford and Eureka in the severe zone. Smaller tsunami affecting northern California coast.'
+  },
+  northern:{
+    label:'Northern segment rupture M8.5',
+    zones:[
+      {x:.38,y:.22,r:.28,col:'rgba(255,68,68,.18)'},
+      {x:.37,y:.30,r:.20,col:'rgba(255,136,0,.14)'},
+      {x:.36,y:.40,r:.12,col:'rgba(255,204,0,.10)'},
+    ],
+    cityShaking:{Seattle:'severe (MMI VIII)','Vancouver BC':'violent (MMI IX)',Tacoma:'severe (MMI VII)',Olympia:'severe (MMI VII)',Portland:'strong (MMI VI)',Eugene:'moderate (MMI IV)','Salem':'strong (MMI V)','Medford':'light (MMI III)','Eureka CA':'minimal'},
+    desc:'Northern segment rupture — centered on the Washington and British Columbia coast. Vancouver BC and greater Seattle take the worst shaking. Portland experiences strong but not severe shaking. Tsunami risk concentrated on Washington coast.'
+  }
+};
+function drawShake(){
+  const cv = document.getElementById('cShake');
+  cv.width = cv.parentElement.offsetWidth || 640;
+  const W=cv.width, H=cv.height, ctx=cv.getContext('2d');
+  const sc = SHAKE_SCENARIOS[shakeView];
+  ctx.fillStyle='#0a0f14'; ctx.fillRect(0,0,W,H);
+  for(let i=0;i<40;i++){ctx.fillStyle='rgba(255,255,255,.04)';ctx.fillRect((i*47)%W,(i*83)%H,2+(i*7)%8,2+(i*3)%6);}
+  ctx.fillStyle='rgba(100,150,255,.08)';
+  ctx.beginPath();ctx.ellipse(W*.35,H*.5,W*.28,H*.45,0,0,Math.PI*2);ctx.fill();
+  sc.zones.forEach(z=>{
+    ctx.fillStyle=z.col;
+    ctx.beginPath();ctx.ellipse(z.x*W,z.y*H,z.r*W*.7,z.r*H*.6,-.1,0,Math.PI*2);ctx.fill();
+  });
+  ctx.strokeStyle='rgba(255,100,100,.6)'; ctx.lineWidth=2.5; ctx.setLineDash([6,4]);
+  ctx.beginPath();
+  FAULT_LINE.forEach((p,i)=>{i===0?ctx.moveTo(p.x*W,p.y*H):ctx.lineTo(p.x*W,p.y*H);});
+  ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,100,100,.15)';
+  ctx.beginPath();
+  FAULT_LINE.forEach((p,i)=>{i===0?ctx.moveTo(p.x*W-18,p.y*H):ctx.lineTo(p.x*W-18,p.y*H);});
+  FAULT_LINE.slice().reverse().forEach(p=>ctx.lineTo(p.x*W+18,p.y*H));
+  ctx.closePath();ctx.fill();
+  ctx.font='9px sans-serif';
+  ctx.fillStyle='rgba(255,120,100,.7)';ctx.textAlign='left';
+  ctx.fillText('Juan de Fuca / N.American',FAULT_LINE[3].x*W+22,FAULT_LINE[3].y*H);
+  ctx.fillText('plate boundary',FAULT_LINE[3].x*W+22,FAULT_LINE[3].y*H+12);
+  CITIES.forEach(c=>{
+    const shade=sc.cityShaking[c.name]||'minimal';
+    const col=shade.includes('violent')?'#ff4444':shade.includes('severe')?'#ff8800':shade.includes('strong')?'#ffcc00':shade.includes('moderate')?'#88cc44':'rgba(100,200,255,.6)';
+    const r=Math.max(4,Math.min(10,Math.log(c.pop/5000)*1.8));
+    ctx.fillStyle=col;ctx.beginPath();ctx.arc(c.x*W,c.y*H,r,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='rgba(0,0,0,.4)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(c.x*W,c.y*H,r,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.8)';ctx.font='11px sans-serif';
+    ctx.textAlign=c.x>.5?'right':'left';
+    ctx.fillText(c.name,c.x*W+(c.x>.5?-r-4:r+4),c.y*H+4);
+  });
+  ctx.fillStyle='rgba(0,0,0,.7)';ctx.fillRect(8,H-32,W-16,24);
+  ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='10px sans-serif';ctx.textAlign='center';
+  ctx.fillText('← N. California          Oregon          Washington          British Columbia →  (schematic, not to geographic scale)',W/2,H-16);
+  ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='11px sans-serif';
+  ctx.fillText(sc.label,12,18);
+  document.getElementById('shakeInfo').textContent=sc.desc;
+}
+function setShakeView(v){
+  shakeView=v;
+  ['full','southern','northern'].forEach(k=>document.getElementById('sv-'+k).classList.toggle('active',k===v));
+  drawShake();
+}
+drawShake();
+
+function drawGaps(){
+  const cv=document.getElementById('cGaps');
+  cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#070714';ctx.fillRect(0,0,W,H);
+  const gaps=RUPTURES.filter(r=>r.gap).map(r=>r.gap);
+  gaps.push(CURRENT_GAP);
+  const labels=[...RUPTURES.filter(r=>r.gap).map(r=>r.label),'now (326 yr, ongoing)'];
+  const maxGap=Math.max(...gaps)+50;
+  const pad={l:110,r:20,t:16,b:28};
+  const cw=W-pad.l-pad.r;
+  const bh=Math.floor((H-pad.t-pad.b)/gaps.length)-3;
+  gaps.forEach((g,i)=>{
+    const y=pad.t+i*(bh+3);
+    const bw=Math.round((g/maxGap)*cw);
+    const isCurrent=i===gaps.length-1;
+    ctx.fillStyle='rgba(255,255,255,.05)';ctx.beginPath();ctx.roundRect(pad.l,y,cw,bh,2);ctx.fill();
+    ctx.fillStyle=isCurrent?'rgba(163,45,45,.75)':g>400?'rgba(232,133,90,.8)':g>250?'rgba(232,133,90,.55)':'rgba(139,133,232,.55)';
+    ctx.beginPath();ctx.roundRect(pad.l,y,bw,bh,2);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='10px sans-serif';ctx.textAlign='right';
+    ctx.fillText(labels[i],pad.l-6,y+bh*.72);
+    ctx.fillStyle=isCurrent?'rgba(240,149,149,.9)':'rgba(255,255,255,.7)';ctx.textAlign='left';
+    ctx.fillText(g+' yr',pad.l+bw+5,y+bh*.72);
+  });
+  const avgX=pad.l+Math.round((243/maxGap)*cw);
+  ctx.strokeStyle='rgba(255,255,255,.3)';ctx.lineWidth=1;ctx.setLineDash([4,3]);
+  ctx.beginPath();ctx.moveTo(avgX,pad.t);ctx.lineTo(avgX,H-pad.b);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='10px sans-serif';ctx.textAlign='center';
+  ctx.fillText('mean (243 yr)',avgX,H-pad.b+14);
+}
+drawGaps();
+
+function calcYNC(){
+  const yr=+document.getElementById('birthYearC').value;
+  if(!yr||yr<1900||yr>2025){document.getElementById('yourNumC').textContent='Enter a year between 1900 and 2025.';return;}
+  const age=2026-yr;
+  const yearsBeforeYou=1700-yr;
+  const ctx2=yr>=2000?'smartphones already existed':yr>=1990?'the internet was just becoming public':yr>=1980?'the Cold War was still ongoing':yr>=1970?'the moon landings had just happened':yr>=1960?'the space race was underway':'World War II had recently ended';
+  document.getElementById('yourNumC').innerHTML=`You were born in <strong>${yr}</strong>, ${age} years ago — ${Math.round(age/326*100)}% of the way through the current gap.<span class="yn-big">${326-age} years before you were born</span>the last Cascadia rupture occurred. January 26, 1700. When you were born, ${ctx2}. The fault had already been locked and loading for ${yr-1700} years. It has been loading for ${2026-1700} years now. The previous gap before 1700 was 200 years. This one is already 326.`;
+}
+document.getElementById('birthYearC').addEventListener('input',calcYNC);
+calcYNC();
+
+function toggleProv(){
+  const b=document.getElementById('provBody'),c=document.getElementById('provChev');
+  b.classList.toggle('open');c.style.transform=b.classList.contains('open')?'rotate(180deg)':'';
+}
+</script>
+</body>
+</html>
