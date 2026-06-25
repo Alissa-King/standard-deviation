@@ -215,43 +215,49 @@
 const TWO_PI=Math.PI*2;
 let simPlaying=false,simRAF=null,simTS=null;
 let NUM_CARS=18, cars=[], TRACK_R=0, TRACK_CX=0, TRACK_CY=0;
-const DESIRED_SPEED=0.018, JAM_THRESHOLD=22;
+
+// Optimal Velocity Model (Bando et al. 1995) — the actual physics of phantom jams.
+// Cars spontaneously jam above ~22 cars because desired gap exceeds available space.
+const VMAX=0.021;   // free-flow angular speed
+const D_GAP=0.29;   // desired gap in radians (critical density ≈ 2π/0.29 ≈ 22 cars)
+const NOISE=0.00022; // driver imperfection — seeds instability without manual trigger
+
+function optV(gap){
+  // Smooth S-curve: 0 when bumper-to-bumper, VMAX when gap is generous
+  return VMAX*Math.max(0, Math.tanh(2.5*(gap/D_GAP - 0.75)));
+}
 
 function initCars(n){
   cars=[];
   for(let i=0;i<n;i++){
-    const angle=(TWO_PI/n)*i;
-    cars.push({angle,speed:DESIRED_SPEED,braking:0,color:'#8b85e8'});
+    const angle=(TWO_PI/n)*i + (Math.random()-0.5)*0.01;
+    cars.push({angle:(angle+TWO_PI)%TWO_PI, speed:VMAX*0.9+(Math.random()-0.5)*0.003});
   }
 }
 
 function stepSim(){
   const n=cars.length;
-  const reaction=1-((+document.getElementById('reactionSlider').value-1)/9)*0.7;
-  for(let i=0;i<n;i++){
+  const rv=+document.getElementById('reactionSlider').value;
+  // Lower kappa = slower reaction = more unstable. Quick drivers (rv=1) dampen jams.
+  const kappa=0.10/(0.4+rv*0.14);
+  const newSpeeds=cars.map((car,i)=>{
     const ahead=cars[(i+1)%n];
-    let dAngle=ahead.angle-cars[i].angle;
-    if(dAngle<0)dAngle+=TWO_PI;
-    const gap=dAngle/(TWO_PI/n);
-    const desiredGap=1.2;
-    const speedDiff=ahead.speed-cars[i].speed;
-    const accel=(gap-desiredGap)*0.6*reaction+speedDiff*0.4*reaction;
-    cars[i].speed=Math.max(0,Math.min(DESIRED_SPEED*1.5,cars[i].speed+accel*0.08));
-    cars[i].angle=(cars[i].angle+cars[i].speed)%TWO_PI;
-    const isSlow=cars[i].speed<DESIRED_SPEED*0.4;
-    cars[i].color=isSlow?'#ff4444':cars[i].speed<DESIRED_SPEED*0.75?'#ff8844':cars[i].speed<DESIRED_SPEED*1.0?'#ffcc44':'#5dcaa5';
-  }
-  const avgSpeed=cars.reduce((s,c)=>s+c.speed,0)/n;
-  const avgMph=Math.round(avgSpeed/DESIRED_SPEED*65);
-  document.getElementById('avgSpeedDisp').textContent='avg: '+avgMph+' mph';
-  const jammed=cars.filter(c=>c.speed<DESIRED_SPEED*0.4).length;
-  const jamPct=Math.round(jammed/n*100);
-  const dot=document.getElementById('densityDot');
-  const status=document.getElementById('densityStatus');
-  if(n<14){dot.style.background='#5dcaa5';status.textContent='stable flow — below critical density';}
-  else if(n<20&&jammed===0){dot.style.background='#ffcc44';status.textContent='near threshold — small disturbances may amplify';}
-  else if(jammed>0){dot.style.background='#ff4444';status.textContent=`jam active — ${jamPct}% of cars stopped or near-stopped`;}
-  else{dot.style.background='#ff8844';status.textContent='unstable — jam likely to form spontaneously';}
+    let gap=ahead.angle-car.angle;
+    if(gap<=0)gap+=TWO_PI;
+    gap=Math.max(gap-0.05,0.001); // subtract car length
+    const dv=kappa*(optV(gap)-car.speed)+(Math.random()-0.5)*NOISE;
+    return Math.max(0,car.speed+dv);
+  });
+  cars.forEach((car,i)=>{car.speed=newSpeeds[i];car.angle=(car.angle+car.speed+TWO_PI)%TWO_PI;});
+}
+
+function carColor(speed){
+  const r=speed/VMAX;
+  if(r<0.12)return'#ff2020';
+  if(r<0.40)return'#ff6030';
+  if(r<0.65)return'#ffaa30';
+  if(r<0.88)return'#ffdd44';
+  return'#5dcaa5';
 }
 
 function drawSim(){
@@ -265,33 +271,46 @@ function drawSim(){
   ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;
   ctx.beginPath();ctx.arc(TRACK_CX,TRACK_CY,TRACK_R-14,0,TWO_PI);ctx.stroke();
   ctx.beginPath();ctx.arc(TRACK_CX,TRACK_CY,TRACK_R+14,0,TWO_PI);ctx.stroke();
-  cars.forEach((car,i)=>{
+  cars.forEach(car=>{
     const cx=TRACK_CX+Math.cos(car.angle)*TRACK_R;
     const cy=TRACK_CY+Math.sin(car.angle)*TRACK_R;
-    ctx.fillStyle=car.color;
+    ctx.fillStyle=carColor(car.speed);
     ctx.beginPath();ctx.arc(cx,cy,5,0,TWO_PI);ctx.fill();
   });
+  // Detect jam cluster and label wave
+  const slowCars=cars.filter(c=>c.speed<VMAX*0.3);
+  if(slowCars.length>=2){
+    const sx=slowCars.reduce((s,c)=>s+Math.cos(c.angle),0);
+    const sy=slowCars.reduce((s,c)=>s+Math.sin(c.angle),0);
+    const mean=Math.atan2(sy,sx);
+    const spread=Math.max(0.35,slowCars.length/cars.length*TWO_PI*1.1);
+    ctx.strokeStyle='rgba(255,68,68,.5)';ctx.lineWidth=4;
+    ctx.beginPath();ctx.arc(TRACK_CX,TRACK_CY,TRACK_R,mean-spread/2,mean+spread/2);ctx.stroke();
+    const lx=TRACK_CX+Math.cos(mean+0.7)*(TRACK_R+26);
+    const ly=TRACK_CY+Math.sin(mean+0.7)*(TRACK_R+26);
+    ctx.fillStyle='rgba(255,88,88,.9)';ctx.font='500 10px sans-serif';ctx.textAlign='center';
+    ctx.fillText('← jam wave',lx,ly);
+  }
   ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='11px sans-serif';ctx.textAlign='center';
   ctx.fillText('→ clockwise',TRACK_CX,TRACK_CY+TRACK_R+28);
   ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='10px sans-serif';
   ctx.fillText(cars.length+' cars on track',TRACK_CX,TRACK_CY+4);
-  const stoppedCars=cars.filter(c=>c.speed<DESIRED_SPEED*0.4);
-  if(stoppedCars.length>2){
-    const waveAngles=stoppedCars.map(c=>c.angle);
-    const meanAngle=Math.atan2(stoppedCars.reduce((s,c)=>s+Math.sin(c.angle),0),stoppedCars.reduce((s,c)=>s+Math.cos(c.angle),0));
-    const wx=TRACK_CX+Math.cos(meanAngle)*TRACK_R;
-    const wy=TRACK_CY+Math.sin(meanAngle)*TRACK_R;
-    ctx.strokeStyle='rgba(255,68,68,.4)';ctx.lineWidth=3;
-    ctx.beginPath();ctx.arc(TRACK_CX,TRACK_CY,TRACK_R,meanAngle-.4,meanAngle+.4);ctx.stroke();
-    ctx.fillStyle='rgba(255,68,68,.8)';ctx.font='500 10px sans-serif';ctx.textAlign='center';
-    ctx.fillText('← jam wave',wx+Math.cos(meanAngle+.6)*22,wy+Math.sin(meanAngle+.6)*22);
-  }
+  // Status bar
+  const avg=cars.reduce((s,c)=>s+c.speed,0)/cars.length;
+  document.getElementById('avgSpeedDisp').textContent='avg: '+Math.round((avg/VMAX)*65)+' mph';
+  const jamPct=Math.round(slowCars.length/cars.length*100);
+  const dot=document.getElementById('densityDot'),st=document.getElementById('densityStatus');
+  const critN=Math.round(TWO_PI/D_GAP);
+  if(cars.length<critN-5){dot.style.background='#5dcaa5';st.textContent='stable flow — below critical density';}
+  else if(slowCars.length===0&&cars.length<critN+2){dot.style.background='#ffcc44';st.textContent='near threshold — watch for spontaneous jam';}
+  else if(slowCars.length>0){dot.style.background='#ff4444';st.textContent=`jam active — ${jamPct}% of cars in slowdown`;}
+  else{dot.style.background='#ff8844';st.textContent='above critical density — jam forming spontaneously';}
 }
 
 function simStep(ts){
   if(!simTS)simTS=ts;
-  const el=ts-simTS; simTS=ts;
-  const steps=Math.min(8,Math.round(el/16));
+  const el=ts-simTS;simTS=ts;
+  const steps=Math.min(8,Math.max(1,Math.round(el/16)));
   for(let i=0;i<steps;i++)stepSim();
   drawSim();
   if(simPlaying)simRAF=requestAnimationFrame(simStep);
@@ -304,18 +323,18 @@ function resetSim(){
   simPlaying=false;cancelAnimationFrame(simRAF);simTS=null;
   document.getElementById('btnSimPlay').innerHTML='<i class="ti ti-player-play" aria-hidden="true"></i> play';
   initCars(NUM_CARS);drawSim();
-  document.getElementById('simInfo').textContent='Cars move clockwise. Press play and watch for spontaneous jam formation at high densities. Try "brake one car" to seed a jam artificially.';
+  document.getElementById('simInfo').textContent='Cars move clockwise. At 22+ cars a jam forms on its own within ~30 seconds — watch the red cluster appear and drift backward. Try "brake one car" to seed one instantly.';
 }
 function addDisturbance(){
-  if(cars.length===0)return;
+  if(!cars.length)return;
   const idx=Math.floor(Math.random()*cars.length);
   cars[idx].speed=0;
-  document.getElementById('simInfo').textContent='Disturbance added — watch the braking wave propagate backward (counter-clockwise) through the cars behind it.';
+  if(!simPlaying)toggleSim();
+  document.getElementById('simInfo').textContent='One car braked hard. Watch the red cluster form and drift counter-clockwise — opposite to traffic — as each car behind it brakes in turn.';
 }
 function updateDensity(v){
   NUM_CARS=+v;
   document.getElementById('densityVal').textContent=v+' cars';
-  document.getElementById('reactionVal').textContent=['very quick','quick','medium-fast','medium','medium','medium','medium-slow','slow','very slow','sluggish'][+document.getElementById('reactionSlider').value-1];
   initCars(NUM_CARS);drawSim();
 }
 document.getElementById('reactionSlider').addEventListener('input',function(){
