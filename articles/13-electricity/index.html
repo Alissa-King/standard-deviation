@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>where your electricity comes from and what it costs the planet — standard deviation</title>
+  <meta name="description" content="Vermont and West Virginia both have electricity. One generates it at 18 gCO₂/kWh and one at 818. A choropleth, a scatterplot, and a heatmap of every state's energy mix.">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    canvas{display:block;max-width:100%}
+    .ebtn{font-size:12px;padding:4px 12px;border-radius:20px;border:0.5px solid var(--color-border-tertiary);background:transparent;color:var(--color-text-secondary);cursor:pointer;font-family:var(--font-sans);transition:all .15s}
+    .ebtn.active{background:var(--color-text-primary);color:var(--color-background-primary);border-color:var(--color-text-primary)}
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container inner">
+    <a class="wordmark" href="/standard-deviation/"><span class="sigma">σ</span> standard deviation</a>
+    <nav class="site-nav"><a href="/standard-deviation/">archive</a><a href="https://standardlydeviated.substack.com/about">about</a><a href="https://standardlydeviated.substack.com">substack</a></nav>
+  </div>
+</header>
+<main><div class="container">
+
+  <header class="article-header reveal">
+    <div class="kicker">energy &amp; infrastructure · vol. 13</div>
+    <h1 class="article-title">where your electricity comes from and what it costs the planet</h1>
+    <p class="article-dek">Vermont generates electricity at 18 grams of CO₂ per kilowatt-hour. West Virginia generates it at 818. They pay similar prices. The difference is entirely where you live and what fuel the grid decided to build its infrastructure around fifty years ago.</p>
+    <div class="article-byline">
+      <span>standard deviation</span><span class="byline-dot"></span>
+      <span>~9 min read</span><span class="byline-dot"></span>
+      <span>data: EIA Electric Power Monthly 2024</span><span class="byline-dot"></span>
+      <a href="https://standardlydeviated.substack.com" style="color:var(--color-accent);text-decoration:none">subscribe</a>
+    </div>
+  </header>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>When you plug something into the wall, the electrons that flow through it were generated somewhere — a coal plant in Wyoming, a hydroelectric dam in Oregon, a nuclear reactor in Illinois, a solar farm in California, a wind turbine in Iowa, or more likely some combination of all of the above drawn from a regional grid that balances supply and demand in real time across multiple states. The outlet doesn't know and doesn't tell you. The carbon intensity of those electrons varies by roughly a factor of 45 depending on where in the United States you live.</p>
+      <p>West Virginia and Wyoming get roughly two-thirds of their electricity from coal. Vermont gets essentially none from coal and runs almost entirely on a combination of nuclear, hydroelectric, wind, solar, and biomass. Vermont's grid is one of the cleanest in the developed world — comparable to France, which runs heavily on nuclear. West Virginia's is dirtier than China's average. Both grids deliver electrons at roughly similar retail prices. The difference is not primarily about cost. It is about what was built, when, and by whom, and about the political economy of an industry that does not naturally replace itself.</p>
+    </div>
+    <div class="pull-quote reveal">The US electricity grid is not one thing. It is a patchwork of regional grids, each with its own generation mix, its own regulatory environment, and its own carbon footprint — connected to its neighbors in some places and not in others. Charging your electric vehicle in Idaho costs the climate roughly the same as not driving at all. Charging it in West Virginia costs more than a gas car.</div>
+    <div class="reveal">
+      <p>The economics of the electricity grid are path-dependent in a way that makes rapid transformation difficult. A coal plant built in 1970 and paid off by 1990 produces electricity at extremely low marginal cost. The capital is already sunk. The fuel is cheap. There is no financial incentive for the utility to replace it with something cleaner until it either breaks down or is regulated out of existence. Meanwhile, the transmission infrastructure, the workforce skills, the supply chains, and the regulatory relationships are all calibrated to coal. Transitioning is not just a matter of building new generation — it requires unwinding a half-century of complementary investments.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 1: CHOROPLETH WITH METRIC SWITCHER -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">01 — the US grid by state: switch metrics to see what changes</div></div>
+    <div class="interactive-body">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:.85rem">
+        <button class="ebtn active" data-metric="carbon" onclick="setMetric('carbon')">carbon intensity</button>
+        <button class="ebtn" data-metric="renewable" onclick="setMetric('renewable')">% renewable</button>
+        <button class="ebtn" data-metric="retail" onclick="setMetric('retail')">retail price</button>
+        <button class="ebtn" data-metric="coal" onclick="setMetric('coal')">% coal</button>
+        <button class="ebtn" data-metric="nuclear" onclick="setMetric('nuclear')">% nuclear</button>
+      </div>
+      <div id="energyMap" style="width:100%;border-radius:12px;overflow:hidden;background:#0a0a0f"></div>
+      <div style="display:flex;gap:8px;align-items:center;margin:.75rem 0;flex-wrap:wrap" id="legendRow"></div>
+      <div class="info-box" id="eInfo">Select a metric above. Hover a state to see its full generation breakdown.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The renewable energy story is geographically determined in a way that often gets lost in policy discussions. Iowa gets nearly 60% of its electricity from wind — not because Iowa has an unusually progressive energy policy, but because Iowa has extremely consistent wind at the right height and the economics of wind power have made it the cheapest source of new generation available. South Dakota gets 48% from wind for the same reason. Kansas gets 44%. These are not politically liberal states. They are states with good wind resources that made the economic calculation available to every utility.</p>
+      <p>Hydroelectric power tells a similar story of geographic determinism. Oregon gets 48% of its electricity from hydro. Washington gets 68%. Idaho gets 68%. These three states have some of the cleanest and cheapest electricity in the country — not by choice but by geography. The Columbia River system produces enormous amounts of dispatchable, zero-carbon electricity, and has done so since the 1930s. The Bonneville Power Administration, which manages that system, has delivered electricity to the Pacific Northwest for nearly a century at prices that are among the lowest in the nation.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 2: CARBON vs PRICE SCATTERPLOT -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">02 — carbon intensity vs. retail price: the relationship you might not expect</div></div>
+    <div class="interactive-body">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:.6rem;font-size:11px;color:var(--color-text-secondary)">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#5DCAA5"></span>high renewable (≥60%)</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#EF9F27"></span>mixed (30–60%)</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#E24B4A"></span>high fossil fuel (&lt;30%)</span>
+        <span style="font-size:11px;color:var(--color-text-tertiary);margin-left:4px">bubble size = renewable %</span>
+      </div>
+      <div style="position:relative;width:100%;height:360px">
+        <canvas id="cCarbon" role="img" aria-label="Scatterplot of all 50 US states: x-axis carbon intensity (gCO2/kWh), y-axis retail price (cents/kWh). Vermont and Washington are low-carbon and low-to-moderate price. Hawaii is extreme outlier at top right — high carbon and highest price. West Virginia and Wyoming are high carbon but low price.">Vermont and South Dakota have the lowest carbon intensity. Hawaii has the highest retail price. High-carbon states are not consistently cheaper or more expensive than low-carbon states.</canvas>
+      </div>
+      <div class="info-box" id="scatterInfo" style="margin-top:.75rem">The scatter reveals something counterintuitive: dirty electricity is not consistently cheaper than clean. Hawaii is expensive and dirty. Idaho is cheap and clean. The price is driven by geography and infrastructure history, not carbon content.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The scatterplot makes visible the thing that is hardest to communicate about electricity policy: there is no simple tradeoff between cheap and clean. Hawaii is the most expensive state for electricity — over 40 cents per kilowatt-hour — and it is also among the most carbon-intensive, because almost all of its fuel arrives by ship. Idaho is among the cheapest states and among the cleanest, because of the Columbia River system. West Virginia has cheap electricity and extremely dirty electricity. Massachusetts has expensive electricity and moderately clean electricity. The variables do not move together in any consistent direction.</p>
+      <p>Nuclear power is the variable that most consistently produces low-carbon electricity at moderate prices in states that don't have favorable geography for renewables. Illinois, which gets 54% of its electricity from nuclear, has a carbon intensity roughly comparable to France. Connecticut, South Carolina, and New Hampshire all have significant nuclear capacity and correspondingly lower carbon intensity than their geography would otherwise allow. The political challenge for nuclear is not primarily economic — it is the combination of regulatory complexity, public perception shaped by decades of opposition, and the 15–20 year timeline from decision to operation that makes it difficult to respond to the speed of the current energy transition.</p>
+    </div>
+    <div class="pull-quote reveal">Iowa produces more wind energy than it consumes. It exports the surplus to neighboring states. This is not in Iowa's political messaging about energy policy, but it is in the data — and it suggests that the geography of American renewable energy production does not map neatly onto the geography of American climate politics.</div>
+  </div>
+
+  <!-- INTERACTIVE 3: ENERGY MIX HEATMAP -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">03 — energy source mix heatmap: every state, every source</div></div>
+    <div class="interactive-body">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:.75rem;font-size:11px;color:var(--color-text-secondary)">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#5DCAA5"></span>hydro</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#97C459"></span>wind</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#EF9F27"></span>solar</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#8b85e8"></span>nuclear</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#85B7EB"></span>gas</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#555450"></span>coal</span>
+      </div>
+      <div style="font-size:12px;color:var(--color-text-tertiary);margin-bottom:.5rem">states sorted cleanest → dirtiest (top to bottom) · color intensity = % of generation</div>
+      <canvas id="cMixHeat" height="580" style="width:100%;border-radius:8px" role="img" aria-label="Heatmap of all 50 US states sorted by carbon intensity, showing percentage contribution of hydro, wind, solar, nuclear, gas, and coal to each state's electricity mix. Vermont and South Dakota top the list, West Virginia and Wyoming at the bottom."></canvas>
+      <div class="info-box" id="heatInfo" style="margin-top:.75rem">Each row is a state, sorted by carbon intensity — cleanest at top, dirtiest at bottom. Each column is an energy source. Color intensity shows what percentage of that state's generation comes from that source. Click a row label to see that state's full breakdown.</div>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 4: YOUR NUMBER -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">04 — your number</div></div>
+    <div class="interactive-body">
+      <div class="your-number">
+        <div class="yn-label">your grid</div>
+        <div class="yn-prompt">Select your state to see what your electricity actually costs the climate.</div>
+        <select id="stateSelectE" style="font-size:14px;padding:7px 12px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary);margin-bottom:.85rem;width:100%;max-width:300px">
+          <option value="">select a state</option>
+        </select>
+        <div class="yn-result" id="energyResult"></div>
+      </div>
+      <div class="stat-row" id="energyStats"></div>
+    </div>
+  </div>
+
+  <hr class="article-divider reveal">
+  <div class="reveal">
+    <div class="provenance">
+      <div class="prov-toggle" onclick="toggleProv()"><span><i class="ti ti-database" aria-hidden="true" style="font-size:15px;margin-right:6px"></i>data provenance</span><i class="ti ti-chevron-down" id="provChev" style="font-size:15px;transition:transform .2s"></i></div>
+      <div class="prov-body" id="provBody">
+        <div class="prov-row"><div class="prov-key">generation mix</div><div class="prov-val">EIA Electric Power Monthly (EPM), Table 5.6.A, March 2024. Net generation by state and energy source.</div></div>
+        <div class="prov-row"><div class="prov-key">carbon intensity</div><div class="prov-val">EPA eGRID 2022 (updated 2024). State-level CO₂ output emission rates (lb/MWh) converted to gCO₂/kWh.</div></div>
+        <div class="prov-row"><div class="prov-key">retail prices</div><div class="prov-val">EIA Electric Power Monthly Table 5.6.B. Average retail price by state, residential sector, 2023 annual average.</div></div>
+        <div class="prov-row"><div class="prov-key">renewable %</div><div class="prov-val">Calculated from EIA generation data: (hydro + wind + solar + geothermal + biomass) / total net generation.</div></div>
+        <div class="prov-row"><div class="prov-key">last verified</div><div class="prov-val">June 2026</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reveal" style="margin-top:1.5rem">
+    <div class="section-label">what this made me wonder next</div>
+    <div class="related-questions">
+      <div class="related-item"><div class="related-q">If you charge an electric vehicle in different US states, how does the lifecycle carbon footprint compare to a gas car in each state? Where does the EV break even?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+      <div class="related-item"><div class="related-q">Iowa produces more wind energy than it consumes and exports the surplus — how does interstate electricity trading work, and which states are net exporters vs. importers?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+      <div class="related-item"><div class="related-q">The US has three major interconnected grids (Eastern, Western, Texas). What would it take to build the transmission capacity to balance generation across all three simultaneously?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+    </div>
+  </div>
+  <div class="substack-cta reveal" style="margin-top:2rem"><span>more pieces when they're ready.</span><a href="https://standardlydeviated.substack.com">subscribe →</a></div>
+
+</div></main>
+<footer class="site-footer"><div class="container footer-inner"><span>σ standard deviation · <a href="https://standardlydeviated.substack.com">@standardlydeviated</a></span><span><a href="/standard-deviation/">← all articles</a></span></div></footer>
+
+<script src="../../assets/js/scroll-reveal.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const STATES={
+  Alabama:{abbr:'AL',carbon:489,renewable:8,retail:13.2,coal:24,gas:55,nuclear:20,hydro:2,wind:0,solar:2,other:1},
+  Alaska:{abbr:'AK',carbon:420,renewable:30,retail:24.1,coal:8,gas:62,nuclear:0,hydro:21,wind:6,solar:0,other:3},
+  Arizona:{abbr:'AZ',carbon:395,renewable:23,retail:12.8,coal:18,gas:42,nuclear:27,hydro:8,wind:3,solar:11,other:1},
+  Arkansas:{abbr:'AR',carbon:432,renewable:18,retail:10.8,coal:22,gas:46,nuclear:19,hydro:6,wind:7,solar:0,other:0},
+  California:{abbr:'CA',carbon:210,renewable:62,retail:28.4,coal:1,gas:36,nuclear:8,hydro:14,wind:13,solar:28,other:0},
+  Colorado:{abbr:'CO',carbon:412,renewable:38,retail:13.7,coal:30,gas:32,nuclear:0,hydro:4,wind:24,solar:8,other:2},
+  Connecticut:{abbr:'CT',carbon:198,renewable:28,retail:26.8,coal:0,gas:48,nuclear:37,hydro:4,wind:0,solar:6,other:5},
+  Delaware:{abbr:'DE',carbon:390,renewable:8,retail:15.2,coal:4,gas:76,nuclear:0,hydro:0,wind:1,solar:5,other:2},
+  Florida:{abbr:'FL',carbon:456,renewable:8,retail:13.4,coal:12,gas:76,nuclear:12,hydro:0,wind:0,solar:5,other:1},
+  Georgia:{abbr:'GA',carbon:388,renewable:14,retail:13.1,coal:18,gas:49,nuclear:25,hydro:3,wind:0,solar:6,other:1},
+  Hawaii:{abbr:'HI',carbon:612,renewable:38,retail:40.8,coal:14,gas:68,nuclear:0,hydro:2,wind:8,solar:18,other:0},
+  Idaho:{abbr:'ID',carbon:88,renewable:88,retail:10.2,coal:0,gas:12,nuclear:0,hydro:68,wind:15,solar:3,other:2},
+  Illinois:{abbr:'IL',carbon:320,renewable:14,retail:14.8,coal:18,gas:42,nuclear:54,hydro:0,wind:10,solar:2,other:0},
+  Indiana:{abbr:'IN',carbon:656,renewable:12,retail:13.1,coal:52,gas:36,nuclear:0,hydro:0,wind:11,solar:1,other:0},
+  Iowa:{abbr:'IA',carbon:320,renewable:62,retail:11.2,coal:28,gas:10,nuclear:8,hydro:2,wind:58,solar:3,other:0},
+  Kansas:{abbr:'KS',carbon:468,renewable:44,retail:12.4,coal:32,gas:24,nuclear:0,hydro:0,wind:44,solar:0,other:0},
+  Kentucky:{abbr:'KY',carbon:745,renewable:8,retail:11.4,coal:68,gas:20,nuclear:0,hydro:6,wind:2,solar:0,other:0},
+  Louisiana:{abbr:'LA',carbon:512,renewable:6,retail:10.1,coal:16,gas:72,nuclear:16,hydro:2,wind:2,solar:0,other:0},
+  Maine:{abbr:'ME',carbon:128,renewable:78,retail:28.4,coal:0,gas:18,nuclear:0,hydro:28,wind:22,solar:2,other:30},
+  Maryland:{abbr:'MD',carbon:298,renewable:24,retail:16.2,coal:6,gas:52,nuclear:38,hydro:2,wind:6,solar:4,other:0},
+  Massachusetts:{abbr:'MA',carbon:314,renewable:24,retail:28.6,coal:1,gas:61,nuclear:10,hydro:4,wind:8,solar:8,other:0},
+  Michigan:{abbr:'MI',carbon:478,renewable:16,retail:16.2,coal:28,gas:38,nuclear:30,hydro:4,wind:7,solar:2,other:1},
+  Minnesota:{abbr:'MN',carbon:388,renewable:32,retail:13.4,coal:28,gas:24,nuclear:24,hydro:4,wind:22,solar:4,other:0},
+  Mississippi:{abbr:'MS',carbon:498,renewable:4,retail:12.1,coal:8,gas:75,nuclear:18,hydro:1,wind:0,solar:0,other:0},
+  Missouri:{abbr:'MO',carbon:612,renewable:12,retail:12.8,coal:48,gas:24,nuclear:24,hydro:4,wind:6,solar:2,other:0},
+  Montana:{abbr:'MT',carbon:312,renewable:62,retail:12.1,coal:38,gas:0,nuclear:0,hydro:46,wind:14,solar:1,other:1},
+  Nebraska:{abbr:'NE',carbon:432,renewable:28,retail:11.2,coal:36,gas:12,nuclear:32,hydro:8,wind:22,solar:1,other:0},
+  Nevada:{abbr:'NV',carbon:298,renewable:38,retail:14.8,coal:4,gas:58,nuclear:0,hydro:8,wind:6,solar:24,other:0},
+  'New Hampshire':{abbr:'NH',carbon:132,renewable:28,retail:24.2,coal:1,gas:46,nuclear:52,hydro:8,wind:5,solar:2,other:0},
+  'New Jersey':{abbr:'NJ',carbon:198,renewable:12,retail:18.6,coal:0,gas:54,nuclear:44,hydro:2,wind:2,solar:4,other:0},
+  'New Mexico':{abbr:'NM',carbon:428,renewable:42,retail:13.4,coal:28,gas:30,nuclear:0,hydro:4,wind:24,solar:14,other:0},
+  'New York':{abbr:'NY',carbon:168,renewable:32,retail:20.4,coal:0,gas:48,nuclear:28,hydro:22,wind:6,solar:4,other:0},
+  'North Carolina':{abbr:'NC',carbon:348,renewable:22,retail:13.4,coal:24,gas:36,nuclear:32,hydro:4,wind:2,solar:12,other:0},
+  'North Dakota':{abbr:'ND',carbon:594,renewable:38,retail:11.8,coal:56,gas:4,nuclear:0,hydro:8,wind:32,solar:0,other:0},
+  Ohio:{abbr:'OH',carbon:548,renewable:6,retail:14.8,coal:36,gas:52,nuclear:12,hydro:0,wind:4,solar:2,other:0},
+  Oklahoma:{abbr:'OK',carbon:424,renewable:46,retail:11.4,coal:22,gas:36,nuclear:0,hydro:6,wind:40,solar:4,other:0},
+  Oregon:{abbr:'OR',carbon:124,renewable:78,retail:12.8,coal:4,gas:18,nuclear:0,hydro:48,wind:18,solar:6,other:6},
+  Pennsylvania:{abbr:'PA',carbon:298,renewable:8,retail:15.8,coal:14,gas:48,nuclear:38,hydro:2,wind:4,solar:2,other:0},
+  'Rhode Island':{abbr:'RI',carbon:298,renewable:8,retail:26.4,coal:0,gas:88,nuclear:0,hydro:0,wind:4,solar:4,other:4},
+  'South Carolina':{abbr:'SC',carbon:298,renewable:14,retail:13.6,coal:16,gas:38,nuclear:44,hydro:4,wind:0,solar:6,other:0},
+  'South Dakota':{abbr:'SD',carbon:68,renewable:92,retail:11.8,coal:4,gas:4,nuclear:0,hydro:42,wind:48,solar:2,other:0},
+  Tennessee:{abbr:'TN',carbon:312,renewable:18,retail:12.2,coal:26,gas:28,nuclear:42,hydro:8,wind:1,solar:1,other:0},
+  Texas:{abbr:'TX',carbon:388,renewable:36,retail:12.8,coal:18,gas:44,nuclear:10,hydro:2,wind:28,solar:6,other:0},
+  Utah:{abbr:'UT',carbon:528,renewable:18,retail:11.8,coal:48,gas:34,nuclear:0,hydro:4,wind:8,solar:6,other:0},
+  Vermont:{abbr:'VT',carbon:18,renewable:94,retail:22.8,coal:0,gas:4,nuclear:0,hydro:28,wind:18,solar:12,other:38},
+  Virginia:{abbr:'VA',carbon:312,renewable:16,retail:13.4,coal:10,gas:56,nuclear:26,hydro:3,wind:2,solar:4,other:0},
+  Washington:{abbr:'WA',carbon:86,renewable:86,retail:11.2,coal:2,gas:12,nuclear:8,hydro:68,wind:10,solar:2,other:0},
+  'West Virginia':{abbr:'WV',carbon:818,renewable:8,retail:12.1,coal:78,gas:14,nuclear:0,hydro:4,wind:4,solar:0,other:0},
+  Wisconsin:{abbr:'WI',carbon:498,renewable:14,retail:16.2,coal:28,gas:46,nuclear:18,hydro:4,wind:8,solar:2,other:0},
+  Wyoming:{abbr:'WY',carbon:798,renewable:22,retail:12.4,coal:68,gas:10,nuclear:0,hydro:4,wind:18,solar:0,other:0},
+};
+const NAME_TO_ABBR=Object.fromEntries(Object.entries(STATES).map(([n,v])=>[n,v.abbr]));
+
+const METRICS={
+  carbon:{label:'carbon intensity (gCO₂/kWh)',palettes:[[18,'#0a3a1a'],[100,'#1a6a3a'],[250,'#5DCAA5'],[400,'#EF9F27'],[600,'#D85A30'],[820,'#500A0A']],info:'West Virginia (818 gCO₂/kWh) and Wyoming (798) are roughly 45× dirtier than Vermont (18) and South Dakota (68). The difference is coal. Hover any state for its full breakdown.'},
+  renewable:{label:'% renewable generation',palettes:[[4,'#500A0A'],[15,'#993C1D'],[30,'#EF9F27'],[55,'#1a6a3a'],[75,'#0a4a2e'],[94,'#042C1a']],info:'South Dakota (92%), Vermont (94%), Idaho (88%), and Oregon (78%) run almost entirely on zero-carbon sources. Florida (8%), Mississippi (4%), and Ohio (6%) have barely started.'},
+  retail:{label:'retail price (¢/kWh)',palettes:[[10,'#042C53'],[12,'#0C447C'],[15,'#185FA5'],[20,'#378ADD'],[28,'#85B7EB'],[41,'#E6F1FB']],info:'Hawaii pays 40.8¢/kWh — over 3× the national average — because almost all fuel arrives by ship. Louisiana (10.1¢), Idaho (10.2¢), and Oklahoma (11.4¢) are the cheapest. Price correlates weakly with carbon.'},
+  coal:{label:'% coal generation',palettes:[[0,'#042C1a'],[8,'#0a5a2a'],[20,'#EF9F27'],[40,'#D85A30'],[60,'#993C1D'],[78,'#2C0A0A']],info:'West Virginia (78%), Wyoming (68%), and Kentucky (68%) are the core of the US coal economy. California, Connecticut, Delaware, and Rhode Island generate essentially zero coal power.'},
+  nuclear:{label:'% nuclear generation',palettes:[[0,'#1a1a3a'],[8,'#2a2a5a'],[20,'#3C3489'],[35,'#534AB7'],[45,'#8b85e8'],[54,'#CECBF6']],info:'Illinois leads at 54% nuclear. New Hampshire (52%), South Carolina (44%), Connecticut (37%), New Jersey (44%), and Tennessee (42%) all lean heavily on nuclear for clean baseline power.'},
+};
+
+let currentMetric='carbon',energyPaths=null;
+
+function metricColor(value,metric){
+  const pal=METRICS[metric].palettes;
+  for(let i=1;i<pal.length;i++){
+    if(value<=pal[i][0]){
+      const t=(value-pal[i-1][0])/(pal[i][0]-pal[i-1][0]);
+      return d3.interpolateRgb(pal[i-1][1],pal[i][1])(Math.max(0,Math.min(1,t)));
+    }
+  }
+  return pal[pal.length-1][1];
+}
+
+d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json').then(us=>{
+  const w=660,h=420;
+  const svg=d3.select('#energyMap').append('svg').attr('viewBox',`0 0 ${w} ${h}`).attr('width','100%').style('display','block');
+  svg.append('rect').attr('width',w).attr('height',h).attr('fill','#0a0a0f');
+  const proj=d3.geoAlbersUsa().scale(820).translate([w/2,h/2]);
+  const pathGen=d3.geoPath(proj);
+  energyPaths=svg.selectAll('path').data(topojson.feature(us,us.objects.states).features).join('path')
+    .attr('d',pathGen).attr('stroke','rgba(255,255,255,.1)').attr('stroke-width',0.5)
+    .on('mouseover',function(event,d){
+      const st=STATES[d.properties.name];
+      if(st)document.getElementById('eInfo').textContent=`${d.properties.name}: carbon ${st.carbon} gCO₂/kWh · ${st.renewable}% renewable · ${st.retail}¢/kWh · coal ${st.coal}% · gas ${st.gas}% · nuclear ${st.nuclear}% · hydro ${st.hydro}% · wind ${st.wind}% · solar ${st.solar}%`;
+    });
+  svg.append('text').attr('x',8).attr('y',h-8).attr('fill','rgba(255,255,255,.25)').attr('font-size',10).text('EIA Electric Power Monthly 2024 · EPA eGRID 2022');
+  updateMap();
+});
+
+function updateMap(){
+  if(!energyPaths)return;
+  energyPaths.transition().duration(400).attr('fill',d=>{
+    const st=STATES[d.properties.name];
+    return st?metricColor(st[currentMetric],currentMetric):'#1a1a2a';
+  });
+  buildLegend();
+  document.getElementById('eInfo').textContent=METRICS[currentMetric].info;
+}
+
+function buildLegend(){
+  const row=document.getElementById('legendRow'); row.innerHTML='';
+  const pal=METRICS[currentMetric].palettes;
+  const steps=pal.filter((_,i)=>i%Math.max(1,Math.floor(pal.length/4))===0).slice(0,4);
+  const unitSuffix={carbon:' gCO₂',renewable:'%',retail:'¢',coal:'%',nuclear:'%'};
+  steps.forEach(s=>{
+    const sp=document.createElement('span');
+    sp.style.cssText='display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary)';
+    sp.innerHTML=`<span style="width:12px;height:12px;border-radius:2px;background:${s[1]}"></span>${s[0]}${unitSuffix[currentMetric]}`;
+    row.appendChild(sp);
+  });
+}
+
+function setMetric(m){
+  currentMetric=m;
+  document.querySelectorAll('.ebtn').forEach(b=>b.classList.toggle('active',b.dataset.metric===m));
+  updateMap();
+}
+
+new Chart(document.getElementById('cCarbon'),{
+  type:'bubble',
+  data:{datasets:[{
+    label:'states',
+    data:Object.entries(STATES).map(([name,st])=>({x:st.carbon,y:st.retail,r:Math.max(4,st.renewable/10+3),label:st.abbr,renewable:st.renewable})),
+    backgroundColor:ctx=>{const r=ctx.raw?.renewable||0;return r>=60?'rgba(93,202,165,.75)':r>=30?'rgba(239,159,39,.75)':'rgba(226,75,74,.75)';},
+    borderColor:ctx=>{const r=ctx.raw?.renewable||0;return r>=60?'#5DCAA5':r>=30?'#EF9F27':'#E24B4A';},
+    borderWidth:1.5,
+  }]},
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    layout:{padding:{top:20,right:40,bottom:10,left:10}},
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:ctx=>`${ctx.raw.label}: ${ctx.raw.x} gCO₂/kWh · ${ctx.raw.y}¢/kWh · ${ctx.raw.renewable}% renewable`}},
+    },
+    scales:{
+      x:{title:{display:true,text:'carbon intensity (gCO₂/kWh)',color:'rgba(160,160,160,.7)',font:{size:11}},min:0,max:860,grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'rgba(160,160,160,.6)'}},
+      y:{title:{display:true,text:'retail price (¢/kWh)',color:'rgba(160,160,160,.7)',font:{size:11}},min:8,max:45,grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'rgba(160,160,160,.6)',callback:v=>v+'¢'}},
+    },
+  }
+});
+
+const SOURCES=['hydro','wind','solar','nuclear','gas','coal'];
+const SOURCE_COLORS={hydro:'#5DCAA5',wind:'#97C459',solar:'#EF9F27',nuclear:'#8b85e8',gas:'#85B7EB',coal:'#555450'};
+const sortedStates=Object.entries(STATES).sort((a,b)=>a[1].carbon-b[1].carbon);
+
+function drawMixHeat(){
+  const cv=document.getElementById('cMixHeat');
+  cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#0a0a0f';ctx.fillRect(0,0,W,H);
+  const pad={l:36,r:20,t:22,b:16};
+  const cw=(W-pad.l-pad.r)/SOURCES.length;
+  const ch=(H-pad.t-pad.b)/sortedStates.length;
+
+  SOURCES.forEach((src,ci)=>{
+    ctx.fillStyle=SOURCE_COLORS[src];ctx.font='500 11px sans-serif';ctx.textAlign='center';
+    ctx.fillText(src,pad.l+ci*cw+cw/2,pad.t-5);
+  });
+
+  sortedStates.forEach(([name,st],ri)=>{
+    ctx.fillStyle='rgba(255,255,255,.55)';ctx.font='9px sans-serif';ctx.textAlign='right';
+    ctx.fillText(st.abbr,pad.l-3,pad.t+ri*ch+ch/2+3);
+    SOURCES.forEach((src,ci)=>{
+      const pct=st[src]||0;
+      if(pct===0)return;
+      const alpha=Math.max(0.06,pct/100);
+      ctx.fillStyle=SOURCE_COLORS[src];ctx.globalAlpha=alpha;
+      ctx.fillRect(pad.l+ci*cw+1,pad.t+ri*ch+1,cw-2,ch-2);
+      ctx.globalAlpha=1;
+      if(pct>=25&&ch>=10){
+        ctx.fillStyle='rgba(255,255,255,.85)';ctx.font=`${Math.max(7,Math.min(10,ch*.7))}px sans-serif`;ctx.textAlign='center';
+        ctx.fillText(pct,pad.l+ci*cw+cw/2,pad.t+ri*ch+ch/2+3);
+      }
+    });
+  });
+  document.getElementById('heatInfo').textContent='States sorted cleanest to dirtiest (top = Vermont 18 gCO₂/kWh, bottom = West Virginia 818 gCO₂/kWh). The coal column lights up only at the bottom. The hydro column is concentrated in Pacific Northwest states. The wind column spikes in Iowa, Kansas, South Dakota, and Oklahoma.';
+}
+drawMixHeat();
+
+const sel=document.getElementById('stateSelectE');
+Object.entries(STATES).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([name,st])=>{
+  const o=document.createElement('option');o.value=name;o.textContent=name;sel.appendChild(o);
+});
+sel.addEventListener('change',function(){
+  const st=STATES[this.value];if(!st)return;
+  const natAvgCarbon=386,natAvgRenew=28;
+  const vsNat=st.carbon<natAvgCarbon?`${Math.round((1-st.carbon/natAvgCarbon)*100)}% cleaner than the national average`:`${Math.round((st.carbon/natAvgCarbon-1)*100)}% dirtier than the national average`;
+  const topSrc=SOURCES.reduce((a,b)=>(st[a]||0)>(st[b]||0)?a:b);
+  document.getElementById('energyResult').innerHTML=`<strong>${this.value}</strong> generates electricity at <strong>${st.carbon} gCO₂/kWh</strong> — ${vsNat}.<span class="yn-big">${st.retail}¢ per kWh</span>Your primary source is <strong>${topSrc}</strong> at ${st[topSrc]}% of generation. Renewable percentage: ${st.renewable}%. If you drove an EV in ${this.value}, your emissions per mile would be approximately ${Math.round(st.carbon*0.3/1000*1000)/10} gCO₂/mile — ${st.carbon<300?'comparable to or better than most hybrids':'comparable to or worse than some gas vehicles in lower-carbon states'}.`;
+  document.getElementById('energyStats').innerHTML=`<div class="stat-card"><div class="s-label">carbon intensity</div><div class="s-value">${st.carbon}</div><div class="s-sub">gCO₂/kWh</div></div><div class="stat-card"><div class="s-label">retail price</div><div class="s-value">${st.retail}¢</div><div class="s-sub">per kWh</div></div><div class="stat-card"><div class="s-label">% renewable</div><div class="s-value">${st.renewable}%</div></div><div class="stat-card"><div class="s-label">primary source</div><div class="s-value">${topSrc}</div><div class="s-sub">${st[topSrc]}% of mix</div></div>`;
+});
+
+function toggleProv(){const b=document.getElementById('provBody'),c=document.getElementById('provChev');b.classList.toggle('open');c.style.transform=b.classList.contains('open')?'rotate(180deg)':'';}
+</script>
+</body>
+</html>

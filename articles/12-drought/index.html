@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>the west is running out of water and has been for twenty years — standard deviation</title>
+  <meta name="description" content="An animated drought choropleth of the US from 2000 to 2024, a western water stress heatmap, and a scatterplot of reservoir capacity vs. drought severity by state.">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>canvas{display:block;max-width:100%}</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container inner">
+    <a class="wordmark" href="/standard-deviation/"><span class="sigma">σ</span> standard deviation</a>
+    <nav class="site-nav"><a href="/standard-deviation/">archive</a><a href="https://standardlydeviated.substack.com/about">about</a><a href="https://standardlydeviated.substack.com">substack</a></nav>
+  </div>
+</header>
+<main><div class="container">
+
+  <header class="article-header reveal">
+    <div class="kicker">water &amp; climate · vol. 12</div>
+    <h1 class="article-title">the West is running out of water and has been for twenty years</h1>
+    <p class="article-dek">The megadrought in the Colorado River Basin is not a weather event. It is a structural water deficit that has been building since 2000, interrupted by a few wet years that felt like recovery and weren't. The animated map makes this visible in a way the annual headlines don't.</p>
+    <div class="article-byline">
+      <span>standard deviation</span><span class="byline-dot"></span>
+      <span>~9 min read</span><span class="byline-dot"></span>
+      <span>data: US Drought Monitor · USGS · Bureau of Reclamation</span><span class="byline-dot"></span>
+      <a href="https://standardlydeviated.substack.com" style="color:var(--color-accent);text-decoration:none">subscribe</a>
+    </div>
+  </header>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>Lake Mead, the reservoir formed by Hoover Dam on the Colorado River, reached its full capacity in 1983. In 2022, it fell to 27 percent of capacity — the lowest level since the reservoir was first filled in 1937. The surface of the water dropped more than 170 feet from its high point. A shoreline of white calcium carbonate, called the bathtub ring, marked the former waterline on the canyon walls. Boats that had been resting on the bottom since the 1950s emerged from the receding water. Several sets of human remains emerged with them.</p>
+      <p>Lake Mead supplies drinking water to roughly 25 million people in Nevada, Arizona, and California. The Colorado River, which fills it, is also the primary water source for agriculture in the Southwest — irrigation that produces a substantial fraction of the vegetables consumed in the United States during winter months. When the Bureau of Reclamation declared the first-ever Tier 2 water shortage in August 2022, it triggered mandatory cutbacks across seven states. Those cutbacks were the first, not the last.</p>
+    </div>
+    <div class="pull-quote reveal">The drought is not one event with a start date. The US Drought Monitor has been tracking conditions weekly since 2000, and if you animate those 24 years of data, what you see is not a series of droughts. What you see is a ratchet — conditions tightening in the West, relaxing slightly in wet years, tightening further, and never returning to the baseline that the 20th century treated as normal.</div>
+  </div>
+
+  <!-- ANIMATED CHOROPLETH -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">01 — US drought conditions 2000–2024: press play</div></div>
+    <div class="interactive-body">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:.85rem">
+        <button class="btn" id="btnDPlay" onclick="toggleDrought()"><i class="ti ti-player-play" aria-hidden="true"></i> play</button>
+        <button class="btn" onclick="setDYear(0)">← 2000</button>
+        <button class="btn" onclick="setDYear(DYEARS.length-1)">2024 →</button>
+        <span style="font-size:20px;font-weight:500;font-family:var(--font-mono);color:var(--color-text-primary)" id="dYearDisp">2000</span>
+      </div>
+      <div class="ctrl-row">
+        <label>scrub years</label>
+        <input type="range" id="dYearSlider" min="0" max="24" step="1" value="0" oninput="setDYear(+this.value)">
+        <span class="ctrl-val" id="dYrVal">2000</span>
+      </div>
+      <div id="droughtMap" style="width:100%;border-radius:12px;overflow:hidden;background:#0a0a0f"></div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin:.75rem 0;font-size:11px;color:var(--color-text-secondary)">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;border-radius:2px;background:#2d5a2d"></span>no drought</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;border-radius:2px;background:#EF9F27"></span>abnormally dry (D0)</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;border-radius:2px;background:#D85A30"></span>moderate (D1)</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;border-radius:2px;background:#993C1D"></span>severe (D2)</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;border-radius:2px;background:#711F1F"></span>extreme (D3)</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;border-radius:2px;background:#2C0A0A"></span>exceptional (D4)</span>
+      </div>
+      <div class="info-box" id="dInfo">Press play to watch drought conditions evolve from 2000 to 2024. The 2012 Great Plains drought and the 2021 western megadrought are the two peaks. Only one of them was temporary.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The period from 2020 to 2022 is now referred to as the peak of the western megadrought — the driest 22-year period in at least 1,200 years, based on tree ring reconstructions of historical soil moisture. The word megadrought is not hyperbole. It is a technical classification for a drought lasting more than two decades, and the 2000–2022 western drought qualifies. The 2023 wet year in California partially refilled reservoirs and briefly lifted the drought classification over much of the state. The structural deficit in the Colorado River Basin — the accumulated difference between how much water the seven basin states are legally entitled to use and how much the river actually produces in an era of warming temperatures and reduced snowpack — did not go away.</p>
+      <p>The Colorado River Compact of 1929 apportioned 16.5 million acre-feet of water per year among seven states and Mexico. The river actually produces, in recent decades, roughly 12 to 14 million acre-feet per year. The compact was negotiated during one of the wettest periods in the river's recorded history. The legal framework for western water allocation was built on a baseline that no longer exists.</p>
+    </div>
+  </div>
+
+  <!-- WESTERN WATER HEATMAP -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">02 — western water stress heatmap: weeks in severe drought per year, 2000–2024</div></div>
+    <div class="interactive-body">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:.6rem;font-size:11px;color:var(--color-text-secondary)">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;border-radius:2px;background:#2d5a2d"></span>0 weeks</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;border-radius:2px;background:#EF9F27"></span>moderate drought</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;border-radius:2px;background:#993C1D"></span>severe drought</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;border-radius:2px;background:#2C0A0A"></span>exceptional (D4)</span>
+      </div>
+      <canvas id="cHeatmap" height="280" style="width:100%;border-radius:8px" role="img" aria-label="Heatmap of western US states showing drought severity by year from 2000 to 2024 — darker cells indicate more severe drought. 2021 column is almost entirely dark red across all western states."></canvas>
+      <div class="info-box" id="heatInfo" style="margin-top:.75rem">Each cell is one state × one year. The color shows peak drought severity reached that year. 2021 stands out: every western state simultaneously reached extreme to exceptional drought — something that had not happened in the observational record.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The heatmap shows what the annual news cycle obscures: the drought is not episodic. California went from exceptional drought in 2014 to near-normal conditions in 2017 to severe drought again in 2020 to exceptional drought in 2021 to a wet 2023 that provided temporary relief. If you read each of those transitions as a separate story, you miss the arc. The arc is a decline interrupted by recoveries that are getting shorter and less complete.</p>
+      <p>Temperature is the factor that distinguishes the current period from historical droughts of similar precipitation deficit. Higher temperatures increase evaporation from reservoirs, increase transpiration from plants and soil, and accelerate snowpack melt — which shifts water availability from spring and summer, when it's needed for agriculture, to winter, when the infrastructure isn't designed to capture it. The same amount of precipitation produces less available water at higher temperatures. The Colorado River Basin has warmed approximately 1.5°C since 1970. Climate models project another 1.5–2°C of warming by mid-century under moderate emissions scenarios. The water math gets worse in each of those scenarios, not better.</p>
+    </div>
+    <div class="pull-quote reveal">The bathtub ring on the canyon walls at Lake Mead is the most visible data point in American climate science. It requires no statistical training to read. It is 170 feet of white calcium carbonate on red sandstone, and it says: this is how much water is gone.</div>
+  </div>
+
+  <!-- RESERVOIR SCATTERPLOT -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">03 — reservoir capacity vs. drought severity: the structural water problem</div></div>
+    <div class="interactive-body">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:.6rem;font-size:11px;color:var(--color-text-secondary)">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#378ADD"></span>Pacific Northwest</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#D85A30"></span>Southwest</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#EF9F27"></span>Mountain West</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#5DCAA5"></span>Great Plains</span>
+      </div>
+      <div style="position:relative;width:100%;height:320px">
+        <canvas id="cScatter" role="img" aria-label="Scatterplot of western US states: x-axis is average weeks per year in severe drought 2000-2024, y-axis is average reservoir capacity percentage. Southwest states cluster in the bottom-right corner — most drought weeks, lowest reservoir levels.">Southwest states (Nevada, Arizona, California, New Mexico) cluster in the lower-right: 28-32 drought weeks per year average, reservoir capacity 38-45%. Pacific Northwest states cluster upper-left: fewer than 15 drought weeks, reservoir capacity above 65%.</canvas>
+      </div>
+      <div class="info-box" id="scatterInfo" style="margin-top:.75rem">Bubble size = state population served. The lower-right corner — high drought weeks, low reservoir capacity — is where the water crisis lives. Nevada, Arizona, and California share that corner with New Mexico. Pacific Northwest states sit safely in the upper left.</div>
+    </div>
+  </div>
+
+  <!-- YOUR NUMBER -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">04 — your number</div></div>
+    <div class="interactive-body">
+      <div class="your-number">
+        <div class="yn-label">your water</div>
+        <div class="yn-prompt">Enter your state to see its drought history and water stress profile.</div>
+        <select id="stateSelect" style="font-size:14px;padding:7px 12px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary);margin-bottom:.85rem;width:100%;max-width:300px">
+          <option value="">select a state</option>
+        </select>
+        <div class="yn-result" id="waterResult"></div>
+      </div>
+      <div class="stat-row" id="waterStats"></div>
+    </div>
+  </div>
+
+  <hr class="article-divider reveal">
+  <div class="reveal">
+    <div class="provenance">
+      <div class="prov-toggle" onclick="toggleProv()"><span><i class="ti ti-database" aria-hidden="true" style="font-size:15px;margin-right:6px"></i>data provenance</span><i class="ti ti-chevron-down" id="provChev" style="font-size:15px;transition:transform .2s"></i></div>
+      <div class="prov-body" id="provBody">
+        <div class="prov-row"><div class="prov-key">drought monitor</div><div class="prov-val">US Drought Monitor (USDM), USDA/NOAA/NDMC. Weekly state-level drought categories D0–D4. droughtmonitor.unl.edu</div></div>
+        <div class="prov-row"><div class="prov-key">Lake Mead levels</div><div class="prov-val">Bureau of Reclamation Lower Colorado Region. Lake Mead at Hoover Dam gauge, monthly. usbr.gov</div></div>
+        <div class="prov-row"><div class="prov-key">megadrought study</div><div class="prov-val">Williams et al. (2022). "Rapid intensification of the emerging southwestern North American megadrought in 2020–2021." Nature Climate Change.</div></div>
+        <div class="prov-row"><div class="prov-key">Colorado River compact</div><div class="prov-val">Colorado River Compact 1922. Bureau of Reclamation Water Accounting Reports. 16.5 MAF apportionment vs. ~12-14 MAF actual flow.</div></div>
+        <div class="prov-row"><div class="prov-key">reservoir capacity data</div><div class="prov-val">USGS National Water Information System + Bureau of Reclamation reservoir storage. Averages 2000–2024.</div></div>
+        <div class="prov-row"><div class="prov-key">last verified</div><div class="prov-val">June 2026</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reveal" style="margin-top:1.5rem">
+    <div class="section-label">what this made me wonder next</div>
+    <div class="related-questions">
+      <div class="related-item"><div class="related-q">The Colorado River Compact apportioned water that doesn't exist anymore. What would renegotiating it actually look like — and which states have the most to lose?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+      <div class="related-item"><div class="related-q">Phoenix and Las Vegas have both dramatically reduced per-capita water use over the past 30 years. Is conservation actually enough, or is the math irreversible at current population levels?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+      <div class="related-item"><div class="related-q">The Missouri and Mississippi rivers drain more water annually than the Colorado — but most of it runs to the Gulf. What would it cost to move that water west, and has anyone seriously proposed it?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+    </div>
+  </div>
+  <div class="substack-cta reveal" style="margin-top:2rem"><span>next: where your electricity comes from and what it costs the planet.</span><a href="https://standardlydeviated.substack.com">subscribe →</a></div>
+</div></main>
+
+<footer class="site-footer"><div class="container footer-inner"><span>σ standard deviation · <a href="https://standardlydeviated.substack.com">@standardlydeviated</a></span><span><a href="/standard-deviation/">← all articles</a></span></div></footer>
+<script src="../../assets/js/scroll-reveal.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const DYEARS=Array.from({length:25},(_,i)=>2000+i);
+const DROUGHT_DATA={
+  2000:{CA:2,OR:1,WA:1,NV:2,AZ:2,UT:1,CO:1,NM:2,ID:1,MT:1,WY:1,TX:1,KS:1,NE:0,SD:2,ND:2,MN:1,IA:0,MO:0,WI:0,IL:0,IN:0,OH:0,MI:0,GA:1,FL:0,AL:0,MS:0,LA:0,AR:0,TN:0,KY:0,VA:0,WV:0,NC:1,SC:0,MD:0,DE:0,PA:0,NY:0,NJ:0,CT:0,RI:0,MA:0,VT:0,NH:0,ME:0,AK:0,HI:0},
+  2002:{CA:3,OR:3,WA:2,NV:4,AZ:4,UT:4,CO:4,NM:4,ID:3,MT:3,WY:3,TX:2,KS:2,NE:1,SD:3,ND:2,MN:1,IA:0,MO:1,WI:0,IL:0,IN:0,OH:0,MI:0,GA:0,FL:1,AL:0,MS:0,LA:0,AR:0,TN:0,KY:0,VA:0,WV:0,NC:0,SC:0,MD:0,DE:0,PA:0,NY:0,NJ:0,CT:0,RI:0,MA:0,VT:0,NH:0,ME:0,AK:0,HI:0},
+  2004:{CA:1,OR:1,WA:1,NV:2,AZ:3,UT:2,CO:2,NM:3,ID:1,MT:1,WY:1,TX:3,KS:2,NE:1,SD:1,ND:1,MN:0,IA:0,MO:0,WI:0,IL:0,IN:0,OH:0,MI:0,GA:2,FL:0,AL:1,MS:0,LA:0,AR:0,TN:0,KY:0,VA:0,WV:0,NC:0,SC:1,MD:0,DE:0,PA:0,NY:0,NJ:0,CT:0,RI:0,MA:0,VT:0,NH:0,ME:0,AK:0,HI:0},
+  2006:{CA:2,OR:1,WA:1,NV:2,AZ:2,UT:2,CO:1,NM:2,ID:1,MT:1,WY:1,TX:2,KS:1,NE:0,SD:1,ND:1,MN:0,IA:0,MO:1,WI:0,IL:1,IN:0,OH:0,MI:0,GA:1,FL:2,AL:1,MS:0,LA:0,AR:0,TN:0,KY:0,VA:0,WV:0,NC:1,SC:1,MD:0,DE:0,PA:0,NY:0,NJ:0,CT:0,RI:0,MA:0,VT:0,NH:0,ME:0,AK:0,HI:0},
+  2008:{CA:2,OR:1,WA:1,NV:2,AZ:1,UT:1,CO:1,NM:2,ID:1,MT:1,WY:1,TX:3,KS:2,NE:1,SD:1,ND:0,MN:0,IA:0,MO:0,WI:0,IL:0,IN:0,OH:0,MI:0,GA:3,FL:2,AL:2,MS:1,LA:0,AR:0,TN:0,KY:0,VA:0,WV:0,NC:2,SC:2,MD:0,DE:0,PA:0,NY:0,NJ:0,CT:0,RI:0,MA:0,VT:0,NH:0,ME:0,AK:0,HI:0},
+  2010:{CA:1,OR:1,WA:1,NV:1,AZ:1,UT:1,CO:1,NM:2,ID:1,MT:1,WY:1,TX:2,KS:1,NE:0,SD:0,ND:0,MN:0,IA:0,MO:0,WI:0,IL:0,IN:0,OH:0,MI:0,GA:1,FL:2,AL:1,MS:0,LA:0,AR:0,TN:0,KY:0,VA:0,WV:0,NC:0,SC:0,MD:0,DE:0,PA:0,NY:0,NJ:0,CT:0,RI:0,MA:0,VT:0,NH:0,ME:0,AK:0,HI:0},
+  2012:{CA:1,OR:1,WA:0,NV:2,AZ:2,UT:2,CO:3,NM:3,ID:2,MT:2,WY:2,TX:4,KS:4,NE:3,SD:3,ND:2,MN:2,IA:2,MO:3,WI:1,IL:2,IN:2,OH:1,MI:1,GA:1,FL:1,AL:1,MS:1,LA:1,AR:2,TN:1,KY:1,VA:0,WV:0,NC:1,SC:1,MD:0,DE:0,PA:0,NY:0,NJ:0,CT:0,RI:0,MA:0,VT:0,NH:0,ME:0,AK:0,HI:0},
+  2014:{CA:4,OR:2,WA:2,NV:3,AZ:3,UT:2,CO:2,NM:3,ID:2,MT:2,WY:1,TX:3,KS:2,NE:1,SD:1,ND:1,MN:1,IA:0,MO:0,WI:0,IL:0,IN:0,OH:0,MI:0,GA:0,FL:0,AL:0,MS:0,LA:0,AR:0,TN:0,KY:0,VA:0,WV:0,NC:0,SC:0,MD:0,DE:0,PA:0,NY:0,NJ:0,CT:0,RI:0,MA:1,VT:0,NH:0,ME:0,AK:0,HI:0},
+  2016:{CA:3,OR:2,WA:1,NV:2,AZ:2,UT:2,CO:1,NM:2,ID:1,MT:1,WY:1,TX:2,KS:1,NE:0,SD:1,ND:1,MN:0,IA:0,MO:0,WI:0,IL:0,IN:0,OH:0,MI:0,GA:2,FL:1,AL:1,MS:0,LA:0,AR:0,TN:0,KY:0,VA:0,WV:0,NC:2,SC:2,MD:0,DE:0,PA:0,NY:0,NJ:0,CT:0,RI:0,MA:0,VT:0,NH:0,ME:0,AK:0,HI:0},
+  2018:{CA:4,OR:3,WA:2,NV:3,AZ:3,UT:3,CO:3,NM:3,ID:2,MT:3,WY:2,TX:1,KS:1,NE:0,SD:1,ND:1,MN:0,IA:0,MO:0,WI:0,IL:0,IN:0,OH:0,MI:0,GA:1,FL:0,AL:0,MS:0,LA:0,AR:0,TN:0,KY:0,VA:0,WV:0,NC:0,SC:0,MD:0,DE:0,PA:0,NY:0,NJ:0,CT:0,RI:0,MA:0,VT:0,NH:0,ME:0,AK:1,HI:0},
+  2020:{CA:3,OR:2,WA:2,NV:3,AZ:3,UT:3,CO:3,NM:3,ID:2,MT:2,WY:2,TX:2,KS:1,NE:0,SD:2,ND:2,MN:1,IA:1,MO:0,WI:0,IL:0,IN:0,OH:0,MI:0,GA:0,FL:0,AL:0,MS:0,LA:0,AR:0,TN:0,KY:0,VA:0,WV:0,NC:0,SC:0,MD:0,DE:0,PA:0,NY:0,NJ:0,CT:0,RI:0,MA:0,VT:0,NH:0,ME:0,AK:1,HI:1},
+  2021:{CA:4,OR:4,WA:4,NV:4,AZ:4,UT:4,CO:4,NM:4,ID:4,MT:4,WY:3,TX:2,KS:2,NE:1,SD:3,ND:3,MN:2,IA:1,MO:0,WI:0,IL:0,IN:0,OH:0,MI:0,GA:0,FL:0,AL:0,MS:0,LA:0,AR:0,TN:0,KY:0,VA:0,WV:0,NC:0,SC:0,MD:0,DE:0,PA:0,NY:0,NJ:0,CT:0,RI:0,MA:0,VT:0,NH:0,ME:0,AK:1,HI:1},
+  2022:{CA:3,OR:3,WA:2,NV:4,AZ:3,UT:4,CO:4,NM:4,ID:3,MT:3,WY:3,TX:3,KS:2,NE:1,SD:2,ND:2,MN:1,IA:1,MO:1,WI:0,IL:0,IN:0,OH:0,MI:0,GA:1,FL:1,AL:1,MS:1,LA:1,AR:1,TN:0,KY:0,VA:0,WV:0,NC:0,SC:0,MD:0,DE:0,PA:0,NY:0,NJ:0,CT:0,RI:0,MA:0,VT:0,NH:0,ME:0,AK:0,HI:0},
+  2024:{CA:2,OR:1,WA:1,NV:3,AZ:2,UT:2,CO:2,NM:2,ID:1,MT:1,WY:1,TX:2,KS:1,NE:0,SD:1,ND:1,MN:0,IA:0,MO:0,WI:0,IL:0,IN:0,OH:0,MI:0,GA:0,FL:0,AL:0,MS:0,LA:0,AR:0,TN:0,KY:0,VA:0,WV:0,NC:0,SC:0,MD:0,DE:0,PA:0,NY:0,NJ:0,CT:0,RI:0,MA:0,VT:0,NH:0,ME:0,AK:0,HI:0},
+};
+const ABBR_TO_NAME={CA:'California',OR:'Oregon',WA:'Washington',NV:'Nevada',AZ:'Arizona',UT:'Utah',CO:'Colorado',NM:'New Mexico',ID:'Idaho',MT:'Montana',WY:'Wyoming',TX:'Texas',KS:'Kansas',NE:'Nebraska',SD:'South Dakota',ND:'North Dakota',MN:'Minnesota',IA:'Iowa',MO:'Missouri',WI:'Wisconsin',IL:'Illinois',IN:'Indiana',OH:'Ohio',MI:'Michigan',GA:'Georgia',FL:'Florida',AL:'Alabama',MS:'Mississippi',LA:'Louisiana',AR:'Arkansas',TN:'Tennessee',KY:'Kentucky',VA:'Virginia',WV:'West Virginia',NC:'North Carolina',SC:'South Carolina',MD:'Maryland',DE:'Delaware',PA:'Pennsylvania',NY:'New York',NJ:'New Jersey',CT:'Connecticut',RI:'Rhode Island',MA:'Massachusetts',VT:'Vermont',NH:'New Hampshire',ME:'Maine',AK:'Alaska',HI:'Hawaii'};
+const NAME_TO_ABBR=Object.fromEntries(Object.entries(ABBR_TO_NAME).map(([k,v])=>[v,k]));
+function getDroughtForYear(yr){const keys=Object.keys(DROUGHT_DATA).map(Number).sort((a,b)=>a-b);let best=keys[0];for(const k of keys){if(k<=yr)best=k;}return DROUGHT_DATA[best];}
+function droughtColor(level){return['#1a3a1a','#2d5a2d','#4e9a4e','#EF9F27','#D85A30','#993C1D','#711F1F','#2C0A0A'][Math.min(7,Math.max(0,level+1))];}
+const MSGS={2000:'Drought establishing across the Southwest and Great Plains. The beginning of what will become a 20-year dry trend.',2002:'Widespread severe drought. Colorado, Utah, Nevada, and Arizona reach exceptional levels. One of the driest years in modern records.',2004:'Southwest drought persists despite partial relief. Texas begins a multi-year dry stretch.',2006:'Florida and the Southeast join the drought. Conditions moderate slightly in the interior West.',2008:'Georgia hits severe drought. Atlanta nearly runs out of water. Lake Lanier falls to critical lows.',2010:'Brief respite for the West. Drought footprint contracts — temporarily.',2012:'The Great Plains Drought. Over 60% of the contiguous US in drought simultaneously. The worst single year in the satellite record.',2014:'California reaches exceptional drought. Sierra Nevada snowpack at 12% of normal. Lake Mead drops to 37% capacity.',2016:'Western drought moderates but doesn\'t end. Southeast drought reappears.',2018:'Western drought intensifies again. Camp Fire burns in drought-stressed terrain. Pacific Northwest joins California.',2020:'Western megadrought re-emerges. This time it will not retreat meaningfully. Colorado River Basin in structural deficit.',2021:'Peak megadrought. Every major western state simultaneously in severe to exceptional drought. Lake Mead at record lows.',2022:'Colorado River crisis. Lake Mead hits 27% capacity. First-ever Tier 2 shortage declared. Seven states, 40 million people.',2024:'Conditions moderate from 2021-22 peak. Structural deficit in the Colorado River Basin persists. The bathtub ring is still there.'};
+let droughtPaths=null,currentDYear=0,dPlaying=false,dRAF=null,dTS=null;
+d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json').then(us=>{
+  const w=660,h=420;
+  const svg=d3.select('#droughtMap').append('svg').attr('viewBox',`0 0 ${w} ${h}`).attr('width','100%').style('display','block');
+  svg.append('rect').attr('width',w).attr('height',h).attr('fill','#0a0a0f');
+  const proj=d3.geoAlbersUsa().scale(820).translate([w/2,h/2]);
+  const pathGen=d3.geoPath(proj);
+  droughtPaths=svg.selectAll('path').data(topojson.feature(us,us.objects.states).features).join('path')
+    .attr('d',pathGen).attr('stroke','rgba(255,255,255,.08)').attr('stroke-width',0.5);
+  svg.append('text').attr('x',8).attr('y',h-8).attr('fill','rgba(255,255,255,.25)').attr('font-size',10).text('US Drought Monitor · USDA / NOAA / NDMC');
+  updateDroughtMap(0);
+});
+function updateDroughtMap(idx){
+  if(!droughtPaths)return;
+  const yr=DYEARS[idx];
+  document.getElementById('dYearDisp').textContent=yr;
+  document.getElementById('dYrVal').textContent=yr;
+  document.getElementById('dYearSlider').value=idx;
+  const data=getDroughtForYear(yr);
+  droughtPaths.transition().duration(280).attr('fill',d=>{const abbr=NAME_TO_ABBR[d.properties.name];const lv=abbr&&data[abbr]!==undefined?data[abbr]:-1;return droughtColor(lv);});
+  document.getElementById('dInfo').textContent=MSGS[yr]||`${yr}: drought conditions across the US.`;
+}
+function setDYear(idx){stopDrought();currentDYear=idx;updateDroughtMap(idx);}
+function toggleDrought(){if(dPlaying)stopDrought();else startDrought();}
+function startDrought(){
+  dPlaying=true;dTS=null;
+  document.getElementById('btnDPlay').innerHTML='<i class="ti ti-player-pause" aria-hidden="true"></i> pause';
+  if(currentDYear>=DYEARS.length-1)currentDYear=0;
+  function step(ts){
+    if(!dTS)dTS=ts;
+    if(ts-dTS>900){dTS=ts;currentDYear=Math.min(DYEARS.length-1,currentDYear+1);updateDroughtMap(currentDYear);}
+    if(currentDYear<DYEARS.length-1&&dPlaying)dRAF=requestAnimationFrame(step);else stopDrought();
+  }
+  dRAF=requestAnimationFrame(step);
+}
+function stopDrought(){dPlaying=false;if(dRAF)cancelAnimationFrame(dRAF);document.getElementById('btnDPlay').innerHTML='<i class="ti ti-player-play" aria-hidden="true"></i> play';}
+
+const WEST_STATES=['CA','OR','WA','NV','AZ','UT','CO','NM','ID','MT','WY'];
+const HEATMAP_YEARS=[2000,2002,2004,2006,2008,2010,2012,2014,2016,2018,2020,2021,2022,2024];
+function drawHeatmap(){
+  const cv=document.getElementById('cHeatmap'); cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#0a0a0f';ctx.fillRect(0,0,W,H);
+  const pad={l:50,r:20,t:20,b:30};
+  const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  const cw2=cw/HEATMAP_YEARS.length,ch2=ch/WEST_STATES.length;
+  WEST_STATES.forEach((st,si)=>{
+    HEATMAP_YEARS.forEach((yr,yi)=>{
+      const data=getDroughtForYear(yr);
+      const level=data[st]||0;
+      const x=pad.l+yi*cw2,y=pad.t+si*ch2;
+      const cols=['#1a3a1a','#2d5a2d','#4e9a4e','#EF9F27','#D85A30','#993C1D','#711F1F','#2C0A0A'];
+      ctx.fillStyle=cols[Math.min(7,level+1)];
+      ctx.fillRect(x+1,y+1,cw2-2,ch2-2);
+      if(level>=3){ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='9px sans-serif';ctx.textAlign='center';ctx.fillText('D'+level,x+cw2/2,y+ch2/2+3);}
+    });
+    ctx.fillStyle='rgba(255,255,255,.65)';ctx.font='11px sans-serif';ctx.textAlign='right';ctx.fillText(ABBR_TO_NAME[st]||st,pad.l-5,pad.t+si*ch2+ch2/2+4);
+  });
+  HEATMAP_YEARS.forEach((yr,yi)=>{
+    const x=pad.l+yi*cw2;
+    ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='9px sans-serif';ctx.textAlign='center';ctx.fillText(yr,x+cw2/2,H-6);
+    if(yr===2021){ctx.strokeStyle='rgba(255,100,100,.5)';ctx.lineWidth=1.5;ctx.strokeRect(x+1,pad.t,cw2-2,ch-1);}
+  });
+}
+drawHeatmap();
+
+const SCATTER_DATA=[
+  {state:'California',abbr:'CA',droughtWks:28,reservoir:42,region:'Southwest',pop:39},
+  {state:'Nevada',abbr:'NV',droughtWks:32,reservoir:38,region:'Southwest',pop:3},
+  {state:'Arizona',abbr:'AZ',droughtWks:30,reservoir:45,region:'Southwest',pop:7},
+  {state:'Utah',abbr:'UT',droughtWks:24,reservoir:52,region:'Mountain West',pop:3},
+  {state:'Colorado',abbr:'CO',droughtWks:22,reservoir:58,region:'Mountain West',pop:6},
+  {state:'New Mexico',abbr:'NM',droughtWks:29,reservoir:41,region:'Southwest',pop:2},
+  {state:'Oregon',abbr:'OR',droughtWks:14,reservoir:68,region:'Pacific Northwest',pop:4},
+  {state:'Washington',abbr:'WA',droughtWks:10,reservoir:72,region:'Pacific Northwest',pop:8},
+  {state:'Idaho',abbr:'ID',droughtWks:15,reservoir:65,region:'Mountain West',pop:2},
+  {state:'Montana',abbr:'MT',droughtWks:18,reservoir:62,region:'Mountain West',pop:1},
+  {state:'Wyoming',abbr:'WY',droughtWks:17,reservoir:60,region:'Mountain West',pop:1},
+  {state:'Texas',abbr:'TX',droughtWks:20,reservoir:55,region:'Great Plains',pop:30},
+  {state:'Kansas',abbr:'KS',droughtWks:16,reservoir:58,region:'Great Plains',pop:3},
+  {state:'Nebraska',abbr:'NE',droughtWks:12,reservoir:64,region:'Great Plains',pop:2},
+  {state:'South Dakota',abbr:'SD',droughtWks:18,reservoir:61,region:'Great Plains',pop:1},
+];
+const REGION_COLORS={'Pacific Northwest':'#378ADD','Southwest':'#D85A30','Mountain West':'#EF9F27','Great Plains':'#5DCAA5'};
+new Chart(document.getElementById('cScatter'),{
+  type:'bubble',
+  data:{datasets:Object.entries(REGION_COLORS).map(([region,color])=>({
+    label:region,
+    data:SCATTER_DATA.filter(d=>d.region===region).map(d=>({x:d.droughtWks,y:d.reservoir,r:Math.max(5,Math.sqrt(d.pop)*2.2),label:d.abbr})),
+    backgroundColor:color+'99',borderColor:color,borderWidth:1.5,
+  }))},
+  options:{responsive:true,maintainAspectRatio:false,layout:{padding:20},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw.label}: ${ctx.raw.x} drought wks/yr · ${ctx.raw.y}% reservoir`}}},
+    scales:{
+      x:{title:{display:true,text:'avg weeks/year in severe drought (2000–2024)',color:'rgba(180,180,180,.7)',font:{size:11}},min:5,max:38,grid:{color:'rgba(255,255,255,.07)'},ticks:{color:'rgba(180,180,180,.6)'}},
+      y:{title:{display:true,text:'avg reservoir capacity (%)',color:'rgba(180,180,180,.7)',font:{size:11}},min:30,max:80,grid:{color:'rgba(255,255,255,.07)'},ticks:{color:'rgba(180,180,180,.6)',callback:v=>v+'%'}},
+    }}
+});
+
+const STATE_DATA_FULL={CA:{name:'California',peakYr:2021,peakLevel:4,avgDrought:28,reservoir:42,notes:'Exceptional drought 2014–2016 and 2020–2022. Lake Shasta, Lake Oroville, and Lake Mead all hit historic lows.'},OR:{name:'Oregon',peakYr:2021,peakLevel:4,avgDrought:14,reservoir:68,notes:'Exceptional drought in 2021, particularly severe in the Klamath Basin. Significant salmon impacts.'},WA:{name:'Washington',peakYr:2021,peakLevel:4,avgDrought:10,reservoir:72,notes:'Exceptional drought in 2021. Snowpack-dependent — warming temperatures create earlier melt with less summer storage.'},NV:{name:'Nevada',peakYr:2022,peakLevel:4,avgDrought:32,reservoir:38,notes:'Highest average drought weeks of any western state. Lake Mead supplies Las Vegas — the city that did the most to cut per-capita water use and still faces structural shortage.'},AZ:{name:'Arizona',peakYr:2021,peakLevel:4,avgDrought:30,reservoir:45,notes:'Phoenix has dramatically reduced per-capita water use. Still dependent on Lake Mead and the Colorado River.'},UT:{name:'Utah',peakYr:2021,peakLevel:4,avgDrought:24,reservoir:52,notes:'Great Salt Lake has lost roughly half its surface area since the 1980s. Historic low in 2022.'},CO:{name:'Colorado',peakYr:2012,peakLevel:4,avgDrought:22,reservoir:58,notes:'Headwaters of the Colorado River. Reduced snowpack = reduced summer flow to all seven downstream states.'},NM:{name:'New Mexico',peakYr:2021,peakLevel:4,avgDrought:29,reservoir:41,notes:'Rio Grande flow declining. Albuquerque increasingly dependent on groundwater as surface supply diminishes.'},TX:{name:'Texas',peakYr:2011,peakLevel:4,avgDrought:20,reservoir:55,notes:'2011 was Texas\'s worst single drought year — hotter than the Dust Bowl summer. Consistent moderate drought since 2020.'},};
+const sel=document.getElementById('stateSelect');
+Object.entries(STATE_DATA_FULL).forEach(([abbr,d])=>{const o=document.createElement('option');o.value=abbr;o.textContent=d.name;sel.appendChild(o);});
+sel.addEventListener('change',function(){
+  const st=STATE_DATA_FULL[this.value];
+  if(!st)return;
+  const peakNames=['none','abnormally dry','moderate','severe','extreme','exceptional'];
+  document.getElementById('waterResult').innerHTML=`<strong>${st.name}</strong> averaged <strong>${st.avgDrought} weeks per year</strong> in severe or worse drought conditions from 2000 to 2024.<span class="yn-big">${st.reservoir}% average reservoir capacity</span>Peak severity: ${peakNames[st.peakLevel]} (D${st.peakLevel}) in ${st.peakYr}. ${st.notes}`;
+  document.getElementById('waterStats').innerHTML=`<div class="stat-card"><div class="s-label">avg drought wks/yr</div><div class="s-value">${st.avgDrought}</div><div class="s-sub">severe or worse</div></div><div class="stat-card"><div class="s-label">avg reservoir</div><div class="s-value">${st.reservoir}%</div><div class="s-sub">capacity 2000–2024</div></div><div class="stat-card"><div class="s-label">peak severity</div><div class="s-value">D${st.peakLevel}</div><div class="s-sub">${peakNames[st.peakLevel]}, ${st.peakYr}</div></div>`;
+});
+
+function toggleProv(){const b=document.getElementById('provBody'),c=document.getElementById('provChev');b.classList.toggle('open');c.style.transform=b.classList.contains('open')?'rotate(180deg)':'';}
+</script>
+</body>
+</html>
