@@ -210,7 +210,6 @@ function drawWaitingChart(){
   const maxHrs=Math.max(1,...WAIT_CATS.map(c=>Math.round(waitVals[c.id]/60*365)))*1.15;
   const rowH=Math.floor(ch/WAIT_CATS.length);
   const bh=Math.max(8,rowH-5);
-  // grid lines
   [0.25,0.5,0.75,1].forEach(f=>{
     const x=pad.l+f*cw;
     ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=0.5;
