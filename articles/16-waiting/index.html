@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>how much of your life is just waiting — standard deviation</title>
+  <meta name="description" content="Red lights, hold music, loading bars, appointment delays. Waiting arrives in crumbs — but crumbs accumulate. Enter your daily waits and see what they add up to over a lifetime.">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>canvas{display:block;max-width:100%}</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container inner">
+    <a class="wordmark" href="/standard-deviation/"><span class="sigma">σ</span> standard deviation</a>
+    <nav class="site-nav"><a href="/standard-deviation/">archive</a><a href="https://standardlydeviated.substack.com/about">about</a><a href="https://standardlydeviated.substack.com">substack</a></nav>
+  </div>
+</header>
+<main><div class="container">
+
+  <header class="article-header reveal">
+    <div class="kicker">time &amp; systems · vol. 16</div>
+    <h1 class="article-title">how much of your life is just waiting</h1>
+    <p class="article-dek">Red lights. Hold music. Loading bars. Appointment delays. Waiting arrives in crumbs too small to mourn. But crumbs accumulate. At some point a life contains a second life made entirely of waiting.</p>
+    <div class="article-byline">
+      <span>standard deviation</span><span class="byline-dot"></span>
+      <span>~8 min read</span><span class="byline-dot"></span>
+      <span>personal waiting ledger · lifetime compounding calculator · inequality of waiting</span><span class="byline-dot"></span>
+      <a href="https://standardlydeviated.substack.com" style="color:var(--color-accent);text-decoration:none">subscribe</a>
+    </div>
+  </header>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>Waiting rarely feels like a life event. It comes in pieces too small to mourn. Three minutes at a red light. Seven minutes in line. Twelve minutes on hold. Four minutes for the microwave. Six minutes for the doctor to come in. Nine minutes for the prescription. Twenty-two minutes refreshing a tracking page. Thirty seconds for the elevator. Two minutes for the file to upload. Eight minutes because someone is late. One minute because the app is thinking.</p>
+      <p>Waiting does not usually arrive as a catastrophe. It arrives as crumbs. But crumbs accumulate. And at some point, a life contains a second life made entirely of waiting.</p>
+    </div>
+    <div class="pull-quote reveal">Small units of time are psychologically slippery. Five minutes feels like nothing. Five minutes a day is more than thirty hours a year. Thirty minutes a day is more than a full week of waking life. This is why waiting is hard to see: it is not usually dramatic enough to trigger a decision. It is just irritating enough to make you check your phone — which makes the time disappear without coming back.</div>
+    <div class="reveal">
+      <p>The commute is one of the few kinds of waiting we actually measure. The US Census reported a mean one-way travel time of 27.2 minutes in 2024 — 54 minutes round trip, 272 minutes a week, roughly 226 hours a year, or more than nine full 24-hour days. Just commuting. Before the school pickup line, the pharmacy, the DMV, the software update, the appointment that starts late, and the delivery window that says "8 a.m. to 5 p.m." like that is a reasonable way to describe time.</p>
+      <p>The phone has made this invisible. Not because the time returned. Because we stopped noticing it leave.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 1: THE WAITING LEDGER -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">01 — the waiting ledger: enter your daily waits</div></div>
+    <div class="interactive-body">
+      <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:.85rem">Enter minutes per day for each type. Your totals build in real time.</div>
+      <div id="waitingSliders"></div>
+      <div class="stat-row" id="waitingTotals" style="margin-top:.75rem"></div>
+      <canvas id="cWaiting" height="260" style="width:100%;border-radius:8px;background:#0a0a0f;margin-top:.75rem" role="img" aria-label="Stacked bar chart showing how daily waiting minutes compound into annual hours and lifetime years across different categories of waiting"></canvas>
+      <div class="info-box" id="waitingInfo" style="margin-top:.75rem">Your daily waiting minutes compound into something significant. The chart above shows the annual breakdown by category.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>Not all waiting is equal. A wealthy person waits differently than a poor one. A salaried employee waits differently than an hourly worker. Someone with childcare waits differently than someone without it. Someone with a car waits differently than someone dependent on an infrequent bus. Someone with paid leave waits differently than someone who loses wages for every medical appointment.</p>
+      <p>Time is not just personal. It is political. A long line is sometimes a staffing choice. A three-hour appointment window is sometimes a monopoly flex. A slow benefits office is sometimes an administrative burden dressed as a process. An unreliable bus route is sometimes a budget priority wearing a schedule. A phone tree is sometimes a wall — one designed to exhaust the caller rather than assist them.</p>
+    </div>
+    <div class="pull-quote reveal">Not all waiting is waste. Some waiting is restful. Some is social. Some is the price of living among other people. But some waiting is imposed — bad design, understaffing, poverty, bureaucracy. The distinction matters: chosen waiting is a life. Imposed waiting is a tax paid in minutes by people who can least afford it.</div>
+  </div>
+
+  <!-- INTERACTIVE 2: FIVE MINUTES BECOMES A YEAR -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">02 — how daily minutes compound into lost years</div></div>
+    <div class="interactive-body">
+      <div class="ctrl-row">
+        <label>daily waiting (min)</label>
+        <input type="range" id="dailyMin" min="5" max="240" step="5" value="60" oninput="drawCompound()">
+        <span class="ctrl-val" id="dailyMinVal">60 min/day</span>
+      </div>
+      <div class="ctrl-row">
+        <label>your age</label>
+        <input type="range" id="compAge" min="20" max="80" step="1" value="35" oninput="drawCompound()">
+        <span class="ctrl-val" id="compAgeVal">35 years old</span>
+      </div>
+      <canvas id="cCompound" height="260" style="width:100%;border-radius:8px;background:#0a0a0f;margin-top:.75rem" role="img" aria-label="Bar chart showing how different daily waiting amounts (5, 10, 20, 30, 60, 120 minutes) compound into annual hours and lifetime years of waiting by age 80"></canvas>
+      <div class="stat-row" id="compStats" style="margin-top:.75rem"></div>
+      <div class="info-box" id="compInfo" style="margin-top:.75rem">At your daily waiting total, here's what the lifetime math looks like.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>There is also a class dimension to the commute number that the average obscures. The 27-minute mean hides an enormous range. High-income workers disproportionately work from home or near where they live. Low-income workers often live farther from their jobs because housing near employment centers is expensive, and take longer routes because transit coverage is worse in underserved areas. The people whose time is most economically constrained are often the ones spending the most of it in transit.</p>
+      <p>A nine-hour annualized commute burden, distributed unequally, is not a commuting problem. It is a housing and transportation problem that shows up in commuting data.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 3: CHOSEN VS IMPOSED WAITING -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">03 — chosen waiting vs. imposed waiting</div></div>
+    <div class="interactive-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:.75rem 0">
+        <div style="background:rgba(93,202,165,.08);border:0.5px solid rgba(93,202,165,.3);border-radius:8px;padding:1rem">
+          <div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.7px;color:#5DCAA5;margin-bottom:.75rem">chosen waiting</div>
+          <div id="chosenList"></div>
+        </div>
+        <div style="background:rgba(226,75,74,.08);border:0.5px solid rgba(226,75,74,.3);border-radius:8px;padding:1rem">
+          <div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.7px;color:#E24B4A;margin-bottom:.75rem">imposed waiting</div>
+          <div id="imposedList"></div>
+        </div>
+      </div>
+      <div class="info-box" id="waitTypeInfo">The distinction matters. One is a life. The other is a tax. Click any item to learn more.</div>
+    </div>
+  </div>
+
+  <!-- YOUR NUMBER -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">04 — your number</div></div>
+    <div class="interactive-body">
+      <div class="your-number">
+        <div class="yn-label">your waiting life</div>
+        <div class="yn-prompt">Enter your age and estimated daily waiting time. We'll tell you what you've already waited through.</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:.85rem">
+          <input type="number" id="ynAge" min="18" max="90" value="35" placeholder="age" style="width:80px;font-size:14px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-mono)">
+          <input type="number" id="ynDailyMin" min="5" max="300" value="75" placeholder="min/day" style="width:90px;font-size:14px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-mono)">
+          <span style="font-size:12px;color:var(--color-text-tertiary)">minutes of waiting per day</span>
+        </div>
+        <div class="yn-result" id="ynWaitResult"></div>
+      </div>
+      <div class="stat-row" id="ynWaitStats"></div>
+    </div>
+  </div>
+
+  <hr class="article-divider reveal">
+  <div class="reveal">
+    <div class="provenance">
+      <div class="prov-toggle" onclick="toggleProv()"><span><i class="ti ti-database" aria-hidden="true" style="font-size:15px;margin-right:6px"></i>data provenance</span><i class="ti ti-chevron-down" id="provChev" style="font-size:15px;transition:transform .2s"></i></div>
+      <div class="prov-body" id="provBody">
+        <div class="prov-row"><div class="prov-key">commute data</div><div class="prov-val">US Census Bureau American Community Survey 2024. Mean one-way travel time 27.2 min. 9.3% of workers commute 60+ min each way.</div></div>
+        <div class="prov-row"><div class="prov-key">red light waiting</div><div class="prov-val">INRIX Traffic Scorecard. AAA Foundation for Traffic Safety. Average US driver stops at red lights 20+ hours per year.</div></div>
+        <div class="prov-row"><div class="prov-key">customer service hold</div><div class="prov-val">Marchex Institute customer service research. American Consumer Satisfaction Index hold time surveys.</div></div>
+        <div class="prov-row"><div class="prov-key">doctor wait times</div><div class="prov-val">Merritt Hawkins annual Survey of Physician Appointment Wait Times. Average wait for established patient: 26 days, 20 min in office.</div></div>
+        <div class="prov-row"><div class="prov-key">commute inequality</div><div class="prov-val">University of Minnesota Accessibility Observatory. Transit accessibility gap by income decile. EPA EJScreen data.</div></div>
+        <div class="prov-row"><div class="prov-key">last verified</div><div class="prov-val">June 2026</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reveal" style="margin-top:1.5rem">
+    <div class="section-label">what this made me wonder next</div>
+    <div class="related-questions">
+      <div class="related-item"><div class="related-q">What would happen if every institution had to publish the average time it extracts from people — not dollars, but minutes? Hold time. Appointment delays. Form completion time. A patience tax receipt.</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+      <div class="related-item"><div class="related-q">The phone eliminated boredom as a waiting experience but didn't return the time. Did it make waiting better, or just make waiting invisible?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+      <div class="related-item"><div class="related-q">Queuing theory is a real field of mathematics. Hospitals, amusement parks, and call centers all use it. Why are government services so much worse at it than Disney World?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+    </div>
+  </div>
+  <div class="substack-cta reveal" style="margin-top:2rem"><span>more pieces when they're ready.</span><a href="https://standardlydeviated.substack.com">subscribe →</a></div>
+</div></main>
+
+<footer class="site-footer"><div class="container footer-inner"><span>σ standard deviation · <a href="https://standardlydeviated.substack.com">@standardlydeviated</a></span><span><a href="/standard-deviation/">← all articles</a></span></div></footer>
+<script src="../../assets/js/scroll-reveal.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const WAIT_CATS=[
+  {id:'commute',label:'commuting',icon:'ti-car',default:27,color:'#8b85e8',note:'The most-measured waiting. Average US one-way commute: 27 min. 9% of workers exceed 60 min each way.'},
+  {id:'redlight',label:'red lights',icon:'ti-traffic-lights',default:8,color:'#e8855a',note:'US drivers average 20+ hours per year at red lights. About 8 min/day for a typical driver.'},
+  {id:'grocery',label:'grocery / retail lines',icon:'ti-shopping-cart',default:6,color:'#EF9F27',note:'Average grocery checkout wait: 4–8 min. Self-checkout has not consistently reduced this.'},
+  {id:'digital',label:'loading / digital delay',icon:'ti-loader',default:10,color:'#5DCAA5',note:'Loading screens, buffering, software updates, app delays. Harder to measure but cumulative.'},
+  {id:'appointments',label:'medical appointments',icon:'ti-stethoscope',default:20,color:'#378ADD',note:'Average US patient waits 20 min in the office after their scheduled time. Specialists average longer.'},
+  {id:'hold',label:'customer service hold',icon:'ti-phone-off',default:8,color:'#D4537E',note:'Average US hold time: 13 min per call. Varies enormously by industry. Banks and utilities worst.'},
+  {id:'pickup',label:'school / child logistics',icon:'ti-school',default:15,color:'#97C459',note:'School pickup lines, activities, practice pickup. Highly variable; significant for parents.'},
+  {id:'other',label:'other people running late',icon:'ti-clock',default:5,color:'rgba(150,150,150,.7)',note:'Meetings starting late, friends running late, waiting for someone to reply. Socially imposed waiting.'},
+];
+
+let waitVals=Object.fromEntries(WAIT_CATS.map(c=>[c.id,c.default]));
+
+function buildWaitSliders(){
+  const wrap=document.getElementById('waitingSliders');
+  WAIT_CATS.forEach(cat=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:10px;padding:.5rem 0;border-bottom:0.5px solid var(--color-border-tertiary)';
+    row.innerHTML=`<i class="ti ${cat.icon}" style="color:${cat.color};font-size:16px;width:20px;flex-shrink:0" aria-hidden="true"></i>
+    <span style="font-size:12px;min-width:140px;color:var(--color-text-primary);flex-shrink:0">${cat.label}</span>
+    <input type="range" min="0" max="120" step="1" value="${cat.default}" style="flex:1;accent-color:${cat.color}" oninput="updateWait('${cat.id}',+this.value,this.nextElementSibling)">
+    <span style="font-size:12px;font-family:var(--font-mono);min-width:52px;text-align:right;color:var(--color-text-secondary)">${cat.default} min</span>`;
+    wrap.appendChild(row);
+    row.querySelector('input').addEventListener('input',function(){
+      this.nextElementSibling.textContent=this.value+' min';
+      updateWait(cat.id,+this.value);
+    });
+  });
+}
+buildWaitSliders();
+
+function updateWait(id,val){
+  waitVals[id]=val;
+  updateWaitingTotals();
+  drawWaitingChart();
+}
+
+function updateWaitingTotals(){
+  const totalMin=Object.values(waitVals).reduce((a,b)=>a+b,0);
+  const annualHrs=Math.round(totalMin/60*365);
+  const annualDays=Math.round(annualHrs/24*10)/10;
+  const lifeYrs=Math.round(annualHrs/8760*40*10)/10;
+  document.getElementById('waitingTotals').innerHTML=`<div class="stat-card"><div class="s-label">daily waiting</div><div class="s-value">${totalMin} min</div><div class="s-sub">${Math.round(totalMin/60*10)/10} hours</div></div><div class="stat-card"><div class="s-label">per year</div><div class="s-value">${annualHrs.toLocaleString()} hrs</div><div class="s-sub">${annualDays} full days</div></div><div class="stat-card"><div class="s-label">over 40 years</div><div class="s-value">${lifeYrs} yrs</div><div class="s-sub">of your waking life</div></div><div class="stat-card"><div class="s-label">books you could read</div><div class="s-value">${Math.round(annualHrs/5)}</div><div class="s-sub">at 5 hrs per book/yr</div></div>`;
+  document.getElementById('waitingInfo').textContent=`At ${totalMin} minutes of daily waiting, you lose ${annualHrs.toLocaleString()} hours per year — ${annualDays} full days. Over a 40-year adult life: ${lifeYrs} years spent waiting.`;
+}
+
+let waitChart=null;
+function drawWaitingChart(){
+  const totalMin=Object.values(waitVals).reduce((a,b)=>a+b,0);
+  if(totalMin===0)return;
+  const canvas=document.getElementById('cWaiting');
+  if(waitChart)waitChart.destroy();
+  waitChart=new Chart(canvas,{
+    type:'bar',
+    data:{
+      labels:WAIT_CATS.map(c=>c.label),
+      datasets:[{
+        label:'annual hours',
+        data:WAIT_CATS.map(c=>Math.round(waitVals[c.id]/60*365)),
+        backgroundColor:WAIT_CATS.map(c=>c.color+'cc'),
+        borderColor:WAIT_CATS.map(c=>c.color),
+        borderWidth:1,
+      }]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} hours/year (${Math.round(ctx.raw/24*10)/10} days)`}}},
+      scales:{
+        x:{title:{display:true,text:'hours per year',color:'rgba(160,160,160,.7)',font:{size:11}},grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'rgba(160,160,160,.6)'}},
+        y:{grid:{display:false},ticks:{color:'rgba(160,160,160,.6)',font:{size:11}}},
+      }
+    }
+  });
+}
+updateWaitingTotals();
+drawWaitingChart();
+
+let compChart=null;
+function drawCompound(){
+  const dailyMin=+document.getElementById('dailyMin').value;
+  const age=+document.getElementById('compAge').value;
+  document.getElementById('dailyMinVal').textContent=dailyMin+' min/day';
+  document.getElementById('compAgeVal').textContent=age+' years old';
+  const scenarios=[5,10,20,30,60,120];
+  const lifeRemaining=Math.max(1,80-age);
+  const annualHrs=Math.round(dailyMin/60*365);
+  const lifeHrs=Math.round(dailyMin/60*365*lifeRemaining);
+  document.getElementById('compStats').innerHTML=`<div class="stat-card"><div class="s-label">hours waiting/year</div><div class="s-value">${annualHrs.toLocaleString()}</div></div><div class="stat-card"><div class="s-label">days waiting/year</div><div class="s-value">${Math.round(annualHrs/24*10)/10}</div></div><div class="stat-card"><div class="s-label">remaining life hours</div><div class="s-value">${lifeHrs.toLocaleString()}</div><div class="s-sub">to age 80</div></div><div class="stat-card"><div class="s-label">remaining life years</div><div class="s-value">${Math.round(lifeHrs/8760*10)/10}</div><div class="s-sub">waking waiting time</div></div>`;
+  document.getElementById('compInfo').textContent=`At ${dailyMin} minutes/day, you will spend approximately ${Math.round(lifeHrs/8760*10)/10} more years of your waking life waiting before age 80.`;
+  const cv=document.getElementById('cCompound');cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#0a0a0f';ctx.fillRect(0,0,W,H);
+  const pad={l:60,r:20,t:20,b:40};
+  const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  const maxHrs=Math.max(...scenarios.map(s=>s/60*365))*1.1;
+  const bw=Math.floor(cw/scenarios.length)-6;
+  scenarios.forEach((s,i)=>{
+    const hrs=Math.round(s/60*365);
+    const yrs=Math.round(hrs/8760*100)/100;
+    const bh=Math.round((hrs/maxHrs)*ch);
+    const x=pad.l+i*(bw+6);
+    const y=pad.t+ch-bh;
+    const isCurrent=Math.abs(s-dailyMin)<8;
+    ctx.fillStyle=isCurrent?'#8b85e8':'rgba(139,133,232,.35)';
+    ctx.beginPath();ctx.roundRect(x,y,bw,bh,3);ctx.fill();
+    if(isCurrent){ctx.strokeStyle='#8b85e8';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(x-2,y-2,bw+4,bh+2,4);ctx.stroke();}
+    ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillText(s+' min',x+bw/2,H-pad.b+14);
+    ctx.fillStyle=isCurrent?'rgba(139,133,232,.9)':'rgba(255,255,255,.5)';ctx.font='10px sans-serif';
+    ctx.fillText(hrs+'hr/yr',x+bw/2,y-6);
+  });
+  [200,400,600,800].forEach(v=>{
+    if(v>maxHrs)return;
+    const y=pad.t+ch-(v/maxHrs)*ch;
+    ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cw,y);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='10px sans-serif';ctx.textAlign='right';ctx.fillText(v+'hr',pad.l-5,y+4);
+  });
+  ctx.fillStyle='rgba(255,255,255,.35)';ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText('daily waiting minutes',pad.l+cw/2,H-4);
+}
+drawCompound();
+document.getElementById('dailyMin').addEventListener('input',drawCompound);
+document.getElementById('compAge').addEventListener('input',drawCompound);
+
+const CHOSEN=[
+  {label:'sitting with coffee before the day starts',detail:'Deliberate. Chosen. Restorative. Not the same thing as being put on hold.'},
+  {label:'waiting for bread to finish baking',detail:'Anticipatory waiting. You chose the bread. The wait is part of it.'},
+  {label:'letting a kid tie their own shoes',detail:'A gift of time. Teaches patience. Builds capability. Not waste.'},
+  {label:'sitting with a hard decision',detail:'Choosing not to act yet. Often the right call.'},
+  {label:'watching something slowly get ready',detail:'Sunsets. Coffee brewing. Fermentation. The wait is the experience.'},
+];
+const IMPOSED=[
+  {label:'being put on hold by your insurance company',detail:'The hold music says your call is important. The 47-minute wait says something different.'},
+  {label:'waiting 45 minutes past your appointment time',detail:'Your time was scheduled. It was not respected. Not your choice.'},
+  {label:'standing in line at the DMV',detail:'A government service that has not been optimized because the cost falls on you, not them.'},
+  {label:'sitting in traffic that a road design created',detail:'Bad signal timing, missing infrastructure, induced demand. Imposed by planning decisions made before you arrived.'},
+  {label:'waiting for a delayed bus with no real-time info',detail:'Transit latency is not random. It correlates strongly with neighborhood income. This is a policy outcome.'},
+  {label:'filling out the same form for the fifth time',detail:'Administrative burden is a design choice. Usually made by people whose time is not the one being spent.'},
+];
+
+function buildWaitTypes(){
+  const chosenDiv=document.getElementById('chosenList');
+  const imposedDiv=document.getElementById('imposedList');
+  CHOSEN.forEach(item=>{
+    const d=document.createElement('div');
+    d.style.cssText='font-size:12px;color:var(--color-text-secondary);padding:.4rem 0;border-bottom:0.5px solid rgba(93,202,165,.15);cursor:pointer;line-height:1.5';
+    d.textContent=item.label;
+    d.addEventListener('click',()=>document.getElementById('waitTypeInfo').innerHTML=`<strong style="color:#5DCAA5">${item.label}</strong> — ${item.detail}`);
+    chosenDiv.appendChild(d);
+  });
+  IMPOSED.forEach(item=>{
+    const d=document.createElement('div');
+    d.style.cssText='font-size:12px;color:var(--color-text-secondary);padding:.4rem 0;border-bottom:0.5px solid rgba(226,75,74,.15);cursor:pointer;line-height:1.5';
+    d.textContent=item.label;
+    d.addEventListener('click',()=>document.getElementById('waitTypeInfo').innerHTML=`<strong style="color:#E24B4A">${item.label}</strong> — ${item.detail}`);
+    imposedDiv.appendChild(d);
+  });
+}
+buildWaitTypes();
+
+function calcYNWait(){
+  const age=+document.getElementById('ynAge').value||35;
+  const daily=+document.getElementById('ynDailyMin').value||75;
+  const alreadyLived=age-18;
+  const alreadyHrs=Math.round(daily/60*365*Math.max(0,alreadyLived));
+  const alreadyDays=Math.round(alreadyHrs/24);
+  const remaining=Math.max(0,80-age);
+  const futureHrs=Math.round(daily/60*365*remaining);
+  const totalHrs=alreadyHrs+futureHrs;
+  document.getElementById('ynWaitResult').innerHTML=`At <strong>${age} years old</strong> waiting approximately <strong>${daily} minutes per day</strong>:<span class="yn-big">${alreadyDays.toLocaleString()} days</span>already spent waiting since age 18. That's ${Math.round(alreadyHrs/8760*10)/10} years of your waking life, already gone. In the time you have spent waiting since adulthood, you could have learned three languages, read roughly ${Math.round(alreadyHrs/8)} books, or walked ${Math.round(alreadyHrs*3).toLocaleString()} miles.`;
+  document.getElementById('ynWaitStats').innerHTML=`<div class="stat-card"><div class="s-label">hours waited since 18</div><div class="s-value">${alreadyHrs.toLocaleString()}</div></div><div class="stat-card"><div class="s-label">days waited (lifetime so far)</div><div class="s-value">${alreadyDays.toLocaleString()}</div></div><div class="stat-card"><div class="s-label">still to wait (to age 80)</div><div class="s-value">${futureHrs.toLocaleString()} hr</div></div><div class="stat-card"><div class="s-label">books you could read instead</div><div class="s-value">${Math.round(alreadyHrs/8).toLocaleString()}</div><div class="s-sub">at 8 hrs/book</div></div>`;
+}
+document.getElementById('ynAge').addEventListener('input',calcYNWait);
+document.getElementById('ynDailyMin').addEventListener('input',calcYNWait);
+calcYNWait();
+
+function toggleProv(){const b=document.getElementById('provBody'),c=document.getElementById('provChev');b.classList.toggle('open');c.style.transform=b.classList.contains('open')?'rotate(180deg)':'';}
+</script>
+</body>
+</html>

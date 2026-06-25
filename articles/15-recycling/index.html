@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>what actually happens to your recycling — standard deviation</title>
+  <meta name="description" content="You rinse the jar. You put it in the blue bin. After that, the story gets much less comforting. A Sankey diagram, a wishcycling sorter, and the uncomfortable truth about what 'recyclable' means.">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    canvas{display:block;max-width:100%}
+    .item-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin:.75rem 0}
+    .recycle-item{background:var(--color-background-secondary);border:1.5px solid var(--color-border-tertiary);border-radius:8px;padding:.75rem;cursor:pointer;text-align:center;transition:border-color .15s,background .15s;user-select:none}
+    .recycle-item:hover{border-color:var(--color-border-secondary)}
+    .recycle-item.selected{border-color:#5DCAA5;background:rgba(93,202,165,.08)}
+    .recycle-item .ri-icon{font-size:24px;margin-bottom:4px}
+    .recycle-item .ri-name{font-size:12px;color:var(--color-text-primary);font-weight:500}
+    .recycle-item .ri-verdict{font-size:10px;margin-top:3px}
+    .verdict-yes{color:#5DCAA5}
+    .verdict-maybe{color:#EF9F27}
+    .verdict-no{color:#E24B4A}
+    .verdict-wish{color:#8b85e8}
+    .meter-row{display:flex;align-items:center;gap:10px;padding:.5rem 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+    .meter-row:last-child{border-bottom:none}
+    .meter-label{font-size:12px;min-width:160px;color:var(--color-text-primary);flex-shrink:0}
+    .meter-bg{flex:1;height:10px;background:rgba(255,255,255,.06);border-radius:5px;overflow:hidden}
+    .meter-fill{height:100%;border-radius:5px}
+    .meter-val{font-size:11px;font-family:var(--font-mono);min-width:44px;text-align:right;color:var(--color-text-secondary)}
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container inner">
+    <a class="wordmark" href="/standard-deviation/"><span class="sigma">σ</span> standard deviation</a>
+    <nav class="site-nav"><a href="/standard-deviation/">archive</a><a href="https://standardlydeviated.substack.com/about">about</a><a href="https://standardlydeviated.substack.com">substack</a></nav>
+  </div>
+</header>
+<main><div class="container">
+
+  <header class="article-header reveal">
+    <div class="kicker">infrastructure &amp; systems · vol. 15</div>
+    <h1 class="article-title">what actually happens to your recycling</h1>
+    <p class="article-dek">You rinse the jar. You put it in the blue bin. After that, the story gets much less comforting. Recycling is not a promise. It is a market with a morality costume.</p>
+    <div class="article-byline">
+      <span>standard deviation</span><span class="byline-dot"></span>
+      <span>~8 min read</span><span class="byline-dot"></span>
+      <span>wishcycling sorter · Sankey flow · material confidence meter</span><span class="byline-dot"></span>
+      <a href="https://standardlydeviated.substack.com" style="color:var(--color-accent);text-decoration:none">subscribe</a>
+    </div>
+  </header>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>Recycling is one of those household rituals that feels like moral closure. You rinse the jar. Flatten the box. Check the little triangle. Put the thing in the blue bin instead of the trash. The lid closes. The truck comes. The object disappears. And because it disappeared through the correct container, it feels like the story ended well.</p>
+      <p>But the blue bin is not an ending. It is a sorting question. Everything in that bin still has to survive a trip from your kitchen to a truck, from the truck to a facility, from the facility to a bale, from the bale to a buyer, from the buyer to a manufacturing process, and from that process into something worth making again. At every step, things fall out. Some materials are valuable. Some are technically recyclable but not economically worth recycling. Some are contaminated. Some have no buyer. Some get downcycled. Some end up landfilled anyway.</p>
+    </div>
+    <div class="pull-quote reveal">There is a word for putting something in the recycling bin because you hope it is recyclable: wishcycling. It is such a perfect term because it captures the emotional logic of the blue bin. We are not just sorting materials. We are sorting guilt.</div>
+    <div class="reveal">
+      <p>Recycling systems do not run on hope. They run on machinery, labor, resale value, local contracts, contamination thresholds, and commodity markets. The national recycling and composting rate in the US has hovered around 32% for years — a third of municipal solid waste diverted from landfill. That is not nothing. It is also not what the blue bin promises at the curb.</p>
+      <p>The material matters enormously. Paper is different from aluminum. Aluminum is different from glass. Glass is different from plastic. Plastic is not even one thing — it is a family of materials with different chemistries, melting points, markets, and contamination tolerances. The triangle symbol on packaging may be one of the most misleading design elements in modern life. It looks like a promise. Often it is just a resin code.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 1: WISHCYCLING SORTER -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">01 — where does it actually go? click items to find out</div></div>
+    <div class="interactive-body">
+      <div class="item-grid" id="itemGrid"></div>
+      <div class="info-box" id="itemInfo" style="margin-top:.75rem">Click any item to see what happens to it after the blue bin.</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:.75rem;font-size:11px;color:var(--color-text-secondary)">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#5DCAA5"></span>yes — reliably recycled</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#EF9F27"></span>maybe — depends on your program</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#E24B4A"></span>no — usually landfilled</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#8b85e8"></span>wishcycling — please stop</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>Contamination is the number that matters most and gets discussed the least. A single contaminated item — a greasy pizza box in the paper stream, a food-coated container in the plastic bale, a broken drinking glass in the glass bin — can contaminate an entire load. Some facilities reject whole truckloads over a contamination threshold. The economics of recycling are thin enough that even a small degradation in material quality can push a bale from "valuable commodity" to "not worth processing."</p>
+      <p>This is why plastic bags are the recycling program's particular nemesis. They are technically recyclable at certain drop-off locations. But in a curbside bin, they wind around sorting machinery at materials recovery facilities and shut the operation down. Curbside programs across the country have sent increasingly direct instructions about plastic bags. The bags keep arriving anyway, full of recyclables, because people's intentions are good and the information never quite reaches the moment of decision.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 2: SANKEY FLOW DIAGRAM -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">02 — the fate of 100 lbs of curbside recycling</div></div>
+    <div class="interactive-body">
+      <div class="ctrl-row">
+        <label>bin quality</label>
+        <select id="contamLevel" onchange="drawSankey()" style="font-size:13px;padding:5px 10px;border-radius:6px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-primary)">
+          <option value="clean">clean bin (low contamination)</option>
+          <option value="average" selected>average bin</option>
+          <option value="wishcycle">wishcycling bin (high contamination)</option>
+          <option value="bags">plastic bags included</option>
+        </select>
+      </div>
+      <canvas id="cSankey" height="320" style="width:100%;border-radius:8px;background:#0a0a0f;margin-top:.75rem" role="img" aria-label="Sankey flow diagram showing how 100 lbs of curbside recycling flows through the system — accepted materials, rejected contaminants, sorted commodity streams, and final destinations"></canvas>
+      <div class="info-box" id="sankeyInfo" style="margin-top:.75rem">Each flow shows what happens to material at that stage. Contamination widens the red streams. A plastic bag in the wrong bin doesn't just get sorted out — it can jam equipment and divert entire loads.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>After China stopped accepting most foreign recyclables in 2018 — the National Sword policy, which set strict contamination limits — US recycling programs faced a crisis. Material that had been shipped to Chinese processors for decades suddenly had no buyer. Cities and counties faced the choice of paying to landfill material that had previously been sold, or shutting programs down entirely. Many did both. The cost of recycling to municipalities roughly tripled overnight in some regions. Some programs have recovered as domestic processing capacity has grown. Others have narrowed what they accept. A few have not recovered at all.</p>
+      <p>None of that appears on the blue bin.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 3: MATERIAL CONFIDENCE METER -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">03 — recycling confidence by material: what the data actually shows</div></div>
+    <div class="interactive-body">
+      <div id="materialMeters"></div>
+      <div class="info-box" id="meterInfo" style="margin-top:.75rem">Confidence = estimated percentage of this material that is actually recycled into a new product in the US. Click any row for more detail.</div>
+    </div>
+  </div>
+
+  <!-- YOUR NUMBER -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">04 — your number</div></div>
+    <div class="interactive-body">
+      <div class="your-number">
+        <div class="yn-label">your bin</div>
+        <div class="yn-prompt">Enter roughly how many items you put in your recycling bin per week.</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:.85rem">
+          <input type="number" id="itemsPerWeek" min="1" max="200" value="30" style="width:80px;font-size:14px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-mono)">
+          <select id="binQuality" style="font-size:13px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-primary)">
+            <option value="0.85">I'm careful — low contamination</option>
+            <option value="0.68" selected>average household</option>
+            <option value="0.45">I wishcycle pretty freely</option>
+          </select>
+        </div>
+        <div class="yn-result" id="recycleResult"></div>
+      </div>
+      <div class="stat-row" id="recycleStats"></div>
+    </div>
+  </div>
+
+  <hr class="article-divider reveal">
+  <div class="reveal">
+    <div class="provenance">
+      <div class="prov-toggle" onclick="toggleProv()"><span><i class="ti ti-database" aria-hidden="true" style="font-size:15px;margin-right:6px"></i>data provenance</span><i class="ti ti-chevron-down" id="provChev" style="font-size:15px;transition:transform .2s"></i></div>
+      <div class="prov-body" id="provBody">
+        <div class="prov-row"><div class="prov-key">national recycling rate</div><div class="prov-val">EPA "National Overview: Facts and Figures on Materials, Wastes and Recycling." 2018 data (32.1%) is most recent comprehensive figure. epa.gov</div></div>
+        <div class="prov-row"><div class="prov-key">plastic recycling rates</div><div class="prov-val">EPA 2018: plastic recycling rate ~8.7%. Greenpeace (2022) "Circular Claims Fall Flat Again" analysis of US plastic recycling infrastructure.</div></div>
+        <div class="prov-row"><div class="prov-key">aluminum recycling</div><div class="prov-val">Aluminum Association: US aluminum can recycling rate ~50%. Global aluminum recycling rate ~75% (all forms). High value drives high recovery.</div></div>
+        <div class="prov-row"><div class="prov-key">China National Sword</div><div class="prov-val">China's 2018 import restrictions on foreign recyclables. Institute of Scrap Recycling Industries impact reports.</div></div>
+        <div class="prov-row"><div class="prov-key">contamination effects</div><div class="prov-val">ISRI (Institute of Scrap Recycling Industries) contamination studies. Columbia University Earth Institute recycling research.</div></div>
+        <div class="prov-row"><div class="prov-key">last verified</div><div class="prov-val">June 2026</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reveal" style="margin-top:1.5rem">
+    <div class="section-label">what this made me wonder next</div>
+    <div class="related-questions">
+      <div class="related-item"><div class="related-q">What would happen if every package had to show its actual recycling probability in your county — not "recyclable" but "14% chance of becoming another product here"?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+      <div class="related-item"><div class="related-q">Extended Producer Responsibility laws require manufacturers to pay for end-of-life processing. Where have they been implemented, and do they actually change what gets made?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+      <div class="related-item"><div class="related-q">The recycling hierarchy (reduce → reuse → recycle) has been around since the 1970s. Why did the third step get most of the marketing budget?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+    </div>
+  </div>
+  <div class="substack-cta reveal" style="margin-top:2rem"><span>next: how much of your life is just waiting.</span><a href="https://standardlydeviated.substack.com">subscribe →</a></div>
+</div></main>
+
+<footer class="site-footer"><div class="container footer-inner"><span>σ standard deviation · <a href="https://standardlydeviated.substack.com">@standardlydeviated</a></span><span><a href="/standard-deviation/">← all articles</a></span></div></footer>
+<script src="../../assets/js/scroll-reveal.js"></script>
+<script>
+const ITEMS=[
+  {name:'aluminum can',icon:'ti-can',verdict:'yes',color:'#5DCAA5',detail:'Aluminum is the recycling success story. It can be recycled indefinitely without quality loss. A recycled can is back on shelves in 60 days. US can recycling rate: ~50%. Clean aluminum has a strong commodity market globally.'},
+  {name:'cardboard box',icon:'ti-package',verdict:'yes',color:'#5DCAA5',detail:'Clean, dry cardboard is reliably recycled in virtually every program. Break it down flat. The issue: wet cardboard loses fiber strength and may be rejected. Wax-coated cardboard (some produce boxes) is not recyclable.'},
+  {name:'glass jar',icon:'ti-bottle',verdict:'maybe',color:'#EF9F27',detail:'Glass is technically infinitely recyclable. But it is heavy, expensive to transport, and breaks into hard-to-sort cullet. Many programs no longer accept glass curbside — it damages other materials. Check your local program. Drop-off glass recycling is more common than curbside.'},
+  {name:'milk jug (HDPE)',icon:'ti-droplet',verdict:'yes',color:'#5DCAA5',detail:'HDPE (#2) plastic — milk jugs, shampoo bottles, detergent containers — is one of the few plastics with a reliable recycling market. Clean, empty, and left loose in the bin. Widely accepted.'},
+  {name:'greasy pizza box',icon:'ti-pizza',verdict:'no',color:'#E24B4A',detail:'The grease is the problem. Grease contamination degrades paper fiber and makes the entire batch unusable. The top of the box (often clean) can go in recycling; the greasy bottom should go in compost or trash.'},
+  {name:'plastic bag',icon:'ti-shopping-bag',verdict:'wish',color:'#8b85e8',detail:'Do not put plastic bags in curbside recycling. They jam sorting equipment, shut down facilities, and contaminate loads. Many grocery stores offer plastic film drop-off recycling. That\'s where bags belong — not the blue bin.'},
+  {name:'yogurt cup',icon:'ti-cup',verdict:'maybe',color:'#EF9F27',detail:'Usually #5 plastic (polypropylene). Many programs accept it; many don\'t. Clean and rinse thoroughly — food residue is the main rejection cause. Check locally. The lid may be a different plastic than the container.'},
+  {name:'coffee cup',icon:'ti-coffee',verdict:'no',color:'#E24B4A',detail:'Paper cups have a plastic lining that makes them extremely difficult to separate and recycle. Most recycling facilities reject them. The lid (often #6 polystyrene) is also typically not recyclable curbside.'},
+  {name:'newspaper',icon:'ti-newspaper',verdict:'yes',color:'#5DCAA5',detail:'Clean newsprint is one of the highest-confidence recycling items. Strong commodity market, clean fiber, easy to process. Just keep it dry.'},
+  {name:'black plastic tray',icon:'ti-grid-3x3',verdict:'no',color:'#E24B4A',detail:'Black plastic is a trap. The carbon black pigment makes it impossible for sorting equipment to identify the resin type using near-infrared scanners. Most black plastic goes straight to landfill regardless of what the triangle says.'},
+  {name:'berry clamshell',icon:'ti-plant',verdict:'wish',color:'#8b85e8',detail:'PET #1 clamshells are theoretically recyclable but in practice are contaminated by food residue and difficult to bale cleanly. Many programs reject them. The shape also causes sorting challenges. Best practice: check locally, rinse, and when in doubt, trash.'},
+  {name:'receipt paper',icon:'ti-receipt',verdict:'no',color:'#E24B4A',detail:'Thermal paper (used for most receipts) contains BPA or BPS coating that contaminates paper recycling streams. Receipts should go in the trash. Also: the thermal coating means they cannot be composted.'},
+  {name:'steel can',icon:'ti-coin',verdict:'yes',color:'#5DCAA5',detail:'Steel cans (soup cans, pet food cans) are reliably recycled everywhere. Steel has strong magnetic sorting capability and a solid commodity market. Rinse clean, leave the lid tucked inside or discard separately.'},
+  {name:'broken drinking glass',icon:'ti-glass-full',verdict:'no',color:'#E24B4A',detail:'Broken glass is a hazard to workers and contaminates recyclable glass streams (which are sorted by color). Window glass, drinking glasses, and Pyrex have different melting points than container glass and cannot be processed together.'},
+  {name:'foam cup (#6)',icon:'ti-cup-off',verdict:'no',color:'#E24B4A',detail:'Polystyrene foam (#6) is accepted by almost no curbside programs. It is 95% air, light, low-value, and breaks into beads that contaminate other streams. A small number of specialty drop-off programs accept it. Curbside: no.'},
+  {name:'shredded paper',icon:'ti-file-shredder',verdict:'no',color:'#E24B4A',detail:'Shredded paper jams sorting machinery and creates loose fiber that contaminates other materials. Even though the paper itself is recyclable, the shredded form is not. Place shredded paper in a sealed paper bag, or better: compost it.'},
+];
+
+function buildItemGrid(){
+  const grid=document.getElementById('itemGrid');
+  ITEMS.forEach((item,i)=>{
+    const card=document.createElement('div');
+    card.className='recycle-item';
+    card.innerHTML=`<div class="ri-icon"><i class="ti ${item.icon}" style="color:${item.color}" aria-hidden="true"></i></div><div class="ri-name">${item.name}</div><div class="ri-verdict verdict-${item.verdict}" style="color:${item.color}">${item.verdict==='yes'?'recyclable':item.verdict==='maybe'?'check locally':item.verdict==='no'?'usually not':'wishcycling'}</div>`;
+    card.addEventListener('click',()=>{
+      document.querySelectorAll('.recycle-item').forEach(c=>c.classList.remove('selected'));
+      card.classList.add('selected');
+      document.getElementById('itemInfo').innerHTML=`<strong style="color:${item.color}">${item.name}</strong> — ${item.detail}`;
+    });
+    grid.appendChild(card);
+  });
+}
+buildItemGrid();
+
+const SANKEY_CONFIGS={
+  clean:{accepted:88,contaminated:12,recycled:72,downcycled:8,landfilled:20,label:'Clean bin: low contamination, strong commodity markets. Most material flows through successfully.'},
+  average:{accepted:78,contaminated:22,recycled:58,downcycled:10,landfilled:32,label:'Average US household bin. About a third ends up landfilled after sorting and processing losses.'},
+  wishcycle:{accepted:62,contaminated:38,recycled:38,downcycled:8,landfilled:54,label:'High-contamination bin. Over half ends up landfilled. Contamination can trigger rejection of entire loads.'},
+  bags:{accepted:50,contaminated:50,recycled:28,downcycled:5,landfilled:67,label:'Plastic bags in the bin. Equipment jams cause facility shutdowns. Entire truckloads may be rejected. This is the recycling program\'s nightmare scenario.'},
+};
+
+function drawSankey(){
+  const cfg=SANKEY_CONFIGS[document.getElementById('contamLevel').value];
+  const cv=document.getElementById('cSankey');cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#0a0a0f';ctx.fillRect(0,0,W,H);
+  const nodes=[
+    {label:'blue bin\n100 lbs',x:.08,y:.5,col:'#8b85e8'},
+    {label:`accepted\n${cfg.accepted} lbs`,x:.3,y:.35,col:'#5DCAA5'},
+    {label:`rejected\n${cfg.contaminated} lbs`,x:.3,y:.75,col:'#E24B4A'},
+    {label:`recycled\n${cfg.recycled} lbs`,x:.6,y:.2,col:'#5DCAA5'},
+    {label:`downcycled\n${cfg.downcycled} lbs`,x:.6,y:.45,col:'#EF9F27'},
+    {label:`landfill\n${cfg.landfilled} lbs`,x:.6,y:.75,col:'#E24B4A'},
+    {label:'new product\n♻',x:.88,y:.2,col:'#5DCAA5'},
+    {label:'lower-grade\nproduct',x:.88,y:.45,col:'#EF9F27'},
+    {label:'landfill\n(final)',x:.88,y:.75,col:'rgba(80,80,80,.8)'},
+  ];
+  const flows=[
+    {from:0,to:1,w:cfg.accepted/100*.12*H,col:'rgba(93,202,165,.3)'},
+    {from:0,to:2,w:cfg.contaminated/100*.12*H,col:'rgba(226,75,74,.3)'},
+    {from:1,to:3,w:cfg.recycled/100*.10*H,col:'rgba(93,202,165,.25)'},
+    {from:1,to:4,w:cfg.downcycled/100*.10*H,col:'rgba(239,159,39,.25)'},
+    {from:1,to:5,w:(cfg.accepted-cfg.recycled-cfg.downcycled)/100*.10*H,col:'rgba(226,75,74,.2)'},
+    {from:2,to:5,w:cfg.contaminated/100*.10*H,col:'rgba(226,75,74,.2)'},
+    {from:3,to:6,w:cfg.recycled/100*.10*H,col:'rgba(93,202,165,.25)'},
+    {from:4,to:7,w:cfg.downcycled/100*.10*H,col:'rgba(239,159,39,.25)'},
+    {from:5,to:8,w:cfg.landfilled/100*.10*H,col:'rgba(100,100,100,.25)'},
+  ];
+  flows.forEach(f=>{
+    const a=nodes[f.from],b=nodes[f.to];
+    const x0=a.x*W,y0=a.y*H,x1=b.x*W,y1=b.y*H;
+    const mx=(x0+x1)/2;
+    ctx.strokeStyle=f.col;ctx.lineWidth=Math.max(2,f.w);ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(x0,y0);ctx.bezierCurveTo(mx,y0,mx,y1,x1,y1);ctx.stroke();
+  });
+  nodes.forEach(n=>{
+    ctx.fillStyle=n.col;ctx.beginPath();ctx.arc(n.x*W,n.y*H,6,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.75)';ctx.font='10px sans-serif';ctx.textAlign='center';
+    n.label.split('\n').forEach((line,i)=>ctx.fillText(line,n.x*W,n.y*H-14+i*12));
+  });
+  document.getElementById('sankeyInfo').textContent=cfg.label+` In this scenario, ${cfg.recycled} of 100 lbs becomes a new product.`;
+}
+drawSankey();
+
+const MATERIALS=[
+  {name:'aluminum cans',confidence:50,detail:'~50% US can recycling rate. Infinitely recyclable, high commodity value, fast turnaround. The best case in recycling.',col:'#5DCAA5'},
+  {name:'corrugated cardboard',confidence:68,detail:'One of the highest-volume success stories. Strong domestic and export markets for OCC (old corrugated containers). Contamination (grease, moisture) is the main failure point.',col:'#5DCAA5'},
+  {name:'HDPE plastic (#2)',confidence:31,detail:'Milk jugs, shampoo bottles. One of few plastics with a real recycling market. Rate limited by collection coverage and contamination.',col:'#8b85e8'},
+  {name:'PET plastic (#1)',confidence:24,detail:'Water bottles, soda bottles. Decent market but rate is limited by sorting losses and contamination. Clamshells (same resin) have much lower rates.',col:'#8b85e8'},
+  {name:'glass containers',confidence:31,detail:'Technically infinitely recyclable but heavy, breakable, and worth less than transport costs in many markets. Rate varies wildly by region.',col:'#EF9F27'},
+  {name:'steel cans',confidence:36,detail:'Strong magnetic sorting makes steel reliable. Significant downcycling into rebar and other steel products.',col:'#EF9F27'},
+  {name:'mixed paper',confidence:42,detail:'Newspapers, office paper, junk mail. Solid market but declining as paper consumption falls.',col:'#EF9F27'},
+  {name:'plastic bags / film',confidence:6,detail:'Not curbside recyclable. Drop-off programs exist at some grocers. Most film plastic is landfilled or incinerated.',col:'#E24B4A'},
+  {name:'polystyrene foam (#6)',confidence:1,detail:'Almost never recycled in practice. Specialty programs exist but serve a tiny fraction of foam waste.',col:'#E24B4A'},
+  {name:'all other plastics',confidence:5,detail:'#3–#7 plastics combined. Essentially no reliable recycling market for most. EPA reports recycling rates near zero for many categories.',col:'#E24B4A'},
+];
+
+function buildMaterialMeters(){
+  const wrap=document.getElementById('materialMeters');
+  MATERIALS.forEach(m=>{
+    const row=document.createElement('div');row.className='meter-row';row.style.cursor='pointer';
+    row.innerHTML=`<div class="meter-label">${m.name}</div><div class="meter-bg"><div class="meter-fill" style="width:${m.confidence}%;background:${m.col}"></div></div><div class="meter-val">${m.confidence}%</div>`;
+    row.addEventListener('click',()=>document.getElementById('meterInfo').innerHTML=`<strong style="color:${m.col}">${m.name} — ${m.confidence}% recycled</strong>: ${m.detail}`);
+    wrap.appendChild(row);
+  });
+}
+buildMaterialMeters();
+
+function calcRecycle(){
+  const items=+document.getElementById('itemsPerWeek').value||30;
+  const rate=+document.getElementById('binQuality').value;
+  const actuallyRecycled=Math.round(items*rate*0.62);
+  const wishcycled=Math.round(items*(1-rate));
+  const yearItems=items*52;
+  document.getElementById('recycleResult').innerHTML=`You put about <strong>${items} items per week</strong> in the recycling bin. Of those, approximately:<span class="yn-big">${actuallyRecycled} actually get recycled</span>per week. That's ${Math.round(actuallyRecycled/items*100)}% of what you put in. About <strong>${wishcycled} items per week</strong> (${Math.round(wishcycled/items*100)}%) are either contaminated, unrecyclable in your region, or wishcycled. Over a year, you recycle about ${Math.round(actuallyRecycled*52).toLocaleString()} items — which is real and worth doing — and landfill about ${Math.round(wishcycled*52).toLocaleString()} items that went in through the blue bin first.`;
+  document.getElementById('recycleStats').innerHTML=`<div class="stat-card"><div class="s-label">actually recycled/wk</div><div class="s-value">~${actuallyRecycled}</div></div><div class="stat-card"><div class="s-label">effectively lost/wk</div><div class="s-value">~${wishcycled}</div></div><div class="stat-card"><div class="s-label">actual rate</div><div class="s-value">${Math.round(actuallyRecycled/items*100)}%</div></div><div class="stat-card"><div class="s-label">items recycled/year</div><div class="s-value">${(actuallyRecycled*52).toLocaleString()}</div></div>`;
+}
+document.getElementById('itemsPerWeek').addEventListener('input',calcRecycle);
+document.getElementById('binQuality').addEventListener('change',calcRecycle);
+calcRecycle();
+
+function toggleProv(){const b=document.getElementById('provBody'),c=document.getElementById('provChev');b.classList.toggle('open');c.style.transform=b.classList.contains('open')?'rotate(180deg)':'';}
+</script>
+</body>
+</html>

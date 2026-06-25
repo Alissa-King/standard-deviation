@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>the average person does not exist — standard deviation</title>
+  <meta name="description" content="An average is a compression, not a human. Add enough 'average' traits together and the person disappears. Here's the interactive proof.">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    canvas{display:block;max-width:100%}
+    .trait-row{display:flex;align-items:center;gap:10px;padding:.6rem 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+    .trait-row:last-child{border-bottom:none}
+    .trait-label{font-size:13px;min-width:140px;color:var(--color-text-primary);flex-shrink:0}
+    .trait-range{flex:1}
+    .trait-pct{font-size:12px;font-family:var(--font-mono);min-width:80px;text-align:right;color:var(--color-text-secondary)}
+    .crowd-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin:1px;transition:background .3s,opacity .3s}
+    .dot-active{background:#5DCAA5}
+    .dot-fade{background:#333;opacity:.2}
+    .pct-big{font-size:36px;font-weight:500;font-family:var(--font-mono);color:var(--color-text-primary)}
+    .pct-label{font-size:13px;color:var(--color-text-secondary);margin-top:2px}
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container inner">
+    <a class="wordmark" href="/standard-deviation/"><span class="sigma">σ</span> standard deviation</a>
+    <nav class="site-nav"><a href="/standard-deviation/">archive</a><a href="https://standardlydeviated.substack.com/about">about</a><a href="https://standardlydeviated.substack.com">substack</a></nav>
+  </div>
+</header>
+<main><div class="container">
+
+  <header class="article-header reveal">
+    <div class="kicker">statistics &amp; society · vol. 14</div>
+    <h1 class="article-title">the average person does not exist</h1>
+    <p class="article-dek">An average is a compression, not a human. It works fine for individual traits. Stack enough of them together and the person disappears. This is not a rounding error. It is the math.</p>
+    <div class="article-byline">
+      <span>standard deviation</span><span class="byline-dot"></span>
+      <span>~8 min read</span><span class="byline-dot"></span>
+      <span>crowd simulator · jagged profile builder · distribution explorer</span><span class="byline-dot"></span>
+      <a href="https://standardlydeviated.substack.com" style="color:var(--color-accent);text-decoration:none">subscribe</a>
+    </div>
+  </header>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>There is a person we keep designing the world around. They have an average commute, an average income, an average body, an average household size, an average reaction time, an average retirement balance, and an average tolerance for the systems supposedly built for people like them. This person is in every policy model, school calendar, car seat, building code, and budget template. They are everywhere. They do not exist.</p>
+      <p>Or rather — they exist only as math. An average is not a human being. It is a compression. A way of taking a messy cloud of variation and replacing it with one clean number that feels more solid than it is. Sometimes that is useful. But averages have a habit of pretending to be normal. And normal is where things get strange.</p>
+    </div>
+    <div class="pull-quote reveal">In the 1950s, the U.S. Air Force designed its cockpits around the "average" pilot's body — average height, arm length, torso, leg reach. Then they looked at how many pilots actually fell near average across all those dimensions simultaneously. The answer was close to zero. The cockpit had been built for a body that almost nobody had. The average was mathematically accurate. It just wasn't real.</div>
+    <div class="reveal">
+      <p>This is the trap. Averages can describe groups while failing individuals. A dataset's center point tells you where the middle of the crowd is. It does not tell you where any particular person stands — or whether anyone stands there at all.</p>
+      <p>The reason is that people are jagged. You can be above average in one dimension, below in another, completely typical in a third. Someone can have average income but unusually high medical expenses. Average height but unusually short arms. Average commute but an unusually unreliable bus. The "average person" flattens all of that into a line. But the landscape is not flat.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 1: THE DISAPPEARING CROWD -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">01 — watch the average person disappear</div></div>
+    <div class="interactive-body">
+      <div style="margin-bottom:.75rem;font-size:13px;color:var(--color-text-secondary)">Add traits one at a time. Each filter keeps only people who fall within the middle 50% for that characteristic. Watch how fast the crowd thins.</div>
+      <div id="traitControls" style="margin-bottom:.85rem"></div>
+      <div style="display:flex;gap:1.5rem;align-items:flex-start;flex-wrap:wrap;margin:.75rem 0">
+        <div>
+          <div class="pct-big" id="survivorPct">100%</div>
+          <div class="pct-label">people who qualify as<br>"average" across all selected traits</div>
+        </div>
+        <div style="flex:1;min-width:200px">
+          <div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px">1,000 person crowd</div>
+          <div id="crowdDots" style="line-height:1.4"></div>
+        </div>
+      </div>
+      <div class="info-box" id="crowdInfo">No traits selected. Every person qualifies. Add a trait above to start filtering.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The math here is not subtle. If you define "average" as falling in the middle 50% for any single trait, roughly half the population qualifies. Add a second independent trait and it is about 25%. A third: 12.5%. By the time you stack seven or eight traits together, you are looking for someone in the neighborhood of 1% of the population — and that is with generous definitions of "average." The Air Force was using narrower bands and came up with zero.</p>
+      <p>This matters because systems are designed from the center outward. A school day assumes a certain kind of household. A work schedule assumes a certain kind of body and commute. A tax form assumes a certain kind of family structure. A budget app assumes a certain kind of paycheck. And when people do not fit, we call them edge cases — as if the middle were the only real place to be.</p>
+    </div>
+    <div class="pull-quote reveal">What if the edge cases are the population? What if being "not average" is the most normal thing about most people?</div>
+  </div>
+
+  <!-- INTERACTIVE 2: BUILD YOUR JAGGED PROFILE -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">02 — build your jagged profile</div></div>
+    <div class="interactive-body">
+      <div style="margin-bottom:.75rem;font-size:13px;color:var(--color-text-secondary)">Drag each slider to where you think you fall. The chart shows your percentile across traits — and how unlikely it is to be "average" across all of them.</div>
+      <div id="jaggedSliders"></div>
+      <canvas id="cJagged" height="220" style="width:100%;border-radius:8px;background:var(--color-background-secondary);margin-top:.75rem" role="img" aria-label="Radar chart showing user's self-reported percentile across multiple traits — the jagged shape illustrates how rarely anyone is average across all dimensions simultaneously"></canvas>
+      <div class="info-box" id="jaggedInfo" style="margin-top:.75rem">Your profile above shows how jagged you are across dimensions. The probability of being within the middle 50% on all traits simultaneously: see below.</div>
+      <div class="stat-row" id="jaggedStats" style="margin-top:.75rem"></div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The design implication of this is uncomfortable. If we cannot find an average person to build for, we have two options: build for the most common individual cases separately, which is expensive; or build for a range of variation, which requires accepting that the system will not be optimal for anyone in particular. Most institutions choose a third option: build for the center and call everyone else an exception.</p>
+      <p>The cockpit story ended well, eventually. The Air Force's solution was adjustable seats, adjustable pedals, adjustable equipment — designing for the range instead of the point. That reframing — "how much variation can this system handle?" instead of "what does the average user want?" — is the better question. It is also a harder one, because it requires admitting that the average was never really there.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 3: DISTRIBUTION EXPLORER -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">03 — how distributions actually look</div></div>
+    <div class="interactive-body">
+      <div class="ctrl-row">
+        <label>characteristic</label>
+        <select id="distSelect" style="font-size:13px;padding:5px 10px;border-radius:6px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-primary)" onchange="drawDist()">
+          <option value="income">US household income</option>
+          <option value="height_m">US male height</option>
+          <option value="height_f">US female height</option>
+          <option value="commute">one-way commute time</option>
+          <option value="sleep">nightly sleep hours</option>
+          <option value="savings">retirement savings (age 55–64)</option>
+          <option value="screen">daily screen time</option>
+        </select>
+      </div>
+      <canvas id="cDist" height="260" style="width:100%;border-radius:8px;background:#0a0a0f;margin-top:.75rem" role="img" aria-label="Histogram showing the distribution of selected characteristic across the US population — with mean, median, and the middle 50% band highlighted"></canvas>
+      <div class="info-box" id="distInfo" style="margin-top:.75rem">The shaded band is the middle 50% — what most people mean when they say "average." Notice how much of the distribution falls outside it.</div>
+    </div>
+  </div>
+
+  <!-- YOUR NUMBER -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">04 — your number</div></div>
+    <div class="interactive-body">
+      <div class="your-number">
+        <div class="yn-label">your average score</div>
+        <div class="yn-prompt">How many of these traits put you in the middle 50%? Be honest.</div>
+        <div id="ynChecks" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:.75rem 0;font-size:13px"></div>
+        <div class="yn-result" id="ynResult"></div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="article-divider reveal">
+  <div class="reveal">
+    <div class="provenance">
+      <div class="prov-toggle" onclick="toggleProv()"><span><i class="ti ti-database" aria-hidden="true" style="font-size:15px;margin-right:6px"></i>data provenance</span><i class="ti ti-chevron-down" id="provChev" style="font-size:15px;transition:transform .2s"></i></div>
+      <div class="prov-body" id="provBody">
+        <div class="prov-row"><div class="prov-key">cockpit study</div><div class="prov-val">Gilbert Daniels (1952). "The 'Average Man'?" Air Force Technical Report. Cited widely in design and ergonomics literature.</div></div>
+        <div class="prov-row"><div class="prov-key">income distribution</div><div class="prov-val">US Census Bureau Current Population Survey (CPS), 2023 Annual Social and Economic Supplement.</div></div>
+        <div class="prov-row"><div class="prov-key">commute data</div><div class="prov-val">US Census Bureau American Community Survey (ACS) 5-year estimates. Mean travel time to work 27.2 min (2024).</div></div>
+        <div class="prov-row"><div class="prov-key">sleep data</div><div class="prov-val">CDC Sleep Surveillance data. NHIS 2020. ~35% of US adults report sleeping less than 7 hours.</div></div>
+        <div class="prov-row"><div class="prov-key">savings data</div><div class="prov-val">Federal Reserve Survey of Consumer Finances (SCF) 2022. Median retirement savings age 55–64: ~$185,000.</div></div>
+        <div class="prov-row"><div class="prov-key">last verified</div><div class="prov-val">June 2026</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reveal" style="margin-top:1.5rem">
+    <div class="section-label">what this made me wonder next</div>
+    <div class="related-questions">
+      <div class="related-item"><div class="related-q">If averages fail as design targets, what does designing for variation actually look like — and which institutions have figured it out?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+      <div class="related-item"><div class="related-q">The median is less misleading than the mean for skewed distributions. Why do most news stories still use the mean — and when does that choice matter most?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+      <div class="related-item"><div class="related-q">Standard deviation was invented precisely to describe how far reality strays from the average. Why does the number that names this publication show up so rarely in public communication about data?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+    </div>
+  </div>
+  <div class="substack-cta reveal" style="margin-top:2rem"><span>next: what actually happens to your recycling.</span><a href="https://standardlydeviated.substack.com">subscribe →</a></div>
+</div></main>
+
+<footer class="site-footer"><div class="container footer-inner"><span>σ standard deviation · <a href="https://standardlydeviated.substack.com">@standardlydeviated</a></span><span><a href="/standard-deviation/">← all articles</a></span></div></footer>
+<script src="../../assets/js/scroll-reveal.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const TRAITS=[
+  {id:'height',label:'height',desc:'within middle 50% for your gender'},
+  {id:'income',label:'household income',desc:'$40K–$90K annually'},
+  {id:'commute',label:'commute time',desc:'15–45 min one-way'},
+  {id:'sleep',label:'nightly sleep',desc:'6.5–8 hours'},
+  {id:'debt',label:'total debt',desc:'$20K–$120K'},
+  {id:'savings',label:'retirement savings',desc:'$50K–$300K'},
+  {id:'screentime',label:'daily screen time',desc:'3–6 hours'},
+  {id:'grocery',label:'monthly grocery spend',desc:'$400–$900'},
+  {id:'steps',label:'daily steps',desc:'5,000–10,000'},
+];
+
+let activeTraits=new Set();
+function buildTraitControls(){
+  const wrap=document.getElementById('traitControls');
+  TRAITS.forEach(t=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:10px;padding:.45rem 0;border-bottom:0.5px solid var(--color-border-tertiary)';
+    row.innerHTML=`<input type="checkbox" id="trait_${t.id}" style="width:16px;height:16px;accent-color:#5DCAA5;cursor:pointer" onchange="toggleTrait('${t.id}',this.checked)">
+    <label for="trait_${t.id}" style="font-size:13px;color:var(--color-text-primary);cursor:pointer;flex:1">${t.label}</label>
+    <span style="font-size:11px;color:var(--color-text-tertiary)">${t.desc}</span>`;
+    wrap.appendChild(row);
+  });
+}
+buildTraitControls();
+
+function toggleTrait(id,checked){
+  if(checked)activeTraits.add(id);else activeTraits.delete(id);
+  updateCrowd();
+}
+
+function updateCrowd(){
+  const n=activeTraits.size;
+  const survivorPct=n===0?100:Math.round(Math.pow(0.5,n)*100*10)/10;
+  const survivors=Math.round(survivorPct/100*1000);
+  document.getElementById('survivorPct').textContent=survivorPct+'%';
+  const dots=document.getElementById('crowdDots');
+  dots.innerHTML='';
+  for(let i=0;i<1000;i++){
+    const d=document.createElement('span');
+    d.className='crowd-dot '+(i<survivors?'dot-active':'dot-fade');
+    dots.appendChild(d);
+  }
+  const msgs=['No traits selected. 1,000 out of 1,000 people qualify. Add a trait.','One trait: half the crowd is already gone. The average is already lonely.','Two traits: a quarter remain. Still feels like "most people."','Three traits: 12.5%. We\'re describing a minority and calling it the average.','Four traits: 6.25%. Most people in this room do not fit the model built for them.','Five traits: 3%. The "average" person is now statistically rare.','Six traits: 1.5%. At this point, the average is a ghost.','Seven traits: 0.8%. The cockpit was empty.','Eight traits: 0.4%. This is why the Air Force scrapped fixed cockpits.','Nine traits: 0.2%. Not a person. A rounding error.'];
+  document.getElementById('crowdInfo').textContent=msgs[Math.min(n,msgs.length-1)];
+}
+updateCrowd();
+
+const JAGGED_TRAITS=[
+  {label:'income',unit:'percentile'},
+  {label:'height',unit:'percentile'},
+  {label:'commute',unit:'percentile'},
+  {label:'sleep',unit:'percentile'},
+  {label:'savings',unit:'percentile'},
+  {label:'screen time',unit:'percentile'},
+  {label:'daily steps',unit:'percentile'},
+  {label:'debt',unit:'percentile'},
+];
+const jaggedVals=JAGGED_TRAITS.map(()=>50);
+
+function buildJaggedSliders(){
+  const wrap=document.getElementById('jaggedSliders');
+  JAGGED_TRAITS.forEach((t,i)=>{
+    const row=document.createElement('div');
+    row.className='trait-row';
+    row.innerHTML=`<span class="trait-label">${t.label}</span>
+    <input type="range" class="trait-range" min="1" max="99" value="50" oninput="updateJagged(${i},+this.value)">
+    <span class="trait-pct" id="jv_${i}">50th %ile</span>`;
+    wrap.appendChild(row);
+  });
+}
+buildJaggedSliders();
+
+function updateJagged(idx,val){
+  jaggedVals[idx]=val;
+  document.getElementById('jv_'+idx).textContent=val+'th %ile';
+  drawJagged();
+  updateJaggedStats();
+}
+
+function drawJagged(){
+  const cv=document.getElementById('cJagged');
+  cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  const isDark=matchMedia('(prefers-color-scheme:dark)').matches;
+  ctx.fillStyle=isDark?'#111118':'#f4f3fb';ctx.fillRect(0,0,W,H);
+  const n=jaggedVals.length;
+  const cx=W/2,cy=H/2,r=Math.min(W,H)*0.38;
+  [25,50,75,100].forEach(pct=>{
+    ctx.strokeStyle=isDark?'rgba(255,255,255,.06)':'rgba(0,0,0,.06)';ctx.lineWidth=0.5;
+    ctx.beginPath();
+    for(let i=0;i<n;i++){
+      const angle=i/n*Math.PI*2-Math.PI/2;
+      const pr=r*pct/100;
+      const x=cx+Math.cos(angle)*pr,y=cy+Math.sin(angle)*pr;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.closePath();ctx.stroke();
+    if(pct===50){ctx.fillStyle='rgba(93,202,165,.06)';ctx.fill();}
+  });
+  ctx.strokeStyle='rgba(93,202,165,.4)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+  ctx.beginPath();
+  for(let i=0;i<n;i++){const angle=i/n*Math.PI*2-Math.PI/2;const x=cx+Math.cos(angle)*r*0.5,y=cy+Math.sin(angle)*r*0.5;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+  ctx.closePath();ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle='#5DCAA5';ctx.lineWidth=2.5;ctx.fillStyle='rgba(93,202,165,.15)';
+  ctx.beginPath();
+  jaggedVals.forEach((v,i)=>{
+    const angle=i/n*Math.PI*2-Math.PI/2;
+    const pr=r*v/100;
+    const x=cx+Math.cos(angle)*pr,y=cy+Math.sin(angle)*pr;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.closePath();ctx.fill();ctx.stroke();
+  jaggedVals.forEach((v,i)=>{
+    const angle=i/n*Math.PI*2-Math.PI/2;
+    const pr=r*v/100;
+    const x=cx+Math.cos(angle)*pr,y=cy+Math.sin(angle)*pr;
+    ctx.fillStyle='#5DCAA5';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
+    const lx=cx+Math.cos(angle)*(r+20),ly=cy+Math.sin(angle)*(r+20);
+    ctx.fillStyle=isDark?'rgba(255,255,255,.6)':'rgba(0,0,0,.6)';ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText(JAGGED_TRAITS[i].label,lx,ly+3);
+  });
+}
+drawJagged();
+
+function updateJaggedStats(){
+  const inMiddle=jaggedVals.filter(v=>v>=25&&v<=75).length;
+  const pct=Math.round(Math.pow(0.5,inMiddle)*100*10)/10;
+  document.getElementById('jaggedInfo').textContent=`You fall in the middle 50% on ${inMiddle} of ${jaggedVals.length} traits. The probability of being "average" across all ${jaggedVals.length}: roughly ${pct}%. Which means only about ${Math.round(pct/100*1000)} people in a crowd of 1,000 share your exact shape of average.`;
+  document.getElementById('jaggedStats').innerHTML=`<div class="stat-card"><div class="s-label">traits in middle 50%</div><div class="s-value">${inMiddle}/${jaggedVals.length}</div></div><div class="stat-card"><div class="s-label">probability "average" on all</div><div class="s-value">${pct}%</div></div><div class="stat-card"><div class="s-label">in 1,000 people</div><div class="s-value">${Math.round(pct/100*1000)}</div><div class="s-sub">share your full profile</div></div>`;
+}
+updateJaggedStats();
+
+const DIST_DATA={
+  income:{label:'US household income',unit:'$K',mean:78,median:58,p25:35,p75:105,bins:[{x:0,y:4},{x:15,y:9},{x:25,y:11},{x:35,y:12},{x:45,y:11},{x:55,y:10},{x:65,y:9},{x:75,y:8},{x:90,y:7},{x:110,y:6},{x:140,y:5},{x:180,y:4},{x:250,y:3},{x:400,y:2}],note:'Income is right-skewed — the mean ($78K) is well above the median ($58K) because of very high earners pulling the average up. Most households earn less than the average.'},
+  height_m:{label:'US male height (inches)',unit:'in',mean:69.1,median:69,p25:67,p75:71,bins:[{x:63,y:2},{x:64,y:4},{x:65,y:8},{x:66,y:12},{x:67,y:16},{x:68,y:18},{x:69,y:18},{x:70,y:16},{x:71,y:12},{x:72,y:8},{x:73,y:4},{x:74,y:2},{x:75,y:1}],note:'Height is nearly normally distributed — mean and median are close. But being "average height" is still rare if you stack it with other traits.'},
+  height_f:{label:'US female height (inches)',unit:'in',mean:63.7,median:64,p25:62,p75:65,bins:[{x:58,y:2},{x:59,y:4},{x:60,y:8},{x:61,y:12},{x:62,y:16},{x:63,y:18},{x:64,y:18},{x:65,y:16},{x:66,y:12},{x:67,y:7},{x:68,y:4},{x:69,y:2},{x:70,y:1}],note:'Female height is also roughly normal. The spread from shortest to tallest 50% is only 3 inches — but stack this with income and commute and the "average woman" nearly vanishes.'},
+  commute:{label:'one-way commute time (minutes)',unit:'min',mean:27,median:24,p25:12,p75:40,bins:[{x:0,y:8},{x:5,y:12},{x:10,y:14},{x:15,y:13},{x:20,y:12},{x:25,y:11},{x:30,y:10},{x:40,y:8},{x:50,y:6},{x:60,y:5},{x:75,y:4},{x:90,y:3},{x:120,y:2}],note:'Commute time is right-skewed. Most people have short commutes but the long-distance commuters pull the mean above the median. 9% of workers commute 60+ minutes each way.'},
+  sleep:{label:'nightly sleep hours',unit:'hr',mean:6.8,median:7,p25:6,p75:8,bins:[{x:4,y:4},{x:5,y:8},{x:6,y:18},{x:6.5,y:16},{x:7,y:22},{x:7.5,y:16},{x:8,y:12},{x:8.5,y:8},{x:9,y:4},{x:10,y:2}],note:'About 35% of American adults report sleeping less than 7 hours per night. The distribution bunches around 7 hours but has a meaningful left tail of short sleepers.'},
+  savings:{label:'retirement savings age 55–64 ($K)',unit:'$K',mean:537,median:185,p25:40,p75:450,bins:[{x:0,y:20},{x:25,y:14},{x:75,y:12},{x:150,y:10},{x:250,y:9},{x:350,y:7},{x:500,y:6},{x:750,y:5},{x:1000,y:4},{x:1500,y:3},{x:2500,y:2}],note:'Retirement savings are extremely right-skewed. The median ($185K) is less than a third of the mean ($537K). The majority of Americans near retirement have far less than the "average."'},
+  screen:{label:'daily screen time (hours)',unit:'hr',mean:7.4,median:6.5,p25:4,p75:9,bins:[{x:1,y:3},{x:2,y:5},{x:3,y:8},{x:4,y:11},{x:5,y:13},{x:6,y:14},{x:7,y:13},{x:8,y:12},{x:9,y:10},{x:10,y:8},{x:12,y:5},{x:14,y:3}],note:'Average daily screen time has risen sharply post-2020. The distribution is wide — some people barely touch screens, others are at 14+ hours. The "average" screen user is not a reliable design target.'},
+};
+
+function drawDist(){
+  const key=document.getElementById('distSelect').value;
+  const d=DIST_DATA[key];
+  const cv=document.getElementById('cDist');cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#0a0a0f';ctx.fillRect(0,0,W,H);
+  const pad={l:50,r:20,t:20,b:36};
+  const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  const maxX=Math.max(...d.bins.map(b=>b.x))*1.05;
+  const maxY=Math.max(...d.bins.map(b=>b.y))*1.15;
+  function bx(v){return pad.l+(v/maxX)*cw;}
+  function by(v){return pad.t+ch-(v/maxY)*ch;}
+  const bw=cw/d.bins.length*0.85;
+  d.bins.forEach(b=>{
+    const inMiddle=b.x>=d.p25&&b.x<=d.p75;
+    ctx.fillStyle=inMiddle?'rgba(93,202,165,.7)':'rgba(139,133,232,.35)';
+    const x=bx(b.x),y=by(b.y),h=ch-(y-pad.t);
+    ctx.fillRect(x-bw/2,y,bw,h);
+  });
+  [d.mean,d.median].forEach((v,i)=>{
+    const x=bx(v);
+    ctx.strokeStyle=i===0?'rgba(255,200,68,.8)':'rgba(93,202,165,.9)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+    ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,pad.t+ch);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=i===0?'rgba(255,200,68,.9)':'rgba(93,202,165,.9)';ctx.font='10px sans-serif';ctx.textAlign='center';
+    ctx.fillText(i===0?'mean':'median',x,pad.t+(i===0?10:22));
+  });
+  ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText(d.unit,pad.l+cw/2,H-6);
+  ctx.fillStyle='rgba(93,202,165,.6)';ctx.font='10px sans-serif';ctx.textAlign='left';ctx.fillText('middle 50%',pad.l+4,pad.t+ch-8);
+  document.getElementById('distInfo').textContent=d.note;
+}
+drawDist();
+document.getElementById('distSelect').addEventListener('change',drawDist);
+
+const YN_ITEMS=['my income is between $40K and $90K','my height is within 2 inches of average for my gender','my commute is 15–45 minutes one way','I sleep 6.5–8 hours per night','my total debt is $20K–$120K','my retirement savings are $50K–$300K','my daily screen time is 3–6 hours','my monthly grocery spend is $400–$900','I walk 5,000–10,000 steps per day','my household size is 2–3 people'];
+function buildYNChecks(){
+  const wrap=document.getElementById('ynChecks');
+  YN_ITEMS.forEach((item,i)=>{
+    const label=document.createElement('label');
+    label.style.cssText='display:flex;align-items:center;gap:6px;font-size:12px;color:var(--color-text-secondary);cursor:pointer;line-height:1.4';
+    label.innerHTML=`<input type="checkbox" id="yn_${i}" style="accent-color:#5DCAA5;width:14px;height:14px" onchange="calcYN()"><span>${item}</span>`;
+    wrap.appendChild(label);
+  });
+}
+buildYNChecks();
+function calcYN(){
+  const checked=[...document.querySelectorAll('[id^=yn_]')].filter(c=>c.checked).length;
+  const pct=Math.round(Math.pow(0.5,checked)*100*10)/10;
+  const total=YN_ITEMS.length;
+  const unchecked=total-checked;
+  document.getElementById('ynResult').innerHTML=`You checked <strong>${checked} of ${total}</strong> "average" traits.<span class="yn-big">${pct}% of people match</span>In a room of 1,000 people, roughly <strong>${Math.round(pct/100*1000)}</strong> fit all ${checked} of those criteria simultaneously. ${unchecked>0?`You're outside the average on ${unchecked} traits — which makes you typical.`:'You are the average person. Statistically, you barely exist.'}`;
+}
+calcYN();
+
+function toggleProv(){const b=document.getElementById('provBody'),c=document.getElementById('provChev');b.classList.toggle('open');c.style.transform=b.classList.contains('open')?'rotate(180deg)':'';}
+</script>
+</body>
+</html>
