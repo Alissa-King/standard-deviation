@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>how old is your body, really — standard deviation</title>
+  <meta name="description" content="Your taste buds are 10 days old. Your skeleton is 10 years old. Your cortical neurons are as old as you are. Enter your age and find out which parts of you are ancient and which are practically newborn.">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    canvas { display:block; max-width:100%; }
+    .organ-row { display:flex; align-items:center; gap:10px; padding:.6rem 0; border-bottom:0.5px solid var(--color-border); cursor:pointer; transition:background .1s; }
+    .organ-row:hover { background:var(--color-background-secondary); margin:0 -.5rem; padding-left:.5rem; padding-right:.5rem; border-radius:6px; }
+    .organ-row:last-child { border-bottom:none; }
+    .organ-icon { font-size:18px; width:24px; text-align:center; flex-shrink:0; }
+    .organ-name { font-size:13px; font-weight:500; min-width:140px; color:var(--color-text-primary); flex-shrink:0; }
+    .age-bar-bg { flex:1; height:10px; background:rgba(255,255,255,.06); border-radius:5px; overflow:hidden; }
+    .age-bar { height:100%; border-radius:5px; transition:width .4s ease; }
+    .organ-age { font-size:12px; font-family:var(--font-mono); min-width:72px; text-align:right; color:var(--color-text-secondary); flex-shrink:0; }
+    .body-map { position:relative; margin:.75rem 0; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container inner">
+    <a class="wordmark" href="/standard-deviation/"><span class="sigma">σ</span> standard deviation</a>
+    <nav class="site-nav">
+      <a href="/standard-deviation/">archive</a>
+      <a href="https://standardlydeviated.substack.com/about">about</a>
+      <a href="https://standardlydeviated.substack.com">substack</a>
+    </nav>
+  </div>
+</header>
+<main><div class="container">
+
+  <header class="article-header reveal">
+    <div class="kicker">biology · vol. 06</div>
+    <h1 class="article-title">how old is your body, really</h1>
+    <p class="article-dek">Your taste buds are 10 days old. Your red blood cells are 4 months old. Your skeleton is about 10 years old. Your cortical neurons are as old as you are. Enter your age and find out which parts of you are practically newborn.</p>
+    <div class="article-byline">
+      <span>standard deviation</span><span class="byline-dot"></span>
+      <span>~8 min read</span><span class="byline-dot"></span>
+      <span>data: Frisén lab, radiocarbon dating studies</span><span class="byline-dot"></span>
+      <a href="https://standardlydeviated.substack.com" style="color:var(--color-accent);text-decoration:none">subscribe</a>
+    </div>
+  </header>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>Somewhere in the early 2000s, a Swedish biologist named Jonas Frisén had an unusual idea. The Cold War had ended, atmospheric nuclear testing had stopped, and the pulse of radioactive carbon-14 that the tests had injected into the atmosphere — the "bomb pulse" — was slowly decaying back to background levels. But Frisén realized that every cell in every human body alive during those tests had incorporated some of that carbon-14 into its DNA when it divided. And because C-14 decays at a known rate, and because the atmospheric concentration at any given year is known from ice core records, you could in principle look at the carbon-14 in a cell's DNA and calculate, with reasonable precision, when that cell was born.</p>
+      <p>What Frisén's lab found when they started applying this technique to human tissue samples was that the body is not one age. It is many ages, layered on top of each other, each layer turning over on its own schedule, some of them replacing themselves constantly and others lasting for decades without replacement.</p>
+    </div>
+    <div class="pull-quote reveal">The Ship of Theseus problem — if you replace every plank in a ship, is it still the same ship? — turns out to have a precise biological answer, and the answer is: it depends which plank you mean, and how long you wait.</div>
+    <div class="reveal">
+      <p>Your gut lining renews itself every 2 to 4 days. The cells lining your intestines divide constantly and are shed constantly — the entire inner surface of your digestive tract is replaced roughly every week. Your taste buds, which are specialized epithelial cells on the surface of your tongue, turn over every 10 days or so. Your skin replaces its outer layers over about two to four weeks. Your red blood cells — the most numerous cells in your body — live for roughly 120 days before being broken down in the spleen. These are the cells of constant renewal, the high-turnover parts of you that are perpetually almost brand new.</p>
+      <p>Further down the turnover timescale sit your fat cells, which replace themselves at a rate of about 10% per year — so the average fat cell in your body is roughly a decade old, though that average conceals significant variation. Your muscle cells are more stable than most people think: the nuclei of skeletal muscle cells are rarely replaced in healthy adults, and the average age of a muscle nucleus in a sedentary middle-aged person is around 15 years. Your bone cells — osteoblasts and osteoclasts — participate in a continuous remodeling process that replaces most of the skeleton roughly every 10 years.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 1: YOUR BODY'S AGE PROFILE -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">01 — your body's age profile</div>
+    </div>
+    <div class="interactive-body">
+      <div class="ctrl-row">
+        <label>your age</label>
+        <input type="range" id="ageSlider" min="5" max="90" step="1" value="35" oninput="updateBodyAge(+this.value)">
+        <span class="ctrl-val" id="ageVal">35 years old</span>
+      </div>
+      <div id="organRows" style="margin:.75rem 0"></div>
+      <div class="info-box" id="organInfo" style="margin-top:.5rem">Click any row to learn more about that tissue's renewal process and why it turns over at that rate.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>And then there are the neurons. The cells of the cerebral cortex — the outer layer of the brain responsible for conscious thought, language, memory, and personality — are, in the vast majority of cases, as old as you are. They were born during fetal development or very shortly after birth, and they do not divide again. The neurons you are using to read this sentence were present when you were learning to walk. A small number of brain regions, notably the olfactory bulb and parts of the hippocampus, do generate new neurons throughout life — but the cortex is essentially static at the cellular level. The cells change; the connections between them change constantly; the cells themselves do not.</p>
+      <p>This is not a flaw. The neuroscientific consensus is that the non-renewal of cortical neurons is probably deliberate — that replacing neurons would disrupt the encoded information in the synaptic connections between them, and that the stability of the cells is what allows long-term memory to persist over decades. Your oldest memories are stored in connections between cells that have existed since you were an infant. The cells that remember your childhood are still your original cells.</p>
+    </div>
+    <div class="pull-quote reveal">You are a palimpsest in the same sense as the night sky. The different parts of you are from different times. The version of you that is reading this sentence contains cells that are days old and cells that are decades old, running simultaneously, with no obvious seam between them.</div>
+  </div>
+
+  <!-- INTERACTIVE 2: ANIMATED BODY MAP -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">02 — hover to explore: a body mapped by age</div>
+    </div>
+    <div class="interactive-body">
+      <div class="ctrl-row">
+        <label>your age</label>
+        <input type="range" id="mapAgeSlider" min="5" max="90" step="1" value="35" oninput="updateBodyMap(+this.value)">
+        <span class="ctrl-val" id="mapAgeVal">35 years old</span>
+      </div>
+      <canvas id="cBodyMap" height="400" style="width:100%;border-radius:8px;background:var(--color-background-secondary)" role="img" aria-label="Schematic body diagram with each region colored by average cell age — blue for young cells, red-orange for old cells matching personal age"></canvas>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:var(--color-text-secondary);margin:.6rem 0">
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#5dcaa5"></span>days–weeks old</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#8b85e8"></span>months old</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#ffcc44"></span>years old</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#e8855a"></span>decades old</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#ff4444"></span>your full age</span>
+      </div>
+      <div class="info-box" id="mapInfo">Each region is colored by average cell age at your current age. Hover over regions to see details.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The heart sits in an interesting middle position. For a long time, cardiologists believed that heart muscle cells — cardiomyocytes — did not renew at all, which is why heart attacks cause permanent damage. Frisén's bomb-pulse technique revised this picture. The heart does replace cardiomyocytes, but very slowly — about 1% per year when you're young, slowing further as you age. A 40-year-old's cardiomyocytes are, on average, a mix: some original cells from birth, some renewed in the past decade. The overall average age of a 40-year-old's heart muscle cells works out to roughly 6 to 10 years, which is younger than the heart itself but far older than the stomach lining.</p>
+      <p>The lens of the eye is perhaps the most extreme case of non-renewal. The proteins in the center of the eye lens — the crystallins — are synthesized during fetal development and never replaced. They are, in a person in their 70s, 70 years old. This is part of why the lens progressively stiffens and yellows with age, and why cataracts form: the proteins have simply been around too long, and the accumulated oxidative damage is not repaired because there is no replacement process. Your eye lens is the oldest intact structure in your body. It is older than the cortex, which at least maintains its cellular machinery. The crystallins in the center of your lens are the same molecules that were there at birth.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 3: RENEWAL RATE EXPLORER -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">03 — how fast is each tissue actually replacing itself?</div>
+    </div>
+    <div class="interactive-body">
+      <div class="ctrl-row">
+        <label>zoom in on timescale</label>
+        <input type="range" id="timescaleSlider" min="0" max="3" step="1" value="1" oninput="drawRenewal(+this.value)">
+        <span class="ctrl-val" id="timescaleVal">all tissues</span>
+      </div>
+      <canvas id="cRenewal" height="300" style="width:100%;border-radius:8px;background:#070a14" role="img" aria-label="Horizontal bar chart showing renewal rates across all body tissues from intestinal lining (days) to cortical neurons (never)"></canvas>
+      <div class="info-box" id="renewalInfo" style="margin-top:.75rem">The x-axis is the average age of cells in each tissue. Slide to zoom in — the fast-renewing tissues are invisible at full scale because the cortical neuron bar dominates.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The weighted average age of all the cells in your body — what you might call your cellular age — is substantially lower than your chronological age. The exact number depends on how you weight different cell types, but estimates for a 40-year-old human consistently come out somewhere in the range of 7 to 10 years. The high-turnover tissues drag the average down. You are, in aggregate cellular terms, younger than you think.</p>
+      <p>This is not a consolation. It just means the Ship of Theseus problem is more interesting than a simple yes or no. Most of the ship has been replaced. Some of the original planks are still there and cannot be replaced without losing something. The question of whether it's the same ship is not a question about the planks — it's a question about what you think ships are for.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 4: YOUR NUMBER -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">04 — your number</div>
+    </div>
+    <div class="interactive-body">
+      <div class="your-number">
+        <div class="yn-label">your number</div>
+        <div class="yn-prompt">Enter your age. We'll calculate your weighted average cellular age and what that means.</div>
+        <input type="number" id="cellAge" min="5" max="100" value="35" placeholder="age" style="width:90px;font-size:14px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-mono)">
+        <div class="yn-result" id="cellAgeResult"></div>
+      </div>
+      <div class="stat-row" id="cellAgeStats"></div>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 5: TIMELINE COMPARISON -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">05 — all your ages at once</div>
+    </div>
+    <div class="interactive-body">
+      <div class="ctrl-row">
+        <label>your age</label>
+        <input type="range" id="timelineAge" min="10" max="80" step="1" value="35" oninput="drawTimeline(+this.value)">
+        <span class="ctrl-val" id="timelineAgeVal">35 years old</span>
+      </div>
+      <canvas id="cTimeline" height="260" style="width:100%;border-radius:8px;background:#070a14" role="img" aria-label="Timeline showing when each tissue was last renewed for a person of the selected age — ranging from intestinal lining (this week) to cortical neurons (birth year)"></canvas>
+      <div class="info-box" id="timelineInfo" style="margin-top:.75rem">Each bar extends back in time to when those cells were born. Your cortical neurons reach all the way to the left. Your gut lining barely leaves the right edge.</div>
+    </div>
+  </div>
+
+  <hr class="article-divider reveal">
+
+  <div class="reveal">
+    <div class="provenance">
+      <div class="prov-toggle" onclick="toggleProv()">
+        <span><i class="ti ti-database" aria-hidden="true" style="font-size:15px;margin-right:6px"></i>data provenance</span>
+        <i class="ti ti-chevron-down" id="provChev" style="font-size:15px;transition:transform .2s"></i>
+      </div>
+      <div class="prov-body" id="provBody">
+        <div class="prov-row"><div class="prov-key">bomb-pulse method</div><div class="prov-val">Frisén et al. (2005) — "Retrospective birth dating of cells in humans." Cell 122(1):133–143</div></div>
+        <div class="prov-row"><div class="prov-key">gut turnover</div><div class="prov-val">Marshman et al. (2002). Small intestinal crypt proliferation 2–4 days; villus turnover 3–5 days.</div></div>
+        <div class="prov-row"><div class="prov-key">heart muscle</div><div class="prov-val">Bergmann et al. (2009) — "Evidence for cardiomyocyte renewal in humans." Science 324:98–102. ~1%/yr age 25, ~0.45%/yr age 75.</div></div>
+        <div class="prov-row"><div class="prov-key">fat cells</div><div class="prov-val">Spalding et al. (2008) — "Dynamics of fat cell turnover in humans." Nature 453:783–787. ~10%/yr turnover.</div></div>
+        <div class="prov-row"><div class="prov-key">cortical neurons</div><div class="prov-val">Bhardwaj et al. (2006) — "Neocortical neurogenesis in humans is restricted to development." PNAS 103(33):12564–12568.</div></div>
+        <div class="prov-row"><div class="prov-key">eye lens</div><div class="prov-val">Lynnerup et al. (2008) — "Radiocarbon dating of the human eye lens crystallins." PLoS ONE 3(4):e1529.</div></div>
+        <div class="prov-row"><div class="prov-key">last verified</div><div class="prov-val">June 2026</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reveal" style="margin-top:1.5rem">
+    <div class="section-label">what this made me wonder next</div>
+    <div class="related-questions">
+      <div class="related-item">
+        <div class="related-q">If cortical neurons don't replace themselves, what actually changes in the brain over a lifetime — and what does that mean for memory, personality, and the self?</div>
+        <i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i>
+      </div>
+      <div class="related-item">
+        <div class="related-q">Why does the eye lens accumulate damage while other tissues renew? What would have to change evolutionarily for lens proteins to be replaced?</div>
+        <i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i>
+      </div>
+      <div class="related-item">
+        <div class="related-q">Cancer cells that have been in culture since the 1950s — HeLa cells, taken from Henrietta Lacks — are still dividing. In what sense are they still alive? In what sense are they still her?</div>
+        <i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="substack-cta reveal" style="margin-top:2rem">
+    <span>more pieces coming — subscribe to get them when they're ready.</span>
+    <a href="https://standardlydeviated.substack.com">subscribe →</a>
+  </div>
+
+</div></main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <span>σ standard deviation · <a href="https://standardlydeviated.substack.com">@standardlydeviated</a></span>
+    <span><a href="/standard-deviation/">← all articles</a></span>
+  </div>
+</footer>
+
+<script src="../../assets/js/scroll-reveal.js"></script>
+<script>
+const TISSUES=[
+  {name:'intestinal lining',icon:'ti-heart',renewDays:3,   color:'#5dcaa5',weight:0.04,note:'Fastest-renewing tissue. Entire inner surface replaced every 3–5 days due to constant abrasion and chemical exposure.'},
+  {name:'taste buds',       icon:'ti-droplet',renewDays:10,  color:'#5dcaa5',weight:0.001,note:'Taste receptor cells turn over every 10 days. You get entirely new taste buds roughly 36 times per year.'},
+  {name:'skin (outer)',     icon:'ti-shield',renewDays:28,  color:'#5dcaa5',weight:0.06,note:'The epidermis replaces itself every 2–4 weeks. The skin cells you shed today are mostly from a month ago.'},
+  {name:'red blood cells',  icon:'ti-circle',renewDays:120, color:'#8b85e8',weight:0.07,note:'120-day lifespan, produced in bone marrow. At any given moment, your blood contains cells from 0–120 days old.'},
+  {name:'white blood cells',icon:'ti-shield-check',renewDays:7,color:'#5dcaa5',weight:0.01,note:'Most white blood cells live days to weeks. Some memory lymphocytes can persist for years.'},
+  {name:'platelets',        icon:'ti-virus',renewDays:10,  color:'#5dcaa5',weight:0.005,note:'8–10 day lifespan. Produced in bone marrow by megakaryocytes.'},
+  {name:'liver cells',      icon:'ti-bolt',renewDays:300, color:'#8b85e8',weight:0.03,note:'The liver regenerates aggressively — you can remove 70% of it and it will regrow. Average hepatocyte age: ~300 days in a healthy adult.'},
+  {name:'lung cells (alveoli)',icon:'ti-wind',renewDays:180,color:'#8b85e8',weight:0.02,note:'Alveolar type II cells self-renew over 6–12 months. Damage from smoking or pollution slows this process.'},
+  {name:'fat cells',        icon:'ti-circle',renewYrs:10, color:'#ffcc44',weight:0.20,note:'~10% of fat cells replaced per year, giving an average cell age of ~10 years. Exercise doesn\'t change the replacement rate — only the cell size.'},
+  {name:'muscle (nuclei)',  icon:'ti-run',renewYrs:15, color:'#ffcc44',weight:0.40,note:'Skeletal muscle cell nuclei are rarely replaced in healthy adults. Average age ~15 years, often older than surrounding tissue.'},
+  {name:'skeleton',         icon:'ti-activity',renewYrs:10, color:'#ffcc44',weight:0.07,note:'Bone continuously remodels — osteoclasts dissolve old bone, osteoblasts build new. The full skeleton turns over roughly every 10 years.'},
+  {name:'heart muscle',     icon:'ti-heart-rate-monitor',renewYrs:null,weight:0.01,color:'#e8855a',note:'~1%/year at 25, ~0.45%/year at 75. A 40-year-old\'s cardiomyocytes average ~6–10 years old, a mix of original and renewed.'},
+  {name:'eye lens (center)',icon:'ti-eye',renewYrs:null,color:'#ff4444',weight:0.001,note:'The crystallin proteins at the center of the lens are synthesized during fetal development and NEVER replaced. They are exactly your age — and accumulate damage indefinitely.'},
+  {name:'cortical neurons', icon:'ti-brain',renewYrs:null,color:'#ff4444',weight:0.02,note:'Born during fetal development. Do not divide after birth. A 70-year-old\'s cortical neurons are 70 years old. The cells encoding your oldest memories have never been replaced.'},
+];
+function getTissueAge(t,age){
+  if(t.renewDays)return t.renewDays/365;
+  if(t.renewYrs)return Math.min(t.renewYrs,age);
+  if(t.name==='heart muscle')return Math.min(age,6+age*0.1);
+  if(t.name==='eye lens (center)')return age;
+  if(t.name==='cortical neurons')return age;
+  return age;
+}
+function ageColor(ageYrs,maxAge){
+  const pct=ageYrs/maxAge;
+  if(pct<0.05)return'#5dcaa5';
+  if(pct<0.15)return'#8b85e8';
+  if(pct<0.4)return'#ffcc44';
+  if(pct<0.75)return'#e8855a';
+  return'#ff4444';
+}
+function fmtAge(yrs){
+  if(yrs<1/12)return Math.round(yrs*365)+' days';
+  if(yrs<1)return Math.round(yrs*12)+' months';
+  if(yrs<2)return'~1 year';
+  return Math.round(yrs)+' years';
+}
+
+let currentBodyAge=35;
+function updateBodyAge(age){
+  currentBodyAge=age;
+  document.getElementById('ageVal').textContent=age+' years old';
+  const wrap=document.getElementById('organRows'); wrap.innerHTML='';
+  const sortedT=[...TISSUES].sort((a,b)=>getTissueAge(a,age)-getTissueAge(b,age));
+  const maxAge=age;
+  sortedT.forEach(t=>{
+    const tAge=getTissueAge(t,age);
+    const pct=Math.min(100,(tAge/maxAge)*100);
+    const col=ageColor(tAge,maxAge);
+    const row=document.createElement('div'); row.className='organ-row';
+    row.innerHTML=`<i class="ti ${t.icon} organ-icon" style="color:${col}" aria-hidden="true"></i>
+      <div class="organ-name">${t.name}</div>
+      <div class="age-bar-bg"><div class="age-bar" style="width:${pct.toFixed(1)}%;background:${col}"></div></div>
+      <div class="organ-age">${fmtAge(tAge)}</div>`;
+    row.addEventListener('click',()=>{
+      document.getElementById('organInfo').innerHTML=`<span style="color:${col}"><strong>${t.name}</strong></span> — ${t.note}`;
+    });
+    wrap.appendChild(row);
+  });
+}
+document.getElementById('ageSlider').addEventListener('input',e=>updateBodyAge(+e.target.value));
+updateBodyAge(35);
+
+function updateBodyMap(age){
+  document.getElementById('mapAgeVal').textContent=age+' years old';
+  drawBodyMap(age);
+}
+function drawBodyMap(age){
+  const cv=document.getElementById('cBodyMap');
+  cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  const isDark=window.matchMedia('(prefers-color-scheme:dark)').matches;
+  ctx.fillStyle=isDark?'#111118':'#f4f3fb'; ctx.fillRect(0,0,W,H);
+  const cx=W/2, scale=Math.min(W,H)/500;
+  const regions=[
+    {name:'brain (cortex)',x:cx,y:80*scale,rx:52*scale,ry:44*scale,tissue:'cortical neurons',label:'brain'},
+    {name:'eyes',x:cx-22*scale,y:90*scale,rx:10*scale,ry:10*scale,tissue:'eye lens (center)',label:''},
+    {name:'eyes',x:cx+22*scale,y:90*scale,rx:10*scale,ry:10*scale,tissue:'eye lens (center)',label:''},
+    {name:'heart',x:cx-18*scale,y:170*scale,rx:22*scale,ry:24*scale,tissue:'heart muscle',label:'heart'},
+    {name:'lungs',x:cx-44*scale,y:165*scale,rx:18*scale,ry:30*scale,tissue:'lung cells (alveoli)',label:'lungs'},
+    {name:'lungs',x:cx+44*scale,y:165*scale,rx:18*scale,ry:30*scale,tissue:'lung cells (alveoli)',label:''},
+    {name:'liver',x:cx+24*scale,y:210*scale,rx:28*scale,ry:22*scale,tissue:'liver cells',label:'liver'},
+    {name:'stomach/gut',x:cx,y:230*scale,rx:30*scale,ry:28*scale,tissue:'intestinal lining',label:'gut'},
+    {name:'fat',x:cx,y:290*scale,rx:38*scale,ry:34*scale,tissue:'fat cells',label:'fat'},
+    {name:'skeleton (torso)',x:cx,y:280*scale,rx:10*scale,ry:60*scale,tissue:'skeleton',label:'bone'},
+    {name:'muscle (legs)',x:cx-20*scale,y:350*scale,rx:16*scale,ry:50*scale,tissue:'muscle (nuclei)',label:'muscle'},
+    {name:'muscle (legs)',x:cx+20*scale,y:350*scale,rx:16*scale,ry:50*scale,tissue:'muscle (nuclei)',label:''},
+    {name:'skin',x:cx,y:200*scale,rx:70*scale,ry:180*scale,tissue:'skin (outer)',label:'skin'},
+    {name:'blood',x:cx,y:200*scale,rx:5*scale,ry:120*scale,tissue:'red blood cells',label:'blood'},
+  ];
+  const reverseRegions=[...regions].reverse();
+  reverseRegions.forEach(r=>{
+    const t=TISSUES.find(tis=>tis.name===r.tissue);
+    if(!t)return;
+    const tAge=getTissueAge(t,age);
+    const col=ageColor(tAge,age);
+    ctx.fillStyle=col+'66'; ctx.strokeStyle=col+'99'; ctx.lineWidth=1;
+    ctx.beginPath();ctx.ellipse(r.x,r.y,r.rx,r.ry,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+  });
+  const labeled=new Set();
+  regions.forEach(r=>{
+    if(r.label&&!labeled.has(r.label)){
+      labeled.add(r.label);
+      const t=TISSUES.find(tis=>tis.name===r.tissue);
+      const tAge=getTissueAge(t,age);
+      const col=ageColor(tAge,age);
+      ctx.fillStyle=isDark?'rgba(255,255,255,.8)':'rgba(0,0,0,.7)';
+      ctx.font='500 10px sans-serif'; ctx.textAlign='center';
+      ctx.fillText(r.label,r.x,r.y+3);
+      ctx.fillStyle=col; ctx.font='9px sans-serif';
+      ctx.fillText(fmtAge(tAge),r.x,r.y+13);
+    }
+  });
+  const bodyCol=isDark?'rgba(255,255,255,.08)':'rgba(0,0,0,.05)';
+  ctx.strokeStyle=bodyCol; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.ellipse(cx,80*scale,55*scale,50*scale,0,0,Math.PI*2); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(cx,230*scale,72*scale,185*scale,0,0,Math.PI*2); ctx.stroke();
+  document.getElementById('mapInfo').textContent=`At age ${age}, your gut lining is ${fmtAge(getTissueAge(TISSUES[0],age))} old. Your cortical neurons are ${fmtAge(getTissueAge(TISSUES[TISSUES.length-1],age))} old. The color shows relative age — teal is nearly new, red is as old as you.`;
+}
+document.getElementById('mapAgeSlider').addEventListener('input',e=>updateBodyMap(+e.target.value));
+drawBodyMap(35);
+
+const TIMESCALES=[
+  {label:'all tissues',max:100,filter:()=>true},
+  {label:'long-lived only (>5yr)',max:100,filter:t=>t.renewYrs>=5||t.renewYrs===null},
+  {label:'medium (1mo–5yr)',max:5,filter:t=>t.renewDays>=30||t.renewYrs<=5},
+  {label:'fast turnover (<30 days)',max:0.1,filter:t=>t.renewDays&&t.renewDays<=30},
+];
+function drawRenewal(idx){
+  const ts=TIMESCALES[idx];
+  document.getElementById('timescaleVal').textContent=ts.label;
+  const age=35;
+  const filtered=TISSUES.filter(ts.filter);
+  const cv=document.getElementById('cRenewal');
+  cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width, H=cv.height, ctx=cv.getContext('2d');
+  ctx.fillStyle='#070a14'; ctx.fillRect(0,0,W,H);
+  const pad={l:150,r:20,t:16,b:28};
+  const cw=W-pad.l-pad.r;
+  const bh=Math.floor((H-pad.t-pad.b)/Math.max(filtered.length,1))-3;
+  const maxAgeYrs=ts.max;
+  filtered.forEach((t,i)=>{
+    const tAge=getTissueAge(t,age);
+    const pct=Math.min(1,tAge/maxAgeYrs);
+    const bw=Math.max(2,Math.round(pct*cw));
+    const y=pad.t+i*(bh+3);
+    const col=ageColor(tAge,age);
+    ctx.fillStyle='rgba(255,255,255,.05)'; ctx.beginPath();ctx.roundRect(pad.l,y,cw,bh,2);ctx.fill();
+    ctx.fillStyle=col; ctx.beginPath();ctx.roundRect(pad.l,y,bw,bh,2);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.55)'; ctx.font='11px sans-serif'; ctx.textAlign='right';
+    ctx.fillText(t.name,pad.l-6,y+bh*.72);
+    ctx.fillStyle='rgba(255,255,255,.8)'; ctx.textAlign='left';
+    ctx.fillText(fmtAge(tAge),pad.l+bw+5,y+bh*.72);
+  });
+  document.getElementById('renewalInfo').textContent=idx===0
+    ?'At full scale, cortical neurons dominate completely. The fast-renewing tissues (gut, skin, blood) are invisible slivers at the left edge. Slide to zoom in.'
+    :idx===3?'At this zoom level you can finally see the fast tissues. Your intestinal lining (3 days) and taste buds (10 days) are the youngest cells in your body.'
+    :'Zoomed to '+ts.label+'. The relative ages are now visible.';
+}
+drawRenewal(1);
+document.getElementById('timescaleSlider').addEventListener('input',e=>drawRenewal(+e.target.value));
+
+function calcCellAge(){
+  const age=+document.getElementById('cellAge').value||35;
+  let weightedSum=0, totalWeight=0;
+  TISSUES.forEach(t=>{
+    const tAge=getTissueAge(t,age);
+    weightedSum+=tAge*t.weight; totalWeight+=t.weight;
+  });
+  const avgAge=weightedSum/totalWeight;
+  const youngestAge=getTissueAge(TISSUES[0],age)*365;
+  const oldestAge=getTissueAge(TISSUES[TISSUES.length-1],age);
+  document.getElementById('cellAgeResult').innerHTML=`At <strong>${age} years old</strong>, your weighted average cellular age is approximately:<span class="yn-big">${avgAge.toFixed(1)} years</span>Your youngest cells (intestinal lining) are ${Math.round(youngestAge)} days old. Your oldest cells (cortical neurons, eye lens) are exactly ${age} years old. The distance between those two numbers — measured inside one body, right now — is ${age} years minus ${Math.round(youngestAge)} days.`;
+  document.getElementById('cellAgeStats').innerHTML=`
+    <div class="stat-card"><div class="s-label">weighted avg age</div><div class="s-value">${avgAge.toFixed(1)} yr</div><div class="s-sub">all tissues combined</div></div>
+    <div class="stat-card"><div class="s-label">youngest cells</div><div class="s-value">${Math.round(youngestAge)} days</div><div class="s-sub">intestinal lining</div></div>
+    <div class="stat-card"><div class="s-label">oldest cells</div><div class="s-value">${age} years</div><div class="s-sub">cortical neurons</div></div>
+    <div class="stat-card"><div class="s-label">cellular youth ratio</div><div class="s-value">${(avgAge/age*100).toFixed(0)}%</div><div class="s-sub">of chronological age</div></div>`;
+}
+document.getElementById('cellAge').addEventListener('input',calcCellAge);
+calcCellAge();
+
+function drawTimeline(age){
+  document.getElementById('timelineAgeVal').textContent=age+' years old';
+  const cv=document.getElementById('cTimeline');
+  cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#070a14'; ctx.fillRect(0,0,W,H);
+  const items=[...TISSUES].sort((a,b)=>getTissueAge(b,age)-getTissueAge(a,age));
+  const pad={l:150,r:60,t:20,b:28};
+  const cw=W-pad.l-pad.r;
+  const bh=Math.max(6,Math.floor((H-pad.t-pad.b)/items.length)-2);
+  const nowX=W-pad.r;
+  const birthX=pad.l;
+  ctx.strokeStyle='rgba(255,255,255,.06)'; ctx.lineWidth=0.5;
+  [0,.25,.5,.75,1].forEach(p=>{
+    const x=pad.l+p*cw;
+    ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,H-pad.b);ctx.stroke();
+    const yr=Math.round(2026-age*(1-p));
+    ctx.fillStyle='rgba(255,255,255,.3)'; ctx.font='10px sans-serif'; ctx.textAlign='center';
+    ctx.fillText(yr,x,H-pad.b+14);
+  });
+  items.forEach((t,i)=>{
+    const tAge=getTissueAge(t,age);
+    const startX=pad.l+(1-tAge/age)*cw;
+    const y=pad.t+i*(bh+2);
+    const col=ageColor(tAge,age);
+    ctx.fillStyle=col+'55'; ctx.beginPath();ctx.roundRect(startX,y,nowX-startX,bh,2);ctx.fill();
+    ctx.fillStyle=col; ctx.beginPath();ctx.roundRect(nowX-3,y,3,bh,1);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.5)'; ctx.font='10px sans-serif'; ctx.textAlign='right';
+    ctx.fillText(t.name,pad.l-6,y+bh*.72);
+  });
+  ctx.fillStyle='rgba(93,202,165,.8)'; ctx.font='500 10px sans-serif'; ctx.textAlign='center';
+  ctx.fillText('now',nowX,pad.t-6);
+  ctx.fillStyle='rgba(255,68,68,.6)';
+  ctx.fillText('birth year',birthX,pad.t-6);
+  document.getElementById('timelineInfo').textContent=`Each bar shows how far back in time each tissue's cells were born. At age ${age}, your cortical neurons and eye lens crystallins extend all the way to your birth year (${2026-age}). Your gut lining barely leaves today.`;
+}
+document.getElementById('timelineAge').addEventListener('input',e=>drawTimeline(+e.target.value));
+drawTimeline(35);
+
+function toggleProv(){
+  const b=document.getElementById('provBody'),c=document.getElementById('provChev');
+  b.classList.toggle('open');c.style.transform=b.classList.contains('open')?'rotate(180deg)':'';
+}
+</script>
+</body>
+</html>

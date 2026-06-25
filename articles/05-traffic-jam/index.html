@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>why traffic jams appear out of nowhere — standard deviation</title>
+  <meta name="description" content="No accident. No merge. No on-ramp. Just a wave of braking that moves backward through traffic at exactly 12 mph. Here's the physics, and here's the simulation.">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    canvas { display:block; max-width:100%; }
+    .sim-controls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:.85rem; }
+    .density-indicator { display:flex; align-items:center; gap:8px; padding:.6rem .85rem; background:var(--color-background-secondary); border-radius:8px; border:0.5px solid var(--color-border); margin:.5rem 0; }
+    .density-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; transition:background .3s; }
+    .density-label { font-size:13px; color:var(--color-text-primary); }
+    .density-val { font-size:13px; font-family:var(--font-mono); color:var(--color-text-secondary); margin-left:auto; }
+    .wave-arrow { font-size:22px; color:#e8855a; margin:0 4px; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container inner">
+    <a class="wordmark" href="/standard-deviation/"><span class="sigma">σ</span> standard deviation</a>
+    <nav class="site-nav">
+      <a href="/standard-deviation/">archive</a>
+      <a href="https://standardlydeviated.substack.com/about">about</a>
+      <a href="https://standardlydeviated.substack.com">substack</a>
+    </nav>
+  </div>
+</header>
+<main><div class="container">
+
+  <header class="article-header reveal">
+    <div class="kicker">physics &amp; systems · vol. 05</div>
+    <h1 class="article-title">why traffic jams appear out of nowhere</h1>
+    <p class="article-dek">No accident. No merge. No on-ramp. Just a wave of braking that moves backward through traffic at exactly 12 mph, in the opposite direction the cars are traveling. Here's why it happens and here's the simulation.</p>
+    <div class="article-byline">
+      <span>standard deviation</span><span class="byline-dot"></span>
+      <span>~9 min read</span><span class="byline-dot"></span>
+      <span>live traffic simulation · density threshold finder</span><span class="byline-dot"></span>
+      <a href="https://standardlydeviated.substack.com" style="color:var(--color-accent);text-decoration:none">subscribe</a>
+    </div>
+  </header>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>You have been in this traffic jam. You were moving normally, and then you weren't, and then you were again, and when you finally cleared it there was nothing there — no accident, no construction, no merge point, no reason. You looked in your mirrors and the car behind you was already accelerating. The jam had passed through you and continued backward, like a wave, into the traffic you'd left behind.</p>
+      <p>This is called a phantom traffic jam, or a jamiton — a self-sustaining traffic wave that propagates backward through a stream of vehicles at a roughly constant speed, usually around 12 mph, regardless of the speed of the cars themselves. It requires no trigger to maintain once formed. It moves like a physical wave because it is a physical wave, and the mathematics that describe it are essentially identical to the mathematics of fluid dynamics and shock wave physics.</p>
+    </div>
+    <div class="pull-quote reveal">The jam is not where the cars are stopped. The jam is the wave moving backward through them. By the time you reach the front of it, the cars that caused it are already miles ahead of you, driving normally, completely unaware they were ever in a traffic jam.</div>
+    <div class="reveal">
+      <p>The phenomenon was studied mathematically starting in the 1950s, but was first demonstrated experimentally in 2008 by Yuki Sugiyama and colleagues at Nagoya University. They put 22 cars on a circular track, instructed the drivers to maintain roughly constant spacing and speed, and watched. Within a few minutes, small variations in driver behavior — a slightly late brake, a slightly slow acceleration — amplified into a full stop-and-go wave circulating around the track at roughly 12 mph in the backward direction. No instructions were given to create the jam. No trigger was introduced. The jam emerged from the system itself.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 1: MAIN SIMULATION -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">01 — live simulation: watch the jam form</div>
+    </div>
+    <div class="interactive-body">
+      <div class="sim-controls">
+        <button class="btn active" id="btnSimPlay" onclick="toggleSim()"><i class="ti ti-player-play" aria-hidden="true"></i> play</button>
+        <button class="btn" onclick="resetSim()"><i class="ti ti-refresh" aria-hidden="true"></i> reset</button>
+        <button class="btn" onclick="addDisturbance()"><i class="ti ti-hand-stop" aria-hidden="true"></i> brake one car</button>
+      </div>
+      <div class="ctrl-row">
+        <label>car density</label>
+        <input type="range" id="densitySlider" min="8" max="32" step="1" value="18" oninput="updateDensity(this.value)">
+        <span class="ctrl-val" id="densityVal">18 cars</span>
+      </div>
+      <div class="ctrl-row">
+        <label>driver reaction time</label>
+        <input type="range" id="reactionSlider" min="1" max="10" step="1" value="5">
+        <span class="ctrl-val" id="reactionVal">medium</span>
+      </div>
+      <div class="density-indicator">
+        <div class="density-dot" id="densityDot" style="background:#5dcaa5"></div>
+        <span class="density-label" id="densityStatus">stable flow — below critical density</span>
+        <span class="density-val" id="avgSpeedDisp">avg speed: — mph</span>
+      </div>
+      <canvas id="cSim" height="320" style="width:100%;border-radius:8px;background:#070a14" role="img" aria-label="Circular traffic simulation showing cars moving around a track — phantom jam wave visible as a backward-propagating red cluster"></canvas>
+      <div class="info-box" id="simInfo" style="margin-top:.75rem">Cars move clockwise. Press play and watch for spontaneous jam formation at high densities. At low density, flow stays smooth. "Brake one car" injects a disturbance to seed a jam artificially.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The key variable is density — specifically, whether the density of cars on the road crosses a critical threshold above which stable flow becomes impossible. Below that threshold, small disturbances dissipate. Each car that brakes slightly causes the car behind it to brake slightly less, and the system returns to equilibrium. Above the threshold, disturbances amplify. Each car that brakes slightly causes the car behind it to brake slightly more, and the braking cascades backward through the traffic stream, growing as it goes.</p>
+      <p>The critical density is not a fixed number. It depends on the speed limit, the average following distance drivers maintain, the reaction time of drivers, and the variability in those factors. On a freeway where everyone is maintaining roughly the same speed and spacing, the critical density is around 20–25 vehicles per mile per lane. Rush-hour freeways in major metro areas routinely exceed this.</p>
+    </div>
+    <div class="pull-quote reveal">The jam moves at approximately 12 mph regardless of what the cars are doing, because 12 mph is the speed at which the braking information propagates through the density of vehicles in that system. Change the density and you change that speed — but within typical freeway density ranges, it's almost always between 10 and 15 mph.</div>
+  </div>
+
+  <!-- INTERACTIVE 2: DENSITY THRESHOLD FINDER -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">02 — find the critical density threshold</div>
+    </div>
+    <div class="interactive-body">
+      <div class="ctrl-row">
+        <label>cars per mile (per lane)</label>
+        <input type="range" id="cpmSlider" min="5" max="50" step="1" value="20" oninput="updateCpm(this.value)">
+        <span class="ctrl-val" id="cpmVal">20 cars/mi</span>
+      </div>
+      <canvas id="cDensity" height="260" style="width:100%;border-radius:8px;background:#070a14" role="img" aria-label="Fundamental diagram of traffic flow showing flow rate vs density, with critical density threshold and jam region marked"></canvas>
+      <div class="stat-row" id="densityStats"></div>
+      <div class="info-box" id="cpmInfo" style="margin-top:.75rem">This is the fundamental diagram of traffic flow — flow rate (vehicles/hr) vs. density (vehicles/mi). The peak is the critical density. Past it, more cars = slower traffic = lower total throughput. The highway is moving fewer cars at 40 cars/mi than at 25.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>What makes phantom jams particularly interesting from a systems perspective is that they are a form of spontaneous symmetry breaking — the same thing that happens when a pencil balanced on its tip falls one direction or another. A perfectly uniform stream of cars with perfectly uniform spacing and identical reaction times would never produce a phantom jam. The jam emerges from the noise — from the small variations in human behavior that are unavoidable in any real system. You cannot eliminate phantom jams by asking people to drive more carefully. You can only eliminate them by reducing density below the critical threshold or by removing the human reaction time variable entirely, which is what adaptive cruise control systems attempt to do and what fully automated vehicle platoons could theoretically achieve.</p>
+      <p>Several universities and companies have demonstrated that a single vehicle with adaptive cruise control, placed in a stream of human-driven vehicles, can significantly dampen the amplitude of stop-and-go waves. The vehicle doesn't need to brake as hard as the car in front of it braked. It can react smoothly instead of suddenly, and that smoothness propagates backward through the cars behind it. One car, behaving differently from all the others, changes the dynamics of the entire system. This is what fluid dynamicists call a dissipative system — one where energy is removed from the wave rather than amplified.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 3: WAVE PROPAGATION VISUALIZER -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">03 — the wave moving backward: space-time diagram</div>
+    </div>
+    <div class="interactive-body">
+      <div class="ctrl-row">
+        <label>jam scenario</label>
+        <input type="range" id="scenarioSlider" min="0" max="3" step="1" value="1" oninput="drawSpaceTime(+this.value)">
+        <span class="ctrl-val" id="scenarioVal">moderate density</span>
+      </div>
+      <canvas id="cSpaceTime" height="280" style="width:100%;border-radius:8px;background:#070a14" role="img" aria-label="Space-time diagram showing car trajectories — diagonal lines moving right show cars moving forward, while the backward-moving jam wave appears as a red stripe moving left against the flow"></canvas>
+      <div class="info-box" id="stInfo" style="margin-top:.75rem">Each diagonal line is one car's trajectory — moving right (forward in space) and down (forward in time). The red stripe is the jam wave — notice it moves LEFT, opposite to the cars. This is the backward-propagating phantom jam.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The practical implications of phantom jams are significant. They are not just annoying. They are dangerous — rear-end collisions are disproportionately likely at the tail end of a jam, where one car has stopped and the following car's driver has not yet registered that the traffic ahead has changed. They also consume enormous amounts of fuel, because each cycle of braking and accelerating burns more energy than maintaining constant speed would. The Texas Transportation Institute estimated that phantom jams account for a substantial portion of the 3.3 billion gallons of fuel wasted annually in US traffic congestion — most of which is categorized simply as "congestion" in the data without distinguishing between incident-caused delays and phantom jam delays.</p>
+      <p>The 2008 Nagoya experiment that first demonstrated phantom jams experimentally was elegant in its simplicity: 22 cars, a circular track, no instructions about when to brake. The jam appeared within minutes and circulated stably for the duration of the experiment. When the researchers analyzed the video, the backward wave speed was almost exactly 12 mph. In every subsequent replication, in different countries with different cars and different drivers, the wave speed is always approximately 12 mph. The constant is the physics of the system, not the humans in it.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 4: YOUR NUMBER -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">04 — your number</div>
+    </div>
+    <div class="interactive-body">
+      <div class="your-number">
+        <div class="yn-label">your number</div>
+        <div class="yn-prompt">Enter your commute distance and average speed to find how many phantom jams you've probably sat in.</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:.85rem">
+          <input type="number" id="commuteMiles" min="1" max="100" value="15" placeholder="miles" style="width:80px;font-size:14px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-mono)">
+          <input type="number" id="commuteSpeed" min="5" max="70" value="35" placeholder="avg mph" style="width:80px;font-size:14px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-mono)">
+          <input type="number" id="commuteYears" min="1" max="40" value="5" placeholder="years" style="width:80px;font-size:14px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-mono)">
+        </div>
+        <div class="yn-result" id="commuteResult"></div>
+      </div>
+      <div class="stat-row" id="commuteStats"></div>
+    </div>
+  </div>
+
+  <hr class="article-divider reveal">
+
+  <div class="reveal">
+    <div class="provenance">
+      <div class="prov-toggle" onclick="toggleProv()">
+        <span><i class="ti ti-database" aria-hidden="true" style="font-size:15px;margin-right:6px"></i>data provenance</span>
+        <i class="ti ti-chevron-down" id="provChev" style="font-size:15px;transition:transform .2s"></i>
+      </div>
+      <div class="prov-body" id="provBody">
+        <div class="prov-row"><div class="prov-key">phantom jam research</div><div class="prov-val">Sugiyama et al. (2008) — "Traffic jams without bottlenecks." New Journal of Physics 10(3)</div></div>
+        <div class="prov-row"><div class="prov-key">wave speed</div><div class="prov-val">Kerner & Konhäuser (1994). ~12 mph (19 km/h) propagation measured across multiple studies.</div></div>
+        <div class="prov-row"><div class="prov-key">traffic flow model</div><div class="prov-val">Greenshields fundamental diagram (1935), updated with LWR theory (Lighthill-Whitham-Richards 1955)</div></div>
+        <div class="prov-row"><div class="prov-key">fuel waste estimate</div><div class="prov-val">Texas A&M Transportation Institute Urban Mobility Report, 2023</div></div>
+        <div class="prov-row"><div class="prov-key">adaptive cruise control</div><div class="prov-val">Stern et al. (2018) — "Dissipation of stop-and-go waves via control of autonomous vehicles." Transportation Research Part C.</div></div>
+        <div class="prov-row"><div class="prov-key">last verified</div><div class="prov-val">June 2026</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reveal" style="margin-top:1.5rem">
+    <div class="section-label">what this made me wonder next</div>
+    <div class="related-questions">
+      <div class="related-item">
+        <div class="related-q">If a single autonomous vehicle with smooth adaptive cruise control can dampen a jam — what percentage of a fleet needs to be autonomous before phantom jams stop forming entirely?</div>
+        <i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i>
+      </div>
+      <div class="related-item">
+        <div class="related-q">The same mathematics that describes phantom jams also describes detonation waves, neural firing patterns, and certain chemical reactions. What exactly is the underlying structure they share?</div>
+        <i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i>
+      </div>
+      <div class="related-item">
+        <div class="related-q">Do phantom jams happen on railroads? On pedestrian crowds? Is there a critical density threshold for foot traffic in hallways?</div>
+        <i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="substack-cta reveal" style="margin-top:2rem">
+    <span>next: how old are the cells in your body, really.</span>
+    <a href="https://standardlydeviated.substack.com">subscribe →</a>
+  </div>
+
+</div></main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <span>σ standard deviation · <a href="https://standardlydeviated.substack.com">@standardlydeviated</a></span>
+    <span><a href="/standard-deviation/">← all articles</a></span>
+  </div>
+</footer>
+
+<script src="../../assets/js/scroll-reveal.js"></script>
+<script>
+const TWO_PI=Math.PI*2;
+let simPlaying=false,simRAF=null,simTS=null;
+let NUM_CARS=18, cars=[], TRACK_R=0, TRACK_CX=0, TRACK_CY=0;
+const DESIRED_SPEED=0.018, JAM_THRESHOLD=22;
+
+function initCars(n){
+  cars=[];
+  for(let i=0;i<n;i++){
+    const angle=(TWO_PI/n)*i;
+    cars.push({angle,speed:DESIRED_SPEED,braking:0,color:'#8b85e8'});
+  }
+}
+
+function stepSim(){
+  const n=cars.length;
+  const reaction=1-((+document.getElementById('reactionSlider').value-1)/9)*0.7;
+  for(let i=0;i<n;i++){
+    const ahead=cars[(i+1)%n];
+    let dAngle=ahead.angle-cars[i].angle;
+    if(dAngle<0)dAngle+=TWO_PI;
+    const gap=dAngle/(TWO_PI/n);
+    const desiredGap=1.2;
+    const speedDiff=ahead.speed-cars[i].speed;
+    const accel=(gap-desiredGap)*0.6*reaction+speedDiff*0.4*reaction;
+    cars[i].speed=Math.max(0,Math.min(DESIRED_SPEED*1.5,cars[i].speed+accel*0.08));
+    cars[i].angle=(cars[i].angle+cars[i].speed)%TWO_PI;
+    const isSlow=cars[i].speed<DESIRED_SPEED*0.4;
+    cars[i].color=isSlow?'#ff4444':cars[i].speed<DESIRED_SPEED*0.75?'#ff8844':cars[i].speed<DESIRED_SPEED*1.0?'#ffcc44':'#5dcaa5';
+  }
+  const avgSpeed=cars.reduce((s,c)=>s+c.speed,0)/n;
+  const avgMph=Math.round(avgSpeed/DESIRED_SPEED*65);
+  document.getElementById('avgSpeedDisp').textContent='avg: '+avgMph+' mph';
+  const jammed=cars.filter(c=>c.speed<DESIRED_SPEED*0.4).length;
+  const jamPct=Math.round(jammed/n*100);
+  const dot=document.getElementById('densityDot');
+  const status=document.getElementById('densityStatus');
+  if(n<14){dot.style.background='#5dcaa5';status.textContent='stable flow — below critical density';}
+  else if(n<20&&jammed===0){dot.style.background='#ffcc44';status.textContent='near threshold — small disturbances may amplify';}
+  else if(jammed>0){dot.style.background='#ff4444';status.textContent=`jam active — ${jamPct}% of cars stopped or near-stopped`;}
+  else{dot.style.background='#ff8844';status.textContent='unstable — jam likely to form spontaneously';}
+}
+
+function drawSim(){
+  const cv=document.getElementById('cSim');
+  cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  TRACK_R=Math.min(W,H)*0.36; TRACK_CX=W/2; TRACK_CY=H/2;
+  ctx.fillStyle='#070a14';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=28;
+  ctx.beginPath();ctx.arc(TRACK_CX,TRACK_CY,TRACK_R,0,TWO_PI);ctx.stroke();
+  ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.arc(TRACK_CX,TRACK_CY,TRACK_R-14,0,TWO_PI);ctx.stroke();
+  ctx.beginPath();ctx.arc(TRACK_CX,TRACK_CY,TRACK_R+14,0,TWO_PI);ctx.stroke();
+  cars.forEach((car,i)=>{
+    const cx=TRACK_CX+Math.cos(car.angle)*TRACK_R;
+    const cy=TRACK_CY+Math.sin(car.angle)*TRACK_R;
+    ctx.fillStyle=car.color;
+    ctx.beginPath();ctx.arc(cx,cy,5,0,TWO_PI);ctx.fill();
+  });
+  ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='11px sans-serif';ctx.textAlign='center';
+  ctx.fillText('→ clockwise',TRACK_CX,TRACK_CY+TRACK_R+28);
+  ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='10px sans-serif';
+  ctx.fillText(cars.length+' cars on track',TRACK_CX,TRACK_CY+4);
+  const stoppedCars=cars.filter(c=>c.speed<DESIRED_SPEED*0.4);
+  if(stoppedCars.length>2){
+    const waveAngles=stoppedCars.map(c=>c.angle);
+    const meanAngle=Math.atan2(stoppedCars.reduce((s,c)=>s+Math.sin(c.angle),0),stoppedCars.reduce((s,c)=>s+Math.cos(c.angle),0));
+    const wx=TRACK_CX+Math.cos(meanAngle)*TRACK_R;
+    const wy=TRACK_CY+Math.sin(meanAngle)*TRACK_R;
+    ctx.strokeStyle='rgba(255,68,68,.4)';ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(TRACK_CX,TRACK_CY,TRACK_R,meanAngle-.4,meanAngle+.4);ctx.stroke();
+    ctx.fillStyle='rgba(255,68,68,.8)';ctx.font='500 10px sans-serif';ctx.textAlign='center';
+    ctx.fillText('← jam wave',wx+Math.cos(meanAngle+.6)*22,wy+Math.sin(meanAngle+.6)*22);
+  }
+}
+
+function simStep(ts){
+  if(!simTS)simTS=ts;
+  const el=ts-simTS; simTS=ts;
+  const steps=Math.min(8,Math.round(el/16));
+  for(let i=0;i<steps;i++)stepSim();
+  drawSim();
+  if(simPlaying)simRAF=requestAnimationFrame(simStep);
+}
+function toggleSim(){
+  if(simPlaying){simPlaying=false;cancelAnimationFrame(simRAF);document.getElementById('btnSimPlay').innerHTML='<i class="ti ti-player-play" aria-hidden="true"></i> play';}
+  else{simPlaying=true;simTS=null;document.getElementById('btnSimPlay').innerHTML='<i class="ti ti-player-pause" aria-hidden="true"></i> pause';simRAF=requestAnimationFrame(simStep);}
+}
+function resetSim(){
+  simPlaying=false;cancelAnimationFrame(simRAF);simTS=null;
+  document.getElementById('btnSimPlay').innerHTML='<i class="ti ti-player-play" aria-hidden="true"></i> play';
+  initCars(NUM_CARS);drawSim();
+  document.getElementById('simInfo').textContent='Cars move clockwise. Press play and watch for spontaneous jam formation at high densities. Try "brake one car" to seed a jam artificially.';
+}
+function addDisturbance(){
+  if(cars.length===0)return;
+  const idx=Math.floor(Math.random()*cars.length);
+  cars[idx].speed=0;
+  document.getElementById('simInfo').textContent='Disturbance added — watch the braking wave propagate backward (counter-clockwise) through the cars behind it.';
+}
+function updateDensity(v){
+  NUM_CARS=+v;
+  document.getElementById('densityVal').textContent=v+' cars';
+  document.getElementById('reactionVal').textContent=['very quick','quick','medium-fast','medium','medium','medium','medium-slow','slow','very slow','sluggish'][+document.getElementById('reactionSlider').value-1];
+  initCars(NUM_CARS);drawSim();
+}
+document.getElementById('reactionSlider').addEventListener('input',function(){
+  const labels=['very quick','quick','medium-fast','medium','medium','medium','medium-slow','slow','very slow','sluggish'];
+  document.getElementById('reactionVal').textContent=labels[+this.value-1];
+});
+initCars(NUM_CARS); drawSim();
+
+function updateCpm(v){
+  document.getElementById('cpmVal').textContent=v+' cars/mi';
+  drawFundamental(+v);
+}
+function drawFundamental(density){
+  const cv=document.getElementById('cDensity');
+  cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#070a14';ctx.fillRect(0,0,W,H);
+  const pad={l:60,r:20,t:20,b:44};
+  const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+  const MAX_DENSITY=55, CRITICAL=25, FREE_SPEED=65;
+  function flowRate(d){
+    if(d<=CRITICAL)return d*FREE_SPEED*(1-d/(CRITICAL*2));
+    return Math.max(0,CRITICAL*FREE_SPEED*0.5*(1-(d-CRITICAL)/(MAX_DENSITY-CRITICAL)));
+  }
+  ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=0.5;
+  [0,500,1000,1500].forEach(v=>{
+    const y=pad.t+ch-(v/1600)*ch;
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='10px sans-serif';ctx.textAlign='right';
+    ctx.fillText(v,pad.l-6,y+4);
+  });
+  [0,10,20,30,40,50].forEach(d=>{
+    const x=pad.l+(d/MAX_DENSITY)*cw;
+    ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,pad.t+ch);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='10px sans-serif';ctx.textAlign='center';
+    ctx.fillText(d,x,pad.t+ch+14);
+  });
+  ctx.strokeStyle='rgba(93,202,165,.7)';ctx.lineWidth=2.5;
+  ctx.beginPath();
+  for(let d=0;d<=MAX_DENSITY;d+=0.5){
+    const x=pad.l+(d/MAX_DENSITY)*cw;
+    const y=pad.t+ch-(flowRate(d)/1600)*ch;
+    d===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  const critX=pad.l+(CRITICAL/MAX_DENSITY)*cw;
+  ctx.strokeStyle='rgba(255,68,68,.5)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(critX,pad.t);ctx.lineTo(critX,pad.t+ch);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,68,68,.7)';ctx.font='10px sans-serif';ctx.textAlign='center';
+  ctx.fillText('critical density',critX,pad.t+10);
+  const curX=pad.l+(density/MAX_DENSITY)*cw;
+  const curFlow=flowRate(density);
+  const curY=pad.t+ch-(curFlow/1600)*ch;
+  ctx.fillStyle=density>CRITICAL?'#ff4444':'#5dcaa5';
+  ctx.beginPath();ctx.arc(curX,curY,6,0,TWO_PI);ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.3)';ctx.lineWidth=1;ctx.setLineDash([2,3]);
+  ctx.beginPath();ctx.moveTo(curX,curY);ctx.lineTo(curX,pad.t+ch);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(pad.l,curY);ctx.lineTo(curX,curY);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,255,255,.6)';ctx.font='10px sans-serif';ctx.textAlign='left';
+  ctx.fillText(density+' cars/mi → '+Math.round(curFlow)+' veh/hr',curX+10,curY-6);
+  ctx.fillStyle='rgba(255,255,255,.35)';ctx.font='10px sans-serif';ctx.textAlign='center';
+  ctx.fillText('density (cars per mile)',pad.l+cw/2,H-4);
+  ctx.save();ctx.translate(12,pad.t+ch/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText('flow (vehicles / hour)',0,0);ctx.restore();
+  const stable=density<=CRITICAL;
+  document.getElementById('cpmInfo').textContent=stable
+    ?`At ${density} cars/mi, flow is stable at ~${Math.round(curFlow)} vehicles/hour. Small disturbances dissipate. No phantom jams.`
+    :`At ${density} cars/mi (above critical density of ~${CRITICAL}), total throughput drops to ~${Math.round(curFlow)} veh/hr — LESS than at lower density. The highway is moving fewer cars. Phantom jams will form and sustain.`;
+  document.getElementById('densityStats').innerHTML=`
+    <div class="stat-card"><div class="s-label">density</div><div class="s-value">${density}/mi</div><div class="s-sub">${density>CRITICAL?'above critical':'below critical'}</div></div>
+    <div class="stat-card"><div class="s-label">throughput</div><div class="s-value">${Math.round(curFlow)}</div><div class="s-sub">vehicles/hr/lane</div></div>
+    <div class="stat-card"><div class="s-label">avg speed</div><div class="s-value">${Math.round(density>CRITICAL?curFlow/density:FREE_SPEED*(1-density/(CRITICAL*2)))} mph</div><div class="s-sub">estimated</div></div>
+    <div class="stat-card"><div class="s-label">jam risk</div><div class="s-value">${density>CRITICAL?'high':'low'}</div><div class="s-sub">${density>CRITICAL?'phantom jams likely':'stable flow'}</div></div>`;
+}
+drawFundamental(20);
+
+const ST_SCENARIOS=[
+  {label:'low density — no jams',density:12,jamWidth:0},
+  {label:'moderate density — occasional jams',density:22,jamWidth:0.12},
+  {label:'high density — sustained jam wave',density:32,jamWidth:0.25},
+  {label:'gridlock approaching',density:45,jamWidth:0.5},
+];
+function drawSpaceTime(idx){
+  const sc=ST_SCENARIOS[idx];
+  document.getElementById('scenarioVal').textContent=sc.label;
+  const cv=document.getElementById('cSpaceTime');
+  cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#070a14';ctx.fillRect(0,0,W,H);
+  const numCars=14, timeSteps=H;
+  const carSpeed=(1-sc.density/55)*0.85;
+  const jamSpeed=-0.12;
+  ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=0.5;
+  for(let t=0;t<H;t+=40){ctx.beginPath();ctx.moveTo(0,t);ctx.lineTo(W,t);ctx.stroke();}
+  for(let x=0;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  const JAM_START_X=W*0.35;
+  for(let c=0;c<numCars;c++){
+    let startX=(c/numCars)*W;
+    ctx.beginPath();
+    for(let t=0;t<H;t++){
+      const jamCenter=JAM_START_X+(t/H)*jamSpeed*W;
+      const inJam=sc.jamWidth>0&&Math.abs(((startX+t*carSpeed*W/H)%W)-jamCenter)<sc.jamWidth*W/2;
+      const effectiveSpeed=inJam?0.01:carSpeed;
+      const x=(startX+t*effectiveSpeed*W/H*0.8)%W;
+      t===0?ctx.moveTo(x,t):ctx.lineTo(x,t);
+    }
+    ctx.strokeStyle='rgba(93,202,165,0.5)';ctx.lineWidth=1.5;ctx.stroke();
+  }
+  if(sc.jamWidth>0){
+    ctx.fillStyle='rgba(255,68,68,.12)';
+    ctx.beginPath();
+    ctx.moveTo(JAM_START_X-sc.jamWidth*W/2,0);
+    ctx.lineTo(JAM_START_X+sc.jamWidth*W/2,0);
+    ctx.lineTo(JAM_START_X+jamSpeed*W+sc.jamWidth*W/2,H);
+    ctx.lineTo(JAM_START_X+jamSpeed*W-sc.jamWidth*W/2,H);
+    ctx.closePath();ctx.fill();
+    ctx.fillStyle='rgba(255,68,68,.7)';ctx.font='500 11px sans-serif';ctx.textAlign='center';
+    const midX=JAM_START_X+jamSpeed*W*0.5;
+    ctx.fillText('← jam wave (moving backward)',midX,H/2-8);
+    ctx.fillStyle='rgba(255,68,68,.5)';ctx.font='10px sans-serif';
+    ctx.fillText('~12 mph against traffic',midX,H/2+8);
+  }
+  ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='10px sans-serif';ctx.textAlign='left';
+  ctx.fillText('← space (position on road) →',8,H-6);
+  ctx.save();ctx.translate(10,H/2);ctx.rotate(-Math.PI/2);
+  ctx.textAlign='center';ctx.fillText('time →',0,0);ctx.restore();
+  document.getElementById('stInfo').textContent=sc.jamWidth===0
+    ?'At low density, car trajectories are nearly parallel straight lines — everyone moves at similar speed with no jams.'
+    :`Each green line is one car moving forward through time. The red stripe is the jam — notice it tilts LEFT while cars move right. The jam propagates backward at ~12 mph against traffic.`;
+}
+drawSpaceTime(1);
+document.getElementById('scenarioSlider').addEventListener('input',function(){drawSpaceTime(+this.value);});
+
+function calcCommute(){
+  const miles=+document.getElementById('commuteMiles').value||15;
+  const speed=+document.getElementById('commuteSpeed').value||35;
+  const years=+document.getElementById('commuteYears').value||5;
+  const hoursPerDay=miles/speed;
+  const daysPerYear=250;
+  const totalHours=Math.round(hoursPerDay*daysPerYear*years*2);
+  const jamFreq=speed<40?2.8:speed<55?1.2:0.4;
+  const totalJams=Math.round(jamFreq*daysPerYear*years*2);
+  const hoursInJams=Math.round(totalJams*0.08);
+  document.getElementById('commuteResult').innerHTML=`Over <strong>${years} years</strong> of commuting ${miles} miles each way at an average ${speed} mph:<span class="yn-big">${totalJams.toLocaleString()} phantom jams</span>You've probably sat in roughly ${totalJams.toLocaleString()} phantom jams — slowdowns with no cause that appeared and disappeared without explanation. That's approximately <strong>${hoursInJams} hours</strong> of your life spent decelerating and re-accelerating behind a braking wave that had nothing to do with anything ahead of you.`;
+  document.getElementById('commuteStats').innerHTML=`
+    <div class="stat-card"><div class="s-label">total commute hours</div><div class="s-value">${totalHours.toLocaleString()}</div><div class="s-sub">over ${years} years</div></div>
+    <div class="stat-card"><div class="s-label">est. phantom jams</div><div class="s-value">${totalJams.toLocaleString()}</div><div class="s-sub">both directions</div></div>
+    <div class="stat-card"><div class="s-label">hours lost to jams</div><div class="s-value">~${hoursInJams}</div><div class="s-sub">phantom jams only</div></div>
+    <div class="stat-card"><div class="s-label">jam frequency</div><div class="s-value">${jamFreq.toFixed(1)}/day</div><div class="s-sub">at avg ${speed} mph</div></div>`;
+}
+['commuteMiles','commuteSpeed','commuteYears'].forEach(id=>document.getElementById(id).addEventListener('input',calcCommute));
+calcCommute();
+
+function toggleProv(){
+  const b=document.getElementById('provBody'),c=document.getElementById('provChev');
+  b.classList.toggle('open');c.style.transform=b.classList.contains('open')?'rotate(180deg)':'';
+}
+</script>
+</body>
+</html>

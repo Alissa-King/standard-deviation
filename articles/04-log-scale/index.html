@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>your brain is bad at big numbers. here's the evidence. — standard deviation</title>
+  <meta name="description" content="A magnitude 9 earthquake releases 1,000 times more energy than a magnitude 7. Not twice as much. 1,000 times. The scale we use to measure it is hiding the truth in plain sight.">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    .scale-toggle { display:flex; gap:6px; margin-bottom:.85rem; }
+    .bar-row { display:flex; align-items:center; gap:10px; padding:.5rem 0; border-bottom:0.5px solid var(--color-border); }
+    .bar-row:last-child { border-bottom:none; }
+    .bar-label { font-size:12px; min-width:130px; color:var(--color-text-primary); flex-shrink:0; }
+    .bar-bg { flex:1; height:22px; background:rgba(255,255,255,.05); border-radius:4px; overflow:hidden; position:relative; }
+    .bar-fill { height:100%; border-radius:4px; transition:width .5s cubic-bezier(.4,0,.2,1); }
+    .bar-val { font-size:11px; font-family:var(--font-mono); min-width:80px; text-align:right; color:var(--color-text-secondary); flex-shrink:0; }
+    .scale-label { font-size:10px; text-transform:uppercase; letter-spacing:.7px; color:var(--color-text-tertiary); margin-bottom:.5rem; }
+    canvas { display:block; max-width:100%; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container inner">
+    <a class="wordmark" href="/standard-deviation/"><span class="sigma">σ</span> standard deviation</a>
+    <nav class="site-nav">
+      <a href="/standard-deviation/">archive</a>
+      <a href="https://standardlydeviated.substack.com/about">about</a>
+      <a href="https://standardlydeviated.substack.com">substack</a>
+    </nav>
+  </div>
+</header>
+<main><div class="container">
+
+  <header class="article-header reveal">
+    <div class="kicker">scale &amp; perception · vol. 04</div>
+    <h1 class="article-title">your brain is bad at big numbers. here's the evidence.</h1>
+    <p class="article-dek">A magnitude 9 earthquake releases 1,000 times more energy than a magnitude 7. Not twice as much. 1,000 times. The scales we use to measure things are quietly hiding the truth in plain sight.</p>
+    <div class="article-byline">
+      <span>standard deviation</span><span class="byline-dot"></span>
+      <span>~8 min read</span><span class="byline-dot"></span>
+      <span>toggle: log vs. linear</span><span class="byline-dot"></span>
+      <a href="https://standardlydeviated.substack.com" style="color:var(--color-accent);text-decoration:none">subscribe</a>
+    </div>
+  </header>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The Richter scale runs from 1 to 10. This makes it sound like a reasonable, human-sized thing — a scale you could hang on a wall like a poster, one that you could understand by looking at. It is not that. The Richter scale is logarithmic, which means every whole number represents a 10-fold increase in amplitude and roughly a 31.6-fold increase in energy released. A magnitude 5 earthquake releases about the same energy as a nuclear bomb. A magnitude 9 releases roughly 1,000 times more energy than a magnitude 7. The scale looks like it spans ten steps. It spans something closer to a billion.</p>
+      <p>This is not a quirk of seismology. Almost every scale humans use to measure extreme phenomena is logarithmic, because the phenomena themselves span ranges too vast for a linear scale to represent legibly. Sound is measured in decibels — logarithmic. Acidity is measured in pH — logarithmic. Stellar brightness is measured in magnitudes — logarithmic, and confusingly reversed so that brighter stars have smaller numbers. The human ear, the human eye, and it turns out the human sense of quantity are all themselves roughly logarithmic, which is probably why we keep reaching for these scales. They feel natural. They are also, consistently, hiding from us how extreme the extremes actually are.</p>
+    </div>
+    <div class="pull-quote reveal">The problem with logarithmic scales is not that they are wrong. They are often the most honest representation of the data. The problem is that we read the numbers and our brain treats them as if they were linear — as if 8 were twice 4, instead of being a hundred times larger.</div>
+    <div class="reveal">
+      <p>The best way to understand what a log scale is hiding is to remove it. The charts below let you toggle between the scale as it's conventionally presented and the underlying linear reality. Some of them will break something in your perception of the thing being measured. That's the point.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 1: EARTHQUAKE ENERGY -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">01 — earthquake energy: what the Richter scale is hiding</div>
+    </div>
+    <div class="interactive-body">
+      <div class="scale-toggle">
+        <button class="btn active" id="eq-log" onclick="setEqScale('log')">log scale (as reported)</button>
+        <button class="btn" id="eq-lin" onclick="setEqScale('linear')">linear scale (actual energy)</button>
+      </div>
+      <div class="scale-label" id="eqScaleLabel">showing: richter magnitude (logarithmic)</div>
+      <div id="eqBars"></div>
+      <div class="info-box" id="eqInfo" style="margin-top:.75rem">On the log scale, a M9 looks about 29% larger than a M7. Switch to linear to see the actual energy difference: 1,000×. The 1906 San Francisco earthquake essentially disappears.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The 2011 Tōhoku earthquake and tsunami — the one that triggered the Fukushima disaster — was a magnitude 9.1. The 1989 Loma Prieta earthquake that collapsed a section of the Bay Bridge during the World Series was a magnitude 6.9. On the Richter scale, 9.1 and 6.9 look reasonably close. The actual energy difference is somewhere in the range of 250,000 to 1. Tōhoku released about 600 million times as much energy as a magnitude 4 earthquake. You've felt a magnitude 4. It rattles the windows.</p>
+      <p>Sound works the same way. Zero decibels is roughly the threshold of human hearing — the quietest sound a healthy young person can detect. 60 decibels is a normal conversation. 120 decibels is a jet engine at close range and is the approximate pain threshold for human hearing. This sounds like a range of 120. It is actually a range of one trillion in sound pressure. The difference between a whisper and a jet engine, in actual pressure on your eardrum, is a factor of 10 billion.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 2: SOUND / DECIBELS -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">02 — sound pressure: what decibels are hiding</div>
+    </div>
+    <div class="interactive-body">
+      <div class="scale-toggle">
+        <button class="btn active" id="db-log" onclick="setDbScale('log')">decibels (as reported)</button>
+        <button class="btn" id="db-lin" onclick="setDbScale('linear')">actual sound pressure</button>
+      </div>
+      <div class="scale-label" id="dbScaleLabel">showing: decibels (logarithmic)</div>
+      <div id="dbBars"></div>
+      <div class="info-box" id="dbInfo" style="margin-top:.75rem">On the dB scale a jet engine looks 12× louder than a whisper. In actual pressure: 10,000,000,000×. Every 20 dB is a 10× increase in pressure.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The national debt works on a similar perceptual problem, except without the benefit of a scale name that signals logarithm. A million dollars, a billion dollars, and a trillion dollars look like the same kind of number — they're just different words with the same rhythm. They are not the same kind of number. A million seconds is about 11.5 days. A billion seconds is about 31.7 years. A trillion seconds is about 31,688 years — further back in time than the oldest known cave paintings. The words are close. The things they describe are not.</p>
+    </div>
+    <div class="pull-quote reveal">If you spent a dollar every second, it would take you 11.5 days to spend a million dollars. 31.7 years to spend a billion. And 31,688 years to spend a trillion. The US national debt, at roughly $36 trillion, would take you approximately 1.14 million years to spend at that rate.</div>
+  </div>
+
+  <!-- INTERACTIVE 3: MONEY SCALE -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">03 — million, billion, trillion: the scale you already know wrong</div>
+    </div>
+    <div class="interactive-body">
+      <div class="scale-toggle">
+        <button class="btn active" id="mo-log" onclick="setMoneyScale('log')">log scale</button>
+        <button class="btn" id="mo-lin" onclick="setMoneyScale('linear')">linear scale</button>
+      </div>
+      <div class="scale-label" id="moScaleLabel">showing: log scale</div>
+      <div id="moBars"></div>
+      <div class="info-box" id="moInfo" style="margin-top:.75rem">On log scale, a billion looks about twice a million. Switch to linear: a billion is 1,000 millions. The US national debt doesn't fit on this chart at linear scale unless everything else is invisible.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>pH is perhaps the most useful everyday example because it's both logarithmic and reversed, which means it manages to be counterintuitive in two directions simultaneously. Pure water has a pH of 7. Battery acid has a pH of around 0. Bleach has a pH of around 13. Each whole number step represents a 10-fold change in hydrogen ion concentration. Black coffee, at pH 5, is 100 times more acidic than pure water. Lemon juice, at pH 2, is 100,000 times more acidic than water. These foods sit next to each other at every breakfast table and their acidity differs by a factor of 100,000.</p>
+      <p>There is a version of this for stellar brightness, for the frequency range of the electromagnetic spectrum, for the size difference between a proton and a basketball, for the age of the universe compared to recorded human history. In each case, the conventional representation hides the actual scale behind a compact and legible number. The number is not lying. It is simply doing what logarithms do — compressing an incomprehensible range into something that fits on a label — and we keep forgetting to uncompress it in our heads.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 4: UNIFIED SCALE EXPLORER -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">04 — five scales, one toggle: see them all break at once</div>
+    </div>
+    <div class="interactive-body">
+      <div class="scale-toggle">
+        <button class="btn active" id="all-log" onclick="setAllScale('log')">log (as reported)</button>
+        <button class="btn" id="all-lin" onclick="setAllScale('linear')">linear (actual)</button>
+      </div>
+      <canvas id="cAll" height="340" style="width:100%;border-radius:8px;background:#0a0a0f" role="img" aria-label="Five logarithmic scales shown simultaneously — earthquake energy, sound pressure, pH acidity, stellar magnitude, and money — toggling between log and linear reveals the true scale differences"></canvas>
+      <div class="info-box" id="allInfo" style="margin-top:.75rem">Each panel shows a different scale. On log: all look manageable. On linear: most panels collapse to near-zero because the largest values dominate completely.</div>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 5: YOUR NUMBER -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">05 — your number: how old is a billion seconds?</div>
+    </div>
+    <div class="interactive-body">
+      <div class="your-number">
+        <div class="yn-label">your number</div>
+        <div class="yn-prompt">Enter your age. We'll tell you where you fall on three very different scales.</div>
+        <input type="number" id="userAgeLog" min="1" max="120" value="35" placeholder="age" style="width:90px;font-size:14px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-mono)">
+        <div class="yn-result" id="logYourNum"></div>
+      </div>
+      <div class="stat-row" id="logStats"></div>
+    </div>
+  </div>
+
+  <hr class="article-divider reveal">
+
+  <div class="reveal">
+    <div class="provenance">
+      <div class="prov-toggle" onclick="toggleProv()">
+        <span><i class="ti ti-database" aria-hidden="true" style="font-size:15px;margin-right:6px"></i>data provenance</span>
+        <i class="ti ti-chevron-down" id="provChev" style="font-size:15px;transition:transform .2s"></i>
+      </div>
+      <div class="prov-body" id="provBody">
+        <div class="prov-row"><div class="prov-key">earthquake energy</div><div class="prov-val">USGS earthquake hazards program. Energy formula: E = 10^(1.5M + 4.8) joules (Kanamori 1977)</div></div>
+        <div class="prov-row"><div class="prov-key">sound pressure</div><div class="prov-val">NIOSH sound level reference values. dB = 20 × log10(P/P₀), P₀ = 20 μPa</div></div>
+        <div class="prov-row"><div class="prov-key">pH values</div><div class="prov-val">Standard chemistry reference. pH = -log10[H⁺]. Values from FDA food chemistry tables.</div></div>
+        <div class="prov-row"><div class="prov-key">money figures</div><div class="prov-val">US national debt: US Treasury, June 2026. Individual wealth estimates: Forbes 2025.</div></div>
+        <div class="prov-row"><div class="prov-key">last verified</div><div class="prov-val">June 2026</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reveal" style="margin-top:1.5rem">
+    <div class="section-label">what this made me wonder next</div>
+    <div class="related-questions">
+      <div class="related-item">
+        <div class="related-q">The electromagnetic spectrum spans radio waves to gamma rays — a range of 10²⁴ in frequency. What fraction of that range can humans actually perceive, and what are we missing?</div>
+        <i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i>
+      </div>
+      <div class="related-item">
+        <div class="related-q">If the age of the universe were compressed to a single calendar year, what date did humans appear — and what time did recorded history begin?</div>
+        <i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i>
+      </div>
+      <div class="related-item">
+        <div class="related-q">Is there any domain where human intuition about scale is actually accurate — where our gut estimates match reality without needing a correction?</div>
+        <i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="substack-cta reveal" style="margin-top:2rem">
+    <span>next: why traffic jams appear out of nowhere.</span>
+    <a href="https://standardlydeviated.substack.com">subscribe →</a>
+  </div>
+
+</div></main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <span>σ standard deviation · <a href="https://standardlydeviated.substack.com">@standardlydeviated</a></span>
+    <span><a href="/standard-deviation/">← all articles</a></span>
+  </div>
+</footer>
+
+<script src="../../assets/js/scroll-reveal.js"></script>
+<script>
+const EARTHQUAKES = [
+  {name:'M2 — felt by few',mag:2,col:'#5dcaa5'},
+  {name:'M4 — rattles windows',mag:4,col:'#8b85e8'},
+  {name:'M5 — minor damage',mag:5,col:'#ffcc44'},
+  {name:'M6 — moderate damage',mag:6,col:'#e8855a'},
+  {name:'M6.9 — Loma Prieta 1989',mag:6.9,col:'#e8855a'},
+  {name:'M7.0 — Haiti 2010',mag:7.0,col:'#ff8844'},
+  {name:'M7.9 — San Francisco 1906',mag:7.9,col:'#ff6644'},
+  {name:'M9.0 — Cascadia 1700',mag:9.0,col:'#ff4444'},
+  {name:'M9.1 — Tōhoku 2011',mag:9.1,col:'#ff2222'},
+];
+function eqEnergy(mag){return Math.pow(10,1.5*mag+4.8);}
+function fmtEnergy(j){
+  if(j>=1e18)return(j/1e18).toFixed(1)+' EJ';
+  if(j>=1e15)return(j/1e15).toFixed(1)+' PJ';
+  if(j>=1e12)return(j/1e12).toFixed(1)+' TJ';
+  return(j/1e9).toFixed(1)+' GJ';
+}
+let eqScale='log';
+function setEqScale(s){
+  eqScale=s;
+  document.getElementById('eq-log').classList.toggle('active',s==='log');
+  document.getElementById('eq-lin').classList.toggle('active',s==='linear');
+  document.getElementById('eqScaleLabel').textContent=s==='log'?'showing: richter magnitude (logarithmic)':'showing: actual energy released (joules)';
+  renderEqBars();
+}
+function renderEqBars(){
+  const wrap=document.getElementById('eqBars'); wrap.innerHTML='';
+  const energies=EARTHQUAKES.map(e=>eqEnergy(e.mag));
+  const maxE=Math.max(...energies), maxM=Math.max(...EARTHQUAKES.map(e=>e.mag));
+  EARTHQUAKES.forEach((eq,i)=>{
+    const pct=eqScale==='log'?(eq.mag/maxM)*100:(energies[i]/maxE)*100;
+    const row=document.createElement('div'); row.className='bar-row';
+    row.innerHTML=`<div class="bar-label">${eq.name}</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:${pct.toFixed(1)}%;background:${eq.col}"></div></div>
+      <div class="bar-val">${eqScale==='log'?'M'+eq.mag:fmtEnergy(energies[i])}</div>`;
+    wrap.appendChild(row);
+  });
+  const ratio=Math.round(eqEnergy(9.1)/eqEnergy(6.9));
+  document.getElementById('eqInfo').textContent=eqScale==='log'
+    ?'On the log scale, M9.1 looks about 32% larger than M6.9. They are presented as neighbors on the same axis.'
+    :`At true linear scale, Tōhoku (M9.1) released ${ratio.toLocaleString()}× more energy than Loma Prieta (M6.9). The smaller earthquakes are nearly invisible bars.`;
+}
+renderEqBars();
+
+const SOUNDS=[
+  {name:'threshold of hearing',db:0,col:'#5dcaa5'},
+  {name:'rustling leaves',db:20,col:'#5dcaa5'},
+  {name:'whisper',db:30,col:'#8b85e8'},
+  {name:'library',db:40,col:'#8b85e8'},
+  {name:'normal conversation',db:60,col:'#ffcc44'},
+  {name:'busy restaurant',db:70,col:'#ffcc44'},
+  {name:'vacuum cleaner',db:80,col:'#e8855a'},
+  {name:'lawn mower',db:90,col:'#ff8844'},
+  {name:'concert / club',db:110,col:'#ff6644'},
+  {name:'jet engine (close)',db:130,col:'#ff2222'},
+];
+function dbPressure(db){return Math.pow(10,db/20);}
+let dbScale='log';
+function setDbScale(s){
+  dbScale=s;
+  document.getElementById('db-log').classList.toggle('active',s==='log');
+  document.getElementById('db-lin').classList.toggle('active',s==='linear');
+  document.getElementById('dbScaleLabel').textContent=s==='log'?'showing: decibels (logarithmic)':'showing: actual sound pressure (relative units)';
+  renderDbBars();
+}
+function renderDbBars(){
+  const wrap=document.getElementById('dbBars'); wrap.innerHTML='';
+  const pressures=SOUNDS.map(s=>dbPressure(s.db));
+  const maxP=Math.max(...pressures), maxDb=130;
+  SOUNDS.forEach((s,i)=>{
+    const pct=dbScale==='log'?(s.db/maxDb)*100:(pressures[i]/maxP)*100;
+    const row=document.createElement('div'); row.className='bar-row';
+    const displayVal=dbScale==='log'?s.db+' dB':pressures[i]>=1e6?(pressures[i]/1e6).toFixed(1)+'M×':pressures[i]>=1000?(pressures[i]/1000).toFixed(0)+'K×':Math.round(pressures[i])+'×';
+    row.innerHTML=`<div class="bar-label">${s.name}</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:${Math.max(0.5,pct).toFixed(1)}%;background:${s.col}"></div></div>
+      <div class="bar-val">${displayVal}</div>`;
+    wrap.appendChild(row);
+  });
+  document.getElementById('dbInfo').textContent=dbScale==='log'
+    ?'Every 20 dB is a 10× increase in sound pressure. A jet engine at 130 dB looks 4.3× louder than a whisper at 30 dB on this scale.'
+    :`A jet engine exerts ${(dbPressure(130)/dbPressure(30)).toLocaleString()}× more pressure on your eardrum than a whisper. The whisper's bar is invisible at this scale.`;
+}
+renderDbBars();
+
+const MONEY=[
+  {name:'$100 (nice dinner)',val:100,col:'#5dcaa5'},
+  {name:'$10,000 (used car)',val:10000,col:'#5dcaa5'},
+  {name:'$1 million (lottery)',val:1e6,col:'#8b85e8'},
+  {name:'$1 billion (sports team)',val:1e9,col:'#ffcc44'},
+  {name:'$100 billion (Bezos)',val:1e11,col:'#ff8844'},
+  {name:'$1 trillion (Apple mkt cap)',val:1e12,col:'#ff6644'},
+  {name:'$36 trillion (US debt)',val:36e12,col:'#ff2222'},
+];
+let moScale='log';
+function setMoneyScale(s){
+  moScale=s;
+  document.getElementById('mo-log').classList.toggle('active',s==='log');
+  document.getElementById('mo-lin').classList.toggle('active',s==='linear');
+  document.getElementById('moScaleLabel').textContent=s==='log'?'showing: log scale':'showing: linear scale (actual dollars)';
+  renderMoBars();
+}
+function fmtMoney(v){
+  if(v>=1e12)return'$'+(v/1e12).toFixed(0)+'T';
+  if(v>=1e9)return'$'+(v/1e9).toFixed(0)+'B';
+  if(v>=1e6)return'$'+(v/1e6).toFixed(0)+'M';
+  if(v>=1000)return'$'+(v/1000).toFixed(0)+'K';
+  return'$'+v;
+}
+function renderMoBars(){
+  const wrap=document.getElementById('moBars'); wrap.innerHTML='';
+  const maxVal=36e12, maxLog=Math.log10(36e12);
+  MONEY.forEach(m=>{
+    const pct=moScale==='log'?(Math.log10(m.val)/maxLog)*100:(m.val/maxVal)*100;
+    const row=document.createElement('div'); row.className='bar-row';
+    row.innerHTML=`<div class="bar-label">${m.name}</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:${Math.max(0.3,pct).toFixed(2)}%;background:${m.col}"></div></div>
+      <div class="bar-val">${fmtMoney(m.val)}</div>`;
+    wrap.appendChild(row);
+  });
+  document.getElementById('moInfo').textContent=moScale==='log'
+    ?'On log scale, $1B looks about 43% larger than $1M. On linear scale, $1B is exactly 1,000 times $1M — and everything below $1T is essentially invisible next to the national debt.'
+    :'On linear scale, $100, $10K, $1M, and $1B are all rounding errors next to $36 trillion. The bottom five entries share a single pixel.';
+}
+renderMoBars();
+
+let allScale='log';
+const ALL_PANELS=[
+  {title:'earthquakes',items:[{l:'M4',v:4},{l:'M6',v:6},{l:'M7.9',v:7.9},{l:'M9.1',v:9.1}],
+   toLinear:v=>Math.pow(10,1.5*v+4.8),fmtLog:v=>'M'+v,fmtLin:v=>fmtEnergy(Math.pow(10,1.5*v+4.8)),col:'#e8855a'},
+  {title:'sound (dB)',items:[{l:'30dB',v:30},{l:'60dB',v:60},{l:'90dB',v:90},{l:'130dB',v:130}],
+   toLinear:v=>Math.pow(10,v/20),fmtLog:v=>v+'dB',fmtLin:v=>{const p=Math.pow(10,v/20);return p>=1e6?(p/1e6).toFixed(1)+'M×':p>=1000?(p/1000).toFixed(0)+'K×':Math.round(p)+'×'},col:'#8b85e8'},
+  {title:'money',items:[{l:'$1M',v:1e6},{l:'$1B',v:1e9},{l:'$1T',v:1e12},{l:'$36T',v:36e12}],
+   toLinear:v=>v,fmtLog:v=>fmtMoney(v),fmtLin:v=>fmtMoney(v),col:'#ffcc44'},
+  {title:'pH (acidity)',items:[{l:'pH 7\n(water)',v:7},{l:'pH 5\n(coffee)',v:5},{l:'pH 3\n(vinegar)',v:3},{l:'pH 1\n(stomach)',v:1}],
+   toLinear:v=>Math.pow(10,7-v),fmtLog:v=>'pH '+v,fmtLin:v=>{const c=Math.pow(10,7-v);return c>=1000?Math.round(c).toLocaleString()+'×':c.toFixed(1)+'×'},col:'#5dcaa5'},
+  {title:'time (seconds)',items:[{l:'1M sec',v:1e6},{l:'1B sec',v:1e9},{l:'1T sec',v:1e12},{l:'age of universe',v:4.3e17}],
+   toLinear:v=>v,fmtLog:v=>{if(v>=1e17)return'13.8B yr';if(v>=1e12)return'31.7K yr';if(v>=1e9)return'31.7 yr';return'11.5 days'},
+   fmtLin:v=>{if(v>=1e17)return'13.8B yr';if(v>=1e12)return'31.7K yr';if(v>=1e9)return'31.7 yr';return'11.5 days'},col:'#4488ff'},
+];
+function drawAllScale(){
+  const cv=document.getElementById('cAll');
+  cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#0a0a0f'; ctx.fillRect(0,0,W,H);
+  const cols=ALL_PANELS.length, pw=Math.floor(W/cols)-10, ph=H-60;
+  ALL_PANELS.forEach((panel,pi)=>{
+    const ox=pi*(pw+10)+5;
+    ctx.fillStyle='rgba(255,255,255,.04)';
+    ctx.beginPath();ctx.roundRect(ox,30,pw,ph,4);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.6)'; ctx.font='500 11px sans-serif'; ctx.textAlign='center';
+    ctx.fillText(panel.title,ox+pw/2,22);
+    const linVals=panel.items.map(it=>panel.toLinear(it.v));
+    const maxLin=Math.max(...linVals);
+    const logVals=panel.items.map(it=>it.v);
+    const maxLog=Math.max(...logVals), minLog=Math.min(...logVals);
+    const bw=Math.floor(pw/panel.items.length)-4;
+    panel.items.forEach((item,ii)=>{
+      const bx=ox+ii*(bw+4)+2;
+      let pct;
+      if(allScale==='log'){
+        const lv=Math.log10(panel.toLinear(item.v));
+        const lmin=Math.log10(panel.toLinear(panel.items[0].v));
+        const lmax=Math.log10(panel.toLinear(panel.items[panel.items.length-1].v));
+        pct=(lv-lmin)/(lmax-lmin);
+      } else {
+        pct=linVals[ii]/maxLin;
+      }
+      const bh=Math.max(2,Math.round(pct*(ph-40)));
+      const by=30+ph-10-bh;
+      ctx.fillStyle=panel.col+'33';
+      ctx.beginPath();ctx.roundRect(bx,30+ph-10-ph+40,bw,ph-40,2);ctx.fill();
+      ctx.fillStyle=panel.col;
+      ctx.beginPath();ctx.roundRect(bx,by,bw,bh,2);ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,.55)'; ctx.font='9px sans-serif'; ctx.textAlign='center';
+      const linesArr=item.l.split('\n');
+      linesArr.forEach((ln,li)=>ctx.fillText(ln,bx+bw/2,30+ph+4+li*11));
+    });
+  });
+  document.getElementById('allInfo').textContent=allScale==='log'
+    ?'Every scale looks manageable on log. The bars are all reasonable heights. Switch to linear to see what each scale is actually measuring.'
+    :'On linear scale, the smallest values in each panel collapse to near-zero. In 4 of 5 panels, the bottom entries are invisible — their bars exist but are a fraction of a pixel tall.';
+}
+function setAllScale(s){
+  allScale=s;
+  document.getElementById('all-log').classList.toggle('active',s==='log');
+  document.getElementById('all-lin').classList.toggle('active',s==='linear');
+  drawAllScale();
+}
+drawAllScale();
+
+function calcLogYourNum(){
+  const age=+document.getElementById('userAgeLog').value||35;
+  const seconds=age*365.25*24*3600;
+  const dollars=seconds;
+  const eqEquiv=(Math.log10(seconds*1e3)-4.8)/1.5;
+  document.getElementById('logYourNum').innerHTML=`You are <strong>${age} years old</strong>, which is approximately:<span class="yn-big">${(seconds/1e9).toFixed(2)} billion seconds</span>If your life were measured on a decibel scale, you would be <strong>${(20*Math.log10(age)).toFixed(1)} dB</strong>. At $1/second, you'd need <strong>${(age*31.7).toFixed(0)} more lifetimes</strong> to spend a trillion dollars. And your age in earthquake energy terms is equivalent to a magnitude <strong>${eqEquiv.toFixed(2)}</strong> earthquake — every year of your life.`;
+  document.getElementById('logStats').innerHTML=`
+    <div class="stat-card"><div class="s-label">your age in seconds</div><div class="s-value">${(seconds/1e9).toFixed(1)}B</div><div class="s-sub">${seconds.toLocaleString()} total</div></div>
+    <div class="stat-card"><div class="s-label">dB equivalent</div><div class="s-value">${(20*Math.log10(age)).toFixed(1)} dB</div><div class="s-sub">if age were sound</div></div>
+    <div class="stat-card"><div class="s-label">lives to spend $1T</div><div class="s-value">${(age*31.7).toFixed(0)}</div><div class="s-sub">at $1/second</div></div>
+    <div class="stat-card"><div class="s-label">eq. magnitude</div><div class="s-value">M${((Math.log10(seconds*1e3)-4.8)/1.5).toFixed(2)}</div><div class="s-sub">age as earthquake energy</div></div>`;
+}
+document.getElementById('userAgeLog').addEventListener('input',calcLogYourNum);
+calcLogYourNum();
+
+function toggleProv(){
+  const b=document.getElementById('provBody'),c=document.getElementById('provChev');
+  b.classList.toggle('open');c.style.transform=b.classList.contains('open')?'rotate(180deg)':'';
+}
+</script>
+</body>
+</html>
