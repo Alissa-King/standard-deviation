@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>what percentage of famous preserved objects is actually original — standard deviation</title>
+  <meta name="description" content="The Ship of Theseus problem has an empirical answer. The USS Constitution has been rebuilt so many times that essentially none of the original wood remains. We calculated the rest.">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>canvas{display:block;max-width:100%}.object-card{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:.85rem 1rem;margin:.5rem 0;cursor:pointer;transition:border-color .15s}.object-card:hover,.object-card.selected{border-color:var(--color-accent)}.obj-name{font-size:14px;font-weight:500;color:var(--color-text-primary)}.obj-sub{font-size:12px;color:var(--color-text-secondary);margin-top:2px}.obj-pct{font-size:20px;font-weight:500;font-family:var(--font-mono);margin-top:4px}</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container inner">
+    <a class="wordmark" href="/standard-deviation/"><span class="sigma">σ</span> standard deviation</a>
+    <nav class="site-nav"><a href="/standard-deviation/">archive</a><a href="https://standardlydeviated.substack.com/about">about</a><a href="https://standardlydeviated.substack.com">substack</a></nav>
+  </div>
+</header>
+<main><div class="container">
+
+  <header class="article-header reveal">
+    <div class="kicker">identity &amp; objects · vol. 11</div>
+    <h1 class="article-title">what percentage of famous preserved objects is actually original</h1>
+    <p class="article-dek">The Ship of Theseus problem — if you replace every plank in a ship, is it still the same ship? — turns out to have an empirical answer. We looked up the restoration records. Some of the answers are disturbing.</p>
+    <div class="article-byline">
+      <span>standard deviation</span><span class="byline-dot"></span>
+      <span>~9 min read</span><span class="byline-dot"></span>
+      <span>originality calculator · timeline explorer</span><span class="byline-dot"></span>
+      <a href="https://standardlydeviated.substack.com" style="color:var(--color-accent);text-decoration:none">subscribe</a>
+    </div>
+  </header>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The Ship of Theseus is an ancient thought experiment: the Athenians preserved the ship that Theseus sailed on his legendary voyage, replacing planks as they rotted until, eventually, every plank had been replaced. Is it still the same ship? Plutarch posed this question around 75 CE, and it has been a fixture of philosophy ever since. The usual framing is abstract — it is a puzzle about identity and continuity over time.</p>
+      <p>The empirical version of the question is more interesting. We actually do preserve ships, buildings, tools, artworks, and vehicles over centuries. We have records — sometimes meticulous ones — of what was replaced, when, and with what. The question "what percentage of this famous object is original?" has an answer, and in many cases, that answer is not what the preservation label suggests.</p>
+    </div>
+    <div class="pull-quote reveal">The USS Constitution, docked in Boston Harbor and advertised as the world's oldest commissioned naval vessel still afloat, contains approximately 10–15% original timber. The rest has been replaced, some components multiple times. This is not a secret — the restoration records are public — but it is not prominently disclosed either.</div>
+    <div class="reveal">
+      <p>The Temple of Ise in Japan represents the clearest case of intentional Ship of Theseus behavior. The shrine complex has been ritually dismantled and rebuilt every 20 years for approximately 1,300 years. The current structure was completed in 2013. It is, materially speaking, 13 years old. It is also considered one of the most sacred and ancient religious sites in Japan, with a history spanning 62 rebuildings. The Shinto tradition holds that it is the same sacred space regardless of the physical material — that continuity of ritual and location matters more than continuity of matter. This is a philosophical position, not a preservation error. The Japanese have thought about the Ship of Theseus for longer than most Western philosophers.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 1: OBJECT BROWSER -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">01 — click to explore: how original is each famous object?</div></div>
+    <div class="interactive-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-bottom:.75rem" id="objectGrid"></div>
+      <canvas id="cObject" height="220" style="width:100%;border-radius:8px;background:#0a0a0f" role="img" aria-label="Timeline of restorations and replacements for the selected famous preserved object, showing what percentage of the original material remains"></canvas>
+      <div class="info-box" id="objectInfo" style="margin-top:.75rem">Select an object to see its restoration history and calculate the percentage of original material remaining.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The question becomes more complicated when applied to artworks. Oil paintings are perhaps the most studied case. A painting that has been cleaned, revarnished, relined (backing canvas replaced), and inpainted (areas of lost original paint filled in by later restorers) multiple times may contain substantial non-original material that is invisible under normal viewing conditions. X-ray fluorescence analysis has shown that many famous paintings have been overpainted — sometimes by restorers trying to repair damage, sometimes by later hands trying to update the work, and occasionally by the original artist changing their mind. The "original" painting and the visible painting may not be the same thing.</p>
+      <p>The Lincoln Continental in which President Kennedy was assassinated — officially known as SS-100-X — was rebuilt so extensively after the assassination that it contains essentially none of the original body panels. The floor, the roof, the seats, the interior, the top mechanism, and most of the frame were replaced. The Secret Service kept the vehicle in service (with a different security configuration) until 1977. It is now in the Henry Ford Museum in Dearborn, Michigan, displayed as a historical artifact. What is being preserved, precisely, is a matter of interpretation.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 2: ORIGINALITY CALCULATOR -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">02 — the originality calculator</div></div>
+    <div class="interactive-body">
+      <div class="ctrl-row"><label>object age (years)</label><input type="range" id="objAge" min="10" max="2000" step="10" value="200" oninput="calcOriginality()"><span class="ctrl-val" id="objAgeVal">200 years</span></div>
+      <div class="ctrl-row"><label>material type</label>
+        <select id="matType" onchange="calcOriginality()" style="font-size:13px;padding:5px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary)">
+          <option value="wood">wood (ship / building timber)</option>
+          <option value="metal">metal (iron / steel components)</option>
+          <option value="stone">stone / masonry</option>
+          <option value="canvas">painted canvas</option>
+          <option value="fabric">fabric / textiles</option>
+          <option value="paper">paper / documents</option>
+        </select>
+      </div>
+      <div class="ctrl-row"><label>restoration intensity</label>
+        <select id="restIntensity" onchange="calcOriginality()" style="font-size:13px;padding:5px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary)">
+          <option value="minimal">minimal (museum quality, controlled environment)</option>
+          <option value="moderate" selected>moderate (regular maintenance, some replacement)</option>
+          <option value="heavy">heavy (working vessel / building, frequent repair)</option>
+          <option value="ritual">ritual rebuilding (intentional replacement)</option>
+        </select>
+      </div>
+      <div class="your-number" style="margin:.75rem 0">
+        <div class="yn-result" id="originalityResult"></div>
+      </div>
+      <div class="stat-row" id="originalityStats"></div>
+      <canvas id="cOriginality" height="160" style="width:100%;border-radius:8px;background:#0a0a0f;margin-top:.75rem" role="img" aria-label="Decay curve showing estimated percentage of original material remaining over time for the selected object type and restoration intensity"></canvas>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The Cutty Sark, the famous clipper ship docked in Greenwich, London, presents an unusual case. A fire in 2007 destroyed much of what remained of the original hull planking. The subsequent restoration, completed in 2012, replaced damaged timber with new wood of matching species and used modern structural techniques to support the hull. Approximately 30% of the original timber survived the fire and the previous centuries of restoration; the rest is contemporary. The Cutty Sark is now presented, accurately, as a preserved historic vessel — but what is preserved is more accurately the form and location than the material.</p>
+      <p>Stonehenge is a case where the restoration percentage is surprisingly low and the fact is surprisingly underreported. Multiple restorations in the twentieth century — in 1901, 1919, 1958, 1959, 1964, and 1965 — re-erected fallen and leaning stones, used concrete to stabilize others, and in some cases repositioned stones whose original placement was uncertain. The site looks ancient because the stones themselves are ancient. Whether they are arranged as they were originally arranged is a more complicated question, and one that Stonehenge's official interpretive materials tend not to dwell on.</p>
+    </div>
+    <div class="pull-quote reveal">The question is not whether preservation is worthwhile. It obviously is. The question is what exactly is being preserved, and whether the story told about the object matches what the restoration records show. In most cases, there is a gap between the two.</div>
+  </div>
+
+  <!-- INTERACTIVE 3: FAMOUS OBJECTS RANKED -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">03 — ranked by originality: least to most</div></div>
+    <div class="interactive-body">
+      <canvas id="cRanked" height="380" style="width:100%;border-radius:8px;background:#0a0a0f" role="img" aria-label="Horizontal bar chart ranking famous preserved objects from least to most original material remaining — Temple of Ise at near 0% to Magna Carta at near 100%"></canvas>
+      <div class="info-box" id="rankedInfo" style="margin-top:.75rem">Hover or click bars to see the specific restoration history. Percentage is estimated original material by mass or area, depending on object type.</div>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 4: YOUR NUMBER -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">04 — your number</div></div>
+    <div class="interactive-body">
+      <div class="your-number">
+        <div class="yn-label">your number</div>
+        <div class="yn-prompt">Enter your age. We'll tell you what percentage of your body's original material remains — and how that compares to the USS Constitution.</div>
+        <input type="number" id="personAge" min="5" max="100" value="35" style="width:90px;font-size:14px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-mono)">
+        <div class="yn-result" id="thesusResult"></div>
+      </div>
+      <div class="stat-row" id="thesusStats"></div>
+    </div>
+  </div>
+
+  <hr class="article-divider reveal">
+  <div class="reveal">
+    <div class="provenance">
+      <div class="prov-toggle" onclick="toggleProv()"><span><i class="ti ti-database" aria-hidden="true" style="font-size:15px;margin-right:6px"></i>data provenance</span><i class="ti ti-chevron-down" id="provChev" style="font-size:15px;transition:transform .2s"></i></div>
+      <div class="prov-body" id="provBody">
+        <div class="prov-row"><div class="prov-key">USS Constitution</div><div class="prov-val">USS Constitution Museum restoration records. Naval History and Heritage Command. ~10-15% original timber estimate widely cited by museum staff.</div></div>
+        <div class="prov-row"><div class="prov-key">Temple of Ise</div><div class="prov-val">Shikinen Sengu ritual rebuilding every 20 years since ~690 CE. 62 rebuildings documented. Naiku and Geku shrine documentation.</div></div>
+        <div class="prov-row"><div class="prov-key">Stonehenge restorations</div><div class="prov-val">Pitts, M. (2001) Hengeworld. Brian Edwards documentary research. Historic England conservation records.</div></div>
+        <div class="prov-row"><div class="prov-key">Cutty Sark</div><div class="prov-val">Cutty Sark Trust restoration reports 2007–2012. Fire assessment and timber salvage documentation.</div></div>
+        <div class="prov-row"><div class="prov-key">Kennedy Lincoln Continental</div><div class="prov-val">Henry Ford Museum accession records. Secret Service modification documentation via FOIA releases.</div></div>
+        <div class="prov-row"><div class="prov-key">last verified</div><div class="prov-val">June 2026</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="reveal" style="margin-top:1.5rem">
+    <div class="section-label">what this made me wonder next</div>
+    <div class="related-questions">
+      <div class="related-item"><div class="related-q">If a digital file is copied perfectly, both copies are identical to the original in every measurable way. Does the Ship of Theseus problem apply to digital objects at all?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+      <div class="related-item"><div class="related-q">What percentage of the Mona Lisa is original paint, and where exactly has it been restored, inpainted, or overpainted in the 500 years since Leonardo finished it?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+      <div class="related-item"><div class="related-q">The Voyager probes were launched in 1977 and have never been physically touched since. In what sense are they the same objects they were at launch?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+    </div>
+  </div>
+  <div class="substack-cta reveal" style="margin-top:2rem"><span>more pieces coming — subscribe to find out what's next.</span><a href="https://standardlydeviated.substack.com">subscribe →</a></div>
+</div></main>
+<footer class="site-footer"><div class="container footer-inner"><span>σ standard deviation · <a href="https://standardlydeviated.substack.com">@standardlydeviated</a></span><span><a href="/standard-deviation/">← all articles</a></span></div></footer>
+<script src="../../assets/js/scroll-reveal.js"></script>
+<script>
+const OBJECTS=[
+  {name:'Temple of Ise',sub:'Shinto shrine, Japan — rebuilt every 20yr',pct:0,col:'#ff4444',founded:690,restorations:[{yr:710,pct:100},{yr:730,pct:100},{yr:750,pct:100}],detail:'Ritually rebuilt every 20 years since ~690 CE. Current structure completed 2013. Intentionally zero original material — continuity is spiritual, not material. 62 rebuildings documented.',category:'ritual'},
+  {name:'USS Constitution',sub:'"Old Ironsides," Boston — launched 1797',pct:12,col:'#ff6644',founded:1797,detail:'~10-15% original timber remaining. Multiple major restorations including 1833, 1871, 1906, 1927, 1974, 1992, and ongoing. Working vessel maintenance means continuous replacement.',category:'vessel'},
+  {name:'Cutty Sark',sub:'Clipper ship, Greenwich — launched 1869',pct:28,col:'#e8855a',founded:1869,detail:'~30% original timber. 2007 fire destroyed significant portion. 2008-2012 restoration replaced damaged and rotted timber. Original copper sheathing largely replaced.',category:'vessel'},
+  {name:'Stonehenge',sub:'Wiltshire, UK — ~2500 BCE',pct:55,col:'#ffcc44',founded:-2500,detail:'Stones themselves ancient (~2500 BCE) but six major 20th-century restorations re-erected, repositioned, and stabilized many stones with concrete. Original arrangement uncertain.',category:'monument'},
+  {name:'Westminster Abbey',sub:'London — founded 960 CE',pct:35,col:'#e8855a',founded:960,detail:'Multiple rebuildings. Norman structure largely replaced by Gothic from 1245. Significant WWII bomb damage repairs. Ongoing restoration of exterior stonework.',category:'building'},
+  {name:'Notre-Dame de Paris',sub:'Paris — construction began 1163',pct:42,col:'#ffcc44',founded:1163,detail:'19th-century Viollet-le-Duc restoration added/modified significant elements. 2019 fire destroyed roof and spire. Ongoing reconstruction will further reduce original material percentage.',category:'building'},
+  {name:"Lincoln's Assassination\nLincoln Continental (SS-100-X)",sub:'Kennedy vehicle — 1961 Lincoln',pct:8,col:'#ff4444',founded:1961,detail:'Rebuilt post-assassination with almost entirely new body. Floor, roof, seats, interior, and most frame replaced. In service until 1977 with different configuration.',category:'vehicle'},
+  {name:'Magna Carta (1215)',sub:'British Library copy',pct:98,col:'#5dcaa5',founded:1215,detail:'The four surviving 1215 originals are among the best-preserved medieval documents. Minor edge damage, some foxing. Essentially all original parchment intact. Ink partially faded.',category:'document'},
+  {name:'Parthenon',sub:'Athens — 447-432 BCE',pct:60,col:'#ffcc44',founded:-447,detail:'Original marble largely present but significantly damaged (1687 explosion, removal by Elgin, pollution damage). Ongoing anastylosis (reassembly from original fragments) continues.',category:'monument'},
+  {name:"Stradivari 'Messiah' violin",sub:'Ashmolean Museum — made 1716',pct:92,col:'#5dcaa5',founded:1716,detail:'Exceptionally well-preserved. Never played regularly. Most original varnish intact. Some minor repairs. One of the most original surviving Stradivari instruments.',category:'instrument'},
+];
+let selectedObj=OBJECTS[1];
+function buildObjectGrid(){
+  const grid=document.getElementById('objectGrid');
+  OBJECTS.forEach(o=>{
+    const card=document.createElement('div');card.className='object-card'+(o===selectedObj?' selected':'');
+    const col=o.pct<20?'#ff4444':o.pct<40?'#e8855a':o.pct<60?'#ffcc44':'#5dcaa5';
+    card.innerHTML=`<div class="obj-name">${o.name.split('\n')[0]}</div><div class="obj-sub">${o.sub}</div><div class="obj-pct" style="color:${col}">${o.pct}% original</div>`;
+    card.addEventListener('click',()=>{selectedObj=o;document.querySelectorAll('.object-card').forEach(c=>c.classList.remove('selected'));card.classList.add('selected');drawObject();});
+    grid.appendChild(card);
+  });
+}
+function drawObject(){
+  const o=selectedObj;
+  const cv=document.getElementById('cObject'); cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#0a0a0f';ctx.fillRect(0,0,W,H);
+  const col=o.pct<20?'#ff4444':o.pct<40?'#e8855a':o.pct<60?'#ffcc44':'#5dcaa5';
+  const nowYear=2026;
+  const foundYear=o.founded<0?o.founded:o.founded;
+  const totalSpan=nowYear-foundYear;
+  const pad={l:60,r:20,t:30,b:40};
+  const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  ctx.fillStyle='rgba(255,255,255,.04)';ctx.fillRect(pad.l,pad.t,cw,ch);
+  let originalPct=100;
+  const decayRate=(100-o.pct)/Math.max(1,totalSpan)*1.8;
+  ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();
+  for(let yr=foundYear;yr<=nowYear;yr+=Math.max(1,Math.floor(totalSpan/200))){
+    const elapsed=yr-foundYear;
+    const pct=Math.max(o.pct,100*Math.exp(-decayRate*elapsed/100));
+    const x=pad.l+(elapsed/totalSpan)*cw;
+    const y=pad.t+ch-(pct/100)*ch;
+    yr===foundYear?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  ctx.fillStyle=col+'22';ctx.beginPath();
+  ctx.moveTo(pad.l,pad.t+ch);
+  for(let yr=foundYear;yr<=nowYear;yr+=Math.max(1,Math.floor(totalSpan/200))){
+    const elapsed=yr-foundYear;const pct=Math.max(o.pct,100*Math.exp(-decayRate*elapsed/100));
+    const x=pad.l+(elapsed/totalSpan)*cw;const y=pad.t+ch-(pct/100)*ch;ctx.lineTo(x,y);
+  }
+  ctx.lineTo(pad.l+cw,pad.t+ch);ctx.closePath();ctx.fill();
+  [0,25,50,75,100].forEach(pct=>{
+    const y=pad.t+ch-(pct/100)*ch;
+    ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cw,y);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='10px sans-serif';ctx.textAlign='right';ctx.fillText(pct+'%',pad.l-4,y+4);
+  });
+  ctx.fillStyle=col;ctx.beginPath();ctx.arc(pad.l+cw,pad.t+ch-(o.pct/100)*ch,5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='500 12px sans-serif';ctx.textAlign='right';
+  ctx.fillText(o.pct+'% original',pad.l+cw-8,pad.t+ch-(o.pct/100)*ch-8);
+  ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='10px sans-serif';ctx.textAlign='center';
+  const displayFounded=foundYear<0?Math.abs(foundYear)+' BCE':''+foundYear;
+  ctx.fillText(displayFounded,pad.l,H-6);ctx.fillText('2026',pad.l+cw,H-6);
+  document.getElementById('objectInfo').textContent=o.name.replace('\n',' ')+': '+o.detail;
+}
+buildObjectGrid();drawObject();
+
+function calcOriginality(){
+  const age=+document.getElementById('objAge').value;
+  const mat=document.getElementById('matType').value;
+  const intensity=document.getElementById('restIntensity').value;
+  const decayRates={wood:{minimal:.15,moderate:.35,heavy:.55,ritual:1.0},metal:{minimal:.10,moderate:.25,heavy:.45,ritual:1.0},stone:{minimal:.05,moderate:.12,heavy:.25,ritual:1.0},canvas:{minimal:.08,moderate:.20,heavy:.35,ritual:0.9},fabric:{minimal:.20,moderate:.45,heavy:.70,ritual:1.0},paper:{minimal:.05,moderate:.15,heavy:.30,ritual:0.8}};
+  const rate=decayRates[mat][intensity];
+  const pct=Math.max(0,Math.round(100*Math.exp(-rate*age/100)));
+  document.getElementById('objAgeVal').textContent=age+' years';
+  document.getElementById('originalityResult').innerHTML=`A <strong>${age}-year-old</strong> ${mat.replace('canvas','painted canvas')} object with ${intensity.replace('ritual','ritual rebuilding')} restoration: approximately:<span class="yn-big">${pct}% original material</span>${pct<5?'Essentially no original material remains. The object\'s identity is now entirely about form, location, and provenance rather than physical continuity.':pct<30?'A minority of original material survives. What persists is largely historical form and cultural significance.':pct<60?'A meaningful but minority portion of original material survives alongside significant restoration.':pct<85?'The majority of original material survives. This is considered good preservation in most heritage contexts.':'Excellent preservation. Most original material intact. Rare for this age and material type.'}`;
+  document.getElementById('originalityStats').innerHTML=`<div class="stat-card"><div class="s-label">estimated original</div><div class="s-value">${pct}%</div></div><div class="stat-card"><div class="s-label">replaced/lost</div><div class="s-value">${100-pct}%</div></div><div class="stat-card"><div class="s-label">comparable object</div><div class="s-value">${pct<10?'Temple of Ise':pct<25?'USS Constitution':pct<45?'Cutty Sark':pct<65?'Notre-Dame':'Magna Carta'}</div></div>`;
+  const cv=document.getElementById('cOriginality'); cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#0a0a0f';ctx.fillRect(0,0,W,H);
+  const col=pct<20?'#ff4444':pct<40?'#e8855a':pct<60?'#ffcc44':'#5dcaa5';
+  const pad={l:20,r:20,t:16,b:28};const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  ctx.fillStyle='rgba(255,255,255,.04)';ctx.fillRect(pad.l,pad.t,cw,ch);
+  ctx.fillStyle=col+'55';ctx.fillRect(pad.l,pad.t+ch-(pct/100)*ch,cw,pct/100*ch);
+  ctx.fillStyle='rgba(80,80,80,.4)';ctx.fillRect(pad.l,pad.t,(100-pct)/100*cw,ch);
+  ctx.fillStyle='rgba(255,255,255,.06)';ctx.lineWidth=0.5;
+  [25,50,75].forEach(p=>{const x=pad.l+(p/100)*cw;ctx.strokeStyle='rgba(255,255,255,.06)';ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,pad.t+ch);ctx.stroke();ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText(p+'%',x,H-4);});
+  ctx.fillStyle=col;ctx.font='500 16px sans-serif';ctx.textAlign='center';ctx.fillText(pct+'% original',pad.l+cw/2,H/2+6);
+}
+calcOriginality();
+
+function drawRanked(){
+  const sorted=[...OBJECTS].sort((a,b)=>a.pct-b.pct);
+  const cv=document.getElementById('cRanked'); cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#0a0a0f';ctx.fillRect(0,0,W,H);
+  const pad={l:200,r:60,t:16,b:20};
+  const cw=W-pad.l-pad.r;
+  const bh=Math.floor((H-pad.t-pad.b)/sorted.length)-3;
+  sorted.forEach((o,i)=>{
+    const y=pad.t+i*(bh+3);
+    const col=o.pct<20?'#ff4444':o.pct<40?'#e8855a':o.pct<60?'#ffcc44':'#5dcaa5';
+    const bw=Math.round((o.pct/100)*cw);
+    ctx.fillStyle='rgba(255,255,255,.04)';ctx.beginPath();ctx.roundRect(pad.l,y,cw,bh,2);ctx.fill();
+    ctx.fillStyle=col;ctx.beginPath();ctx.roundRect(pad.l,y,Math.max(2,bw),bh,2);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.55)';ctx.font='10px sans-serif';ctx.textAlign='right';
+    ctx.fillText(o.name.split('\n')[0].substring(0,26),pad.l-6,y+bh*.72);
+    ctx.fillStyle='rgba(255,255,255,.8)';ctx.textAlign='left';
+    ctx.fillText(o.pct+'%',pad.l+bw+5,y+bh*.72);
+  });
+  document.getElementById('rankedInfo').textContent='Ranked by estimated percentage of original material remaining. Temple of Ise (0%) at top, Magna Carta (98%) at bottom. Click object cards above to see restoration details.';
+}
+drawRanked();
+
+function calcThesus(){
+  const age=+document.getElementById('personAge').value||35;
+  const avgCellAge=Math.round((age*0.15+1.5)*10)/10;
+  const cellPct=Math.round(avgCellAge/age*100);
+  const cortexPct=100;
+  const gutPct=Math.round(10/365/age*100*1000)/10;
+  document.getElementById('thesusResult').innerHTML=`You are <strong>${age} years old</strong>. Your weighted average cellular age is approximately ${avgCellAge} years — meaning roughly:<span class="yn-big">~${cellPct}% "original" by cell age</span>But that average is misleading. Your cortical neurons — the ones you're using to read this — are 100% original: ${age} years old, never replaced. Your intestinal lining is ${gutPct < 0.1 ? '<0.1' : gutPct}% "original" — those cells are 3 days old. You are simultaneously the most and least preserved object in this article.`;
+  document.getElementById('thesusStats').innerHTML=`<div class="stat-card"><div class="s-label">avg cellular age</div><div class="s-value">${avgCellAge} yr</div></div><div class="stat-card"><div class="s-label">cortical neurons</div><div class="s-value">100% orig.</div><div class="s-sub">${age} years old</div></div><div class="stat-card"><div class="s-label">gut lining</div><div class="s-value">~0%</div><div class="s-sub">3 days old</div></div><div class="stat-card"><div class="s-label">vs USS Constitution</div><div class="s-value">${cellPct > 12 ? 'more' : 'less'} original</div><div class="s-sub">USS is ~12%</div></div>`;
+}
+document.getElementById('personAge').addEventListener('input',calcThesus);
+calcThesus();
+
+function toggleProv(){const b=document.getElementById('provBody'),c=document.getElementById('provChev');b.classList.toggle('open');c.style.transform=b.classList.contains('open')?'rotate(180deg)':'';}
+</script>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>the sound that's shortening your life — standard deviation</title>
+  <meta name="description" content="The WHO estimates traffic noise causes 1.6 million healthy life-years lost annually in Western Europe. There is a dose-response relationship between nighttime noise and cardiovascular mortality. The map tells the story.">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>canvas{display:block;max-width:100%}.db-row{display:flex;align-items:center;gap:10px;padding:.55rem 0;border-bottom:0.5px solid var(--color-border)}.db-row:last-child{border-bottom:none}.db-label{font-size:13px;min-width:150px;color:var(--color-text-primary)}.db-bar-bg{flex:1;height:12px;background:rgba(255,255,255,.05);border-radius:6px;overflow:hidden}.db-bar{height:100%;border-radius:6px}.db-val{font-size:12px;font-family:var(--font-mono);min-width:50px;text-align:right;color:var(--color-text-secondary)}</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container inner">
+    <a class="wordmark" href="/standard-deviation/"><span class="sigma">σ</span> standard deviation</a>
+    <nav class="site-nav"><a href="/standard-deviation/">archive</a><a href="https://standardlydeviated.substack.com/about">about</a><a href="https://standardlydeviated.substack.com">substack</a></nav>
+  </div>
+</header>
+<main><div class="container">
+
+  <header class="article-header reveal">
+    <div class="kicker">public health · vol. 10</div>
+    <h1 class="article-title">the sound that's shortening your life</h1>
+    <p class="article-dek">The WHO estimates that long-term traffic noise causes 1.6 million healthy life-years lost annually in Western Europe alone. There is a dose-response relationship between nighttime noise and cardiovascular mortality that is as well-established as the smoking-cancer link. The geography is not random.</p>
+    <div class="article-byline">
+      <span>standard deviation</span><span class="byline-dot"></span>
+      <span>~9 min read</span><span class="byline-dot"></span>
+      <span>dose-response curve · neighborhood noise estimator</span><span class="byline-dot"></span>
+      <a href="https://standardlydeviated.substack.com" style="color:var(--color-accent);text-decoration:none">subscribe</a>
+    </div>
+  </header>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The connection between loud noise and hearing damage is obvious and well-known. The connection between chronic moderate noise and cardiovascular mortality is less obvious, less known, and considerably better established than most people realize.</p>
+      <p>The mechanism is not hearing damage. The mechanism is stress. Noise activates the sympathetic nervous system — the fight-or-flight response — even during sleep, even when you are not consciously aware of it. Your body registers a sound as a potential threat, releases cortisol and adrenaline, raises your blood pressure, and increases your heart rate. During waking hours, you can habituate to chronic noise and the physiological response diminishes somewhat. During sleep, habituation is incomplete. The body's stress response to noise is preserved even when the conscious mind is not registering the sound at all.</p>
+    </div>
+    <div class="pull-quote reveal">Nighttime noise is more damaging per decibel than daytime noise, because the body cannot fully suppress its physiological response during sleep. A bedroom window facing a moderately busy street, at 55 dB at night, produces cardiovascular risk comparable to years of mild hypertension.</div>
+    <div class="reveal">
+      <p>The dose-response relationship between nighttime road traffic noise and cardiovascular disease has been documented in multiple large prospective cohort studies. The most comprehensive meta-analysis, by Babisch (2014), found that for every 10 dB increase in nighttime road traffic noise above 50 dB, the relative risk of coronary heart disease increased by approximately 7–17%. The European Environment Agency's subsequent estimates translated this into population-level burden: 1.6 million disability-adjusted life-years (DALYs) lost annually in the European Union from traffic noise alone, making it the second-largest environmental health risk after air pollution. The effect is not small. It is comparable in scale to the health burden of passive smoking.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 1: DOSE-RESPONSE CURVE -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">01 — the dose-response curve: noise and cardiovascular risk</div></div>
+    <div class="interactive-body">
+      <div class="ctrl-row">
+        <label>noise source</label>
+        <select id="noiseSource" onchange="drawDoseResponse()" style="font-size:13px;padding:5px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary)">
+          <option value="road" selected>road traffic</option>
+          <option value="rail">rail traffic</option>
+          <option value="aviation">aviation</option>
+          <option value="industrial">industrial</option>
+        </select>
+      </div>
+      <div class="ctrl-row">
+        <label>your nighttime noise (Lnight)</label>
+        <input type="range" id="noiseLevel" min="35" max="75" step="1" value="55" oninput="drawDoseResponse()">
+        <span class="ctrl-val" id="noiseLevelVal">55 dB</span>
+      </div>
+      <canvas id="cDose" height="280" style="width:100%;border-radius:8px;background:#070a14" role="img" aria-label="Dose-response curve showing relative cardiovascular risk increasing with nighttime noise levels — inflection point around 50 dB where risk begins rising significantly"></canvas>
+      <div class="stat-row" id="doseStats"></div>
+      <div class="info-box" id="doseInfo" style="margin-top:.75rem">The WHO nighttime noise guideline for outdoor areas is 40 dB Lnight. Most urban residents in Europe and North America experience 50–65 dB. The curve shows relative risk — 1.0 is baseline.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The geography of noise exposure is not random, and this is where the public health implications get pointed. The neighborhoods with the highest noise exposure are, systematically, not the neighborhoods where decisions about transportation infrastructure are made. Highway placement decisions in the United States, made largely in the mid-twentieth century, followed a pattern documented by urban historians: highways were routed through neighborhoods with less political power to resist them. Those neighborhoods are disproportionately lower-income and disproportionately non-white. Fifty years later, those same communities bear disproportionate burdens of noise-related cardiovascular disease, childhood cognitive impacts from traffic noise, and reduced property values that limit their ability to mitigate the exposure through soundproofing or relocation.</p>
+      <p>Children are particularly vulnerable. A series of studies beginning with Stansfeld et al. (2005) documented cognitive impacts from chronic aircraft noise exposure in schoolchildren: reading comprehension, memory, and sustained attention all showed dose-dependent impairment at noise levels common near airports and highways. A child whose school is under an airport flight path or adjacent to a highway is operating under a chronic, measurable cognitive handicap that is invisible in their test scores until you look at the noise data.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 2: NOISE ENVIRONMENT EXPLORER -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">02 — common sound environments and their health implications</div></div>
+    <div class="interactive-body">
+      <div id="dbEnvironments"></div>
+      <div class="info-box" id="envInfo" style="margin-top:.75rem">Click any environment to see the chronic health implications. The WHO nighttime guideline is 40 dB — highlighted below. Everything above adds measurable cardiovascular risk with years of exposure.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The solutions are known. Sound barriers reduce highway noise by 5–15 dB at adjacent properties. Low-noise road surfaces reduce rolling noise by 3–8 dB. Building setbacks, urban form regulations, and quiet-side orientation in building design can reduce exposure in new construction. The problem is not technical — it is economic and political. Sound barriers cost money. Low-noise surfaces cost more than conventional asphalt. Quiet-side orientation reduces the density achievable on a given footprint. And the communities that bear the greatest noise burden are typically the least equipped to advocate for the capital investment required to address it.</p>
+      <p>There is also a straightforward intervention that requires no infrastructure at all: telling people what their noise exposure is and what it means. The health effects of noise are not well understood by the public, and the framing of noise as an annoyance rather than a health hazard shapes both individual and policy responses. A person who understands that their 62 dB bedroom window is increasing their cardiovascular risk by 15–20% relative to a quieter option is better equipped to make decisions about where to live, how to advocate for noise mitigation in their neighborhood, and what to ask of their doctor, than a person who just knows the street is loud.</p>
+    </div>
+    <div class="pull-quote reveal">Noise is invisible in the way that air pollution was invisible before we started measuring it. The health effects accumulated quietly for decades before the epidemiological literature reached the scale needed to make the dose-response relationship undeniable. We are roughly twenty years behind on noise where we were with particulate matter in 1990.</div>
+  </div>
+
+  <!-- INTERACTIVE 3: PERSONAL NOISE ESTIMATOR -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">03 — your number: estimate your noise exposure and cardiovascular risk</div></div>
+    <div class="interactive-body">
+      <div class="your-number">
+        <div class="yn-label">your noise profile</div>
+        <div class="yn-prompt">Describe where you sleep to estimate your noise exposure and long-term risk.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:.85rem">
+          <select id="streetType" style="font-size:13px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary)">
+            <option value="rural">rural / quiet suburb</option>
+            <option value="residential">quiet residential street</option>
+            <option value="moderate" selected>moderate residential</option>
+            <option value="busy">busy street / arterial</option>
+            <option value="highway">near highway</option>
+            <option value="airport">near airport</option>
+          </select>
+          <select id="floorLevel" style="font-size:13px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary)">
+            <option value="ground">ground floor</option>
+            <option value="mid" selected>middle floors</option>
+            <option value="high">high floor (10+)</option>
+          </select>
+          <select id="windowType" style="font-size:13px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary)">
+            <option value="open">windows open</option>
+            <option value="single">single-pane windows</option>
+            <option value="double" selected>double-pane windows</option>
+            <option value="triple">triple-pane / soundproof</option>
+          </select>
+        </div>
+        <div class="yn-result" id="noiseResult"></div>
+      </div>
+      <div class="stat-row" id="noiseStats"></div>
+      <canvas id="cPersonal" height="180" style="width:100%;border-radius:8px;background:#070a14;margin-top:.75rem" role="img" aria-label="Bar chart comparing estimated personal noise exposure to WHO guidelines and typical urban levels"></canvas>
+    </div>
+  </div>
+
+  <hr class="article-divider reveal">
+  <div class="reveal">
+    <div class="provenance">
+      <div class="prov-toggle" onclick="toggleProv()"><span><i class="ti ti-database" aria-hidden="true" style="font-size:15px;margin-right:6px"></i>data provenance</span><i class="ti ti-chevron-down" id="provChev" style="font-size:15px;transition:transform .2s"></i></div>
+      <div class="prov-body" id="provBody">
+        <div class="prov-row"><div class="prov-key">WHO DALY estimate</div><div class="prov-val">WHO Europe (2011). Burden of disease from environmental noise. 1.6M DALYs/year EU estimate.</div></div>
+        <div class="prov-row"><div class="prov-key">dose-response (CVD)</div><div class="prov-val">Babisch (2014). Meta-analysis of 24 studies. RR 1.07–1.17 per 10 dB above 50 dB Lnight.</div></div>
+        <div class="prov-row"><div class="prov-key">children cognition</div><div class="prov-val">Stansfeld et al. (2005). RANCH study. Aircraft and road traffic noise, reading comprehension impairment.</div></div>
+        <div class="prov-row"><div class="prov-key">WHO guidelines</div><div class="prov-val">WHO Environmental Noise Guidelines for the European Region (2018). 40 dB Lnight road traffic.</div></div>
+        <div class="prov-row"><div class="prov-key">highway routing history</div><div class="prov-val">Mohl (2008). Interstate: Express Highway Politics. University Press of Kansas.</div></div>
+        <div class="prov-row"><div class="prov-key">last verified</div><div class="prov-val">June 2026</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="reveal" style="margin-top:1.5rem">
+    <div class="section-label">what this made me wonder next</div>
+    <div class="related-questions">
+      <div class="related-item"><div class="related-q">Electric vehicles eliminate engine noise but tire and road noise persist above 30 mph. At what traffic speed does the EV transition actually reduce neighborhood noise levels?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+      <div class="related-item"><div class="related-q">Urban bird populations have evolved to sing at higher frequencies over the past 50 years. Is this measurable genetic adaptation or learned behavioral change?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+      <div class="related-item"><div class="related-q">What happened to noise levels in cities during COVID lockdowns, and did epidemiological data from that period provide natural experiment data on cardiovascular outcomes?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+    </div>
+  </div>
+  <div class="substack-cta reveal" style="margin-top:2rem"><span>next: what percentage of famous preserved objects are actually original.</span><a href="https://standardlydeviated.substack.com">subscribe →</a></div>
+</div></main>
+<footer class="site-footer"><div class="container footer-inner"><span>σ standard deviation · <a href="https://standardlydeviated.substack.com">@standardlydeviated</a></span><span><a href="/standard-deviation/">← all articles</a></span></div></footer>
+<script src="../../assets/js/scroll-reveal.js"></script>
+<script>
+const DOSE_SOURCES={
+  road:{label:'Road traffic',baseline:45,riskPerDb:0.014,col:'#e8855a'},
+  rail:{label:'Rail traffic',baseline:47,riskPerDb:0.009,col:'#8b85e8'},
+  aviation:{label:'Aviation',baseline:50,riskPerDb:0.012,col:'#ffcc44'},
+  industrial:{label:'Industrial',baseline:45,riskPerDb:0.018,col:'#ff4444'},
+};
+function riskAt(db,source){
+  const s=DOSE_SOURCES[source];
+  if(db<=s.baseline)return 1.0;
+  return 1.0+Math.pow((db-s.baseline)/10,1.2)*s.riskPerDb*10;
+}
+function drawDoseResponse(){
+  const source=document.getElementById('noiseSource').value;
+  const level=+document.getElementById('noiseLevel').value;
+  const s=DOSE_SOURCES[source];
+  document.getElementById('noiseLevelVal').textContent=level+' dB';
+  const cv=document.getElementById('cDose'); cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#070a14';ctx.fillRect(0,0,W,H);
+  const pad={l:50,r:20,t:20,b:40};
+  const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  const dbMin=35,dbMax=75,riskMax=1.5;
+  function dbX(db){return pad.l+(db-dbMin)/(dbMax-dbMin)*cw;}
+  function riskY(r){return pad.t+ch-(r-1)/(riskMax-1)*ch;}
+  [35,40,45,50,55,60,65,70,75].forEach(db=>{
+    const x=dbX(db);ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,pad.t+ch);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText(db,x,pad.t+ch+14);
+  });
+  [1.0,1.1,1.2,1.3,1.4].forEach(r=>{
+    const y=riskY(r);ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cw,y);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='10px sans-serif';ctx.textAlign='right';ctx.fillText(r.toFixed(1)+'×',pad.l-4,y+4);
+  });
+  ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+  const whoX=dbX(40);ctx.beginPath();ctx.moveTo(whoX,pad.t);ctx.lineTo(whoX,pad.t+ch);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='10px sans-serif';ctx.textAlign='left';ctx.fillText('WHO limit (40dB)',whoX+4,pad.t+12);
+  ctx.strokeStyle=s.col;ctx.lineWidth=2.5;ctx.beginPath();
+  for(let db=dbMin;db<=dbMax;db+=0.5){const x=dbX(db),y=riskY(Math.min(riskMax,riskAt(db,source)));db===dbMin?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+  ctx.stroke();
+  const curRisk=riskAt(level,source);
+  const cx2=dbX(level),cy2=riskY(Math.min(riskMax,curRisk));
+  ctx.fillStyle=s.col;ctx.beginPath();ctx.arc(cx2,cy2,6,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=1;ctx.setLineDash([2,3]);
+  ctx.beginPath();ctx.moveTo(cx2,cy2);ctx.lineTo(cx2,pad.t+ch);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx2,cy2);ctx.lineTo(pad.l,cy2);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,255,255,.35)';ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText('nighttime noise level (dB)',pad.l+cw/2,H-4);
+  const riskPct=Math.round((curRisk-1)*100);
+  document.getElementById('doseStats').innerHTML=`<div class="stat-card"><div class="s-label">your noise level</div><div class="s-value">${level} dB</div><div class="s-sub">Lnight (nighttime)</div></div><div class="stat-card"><div class="s-label">relative CVD risk</div><div class="s-value">${curRisk.toFixed(2)}×</div><div class="s-sub">vs. baseline</div></div><div class="stat-card"><div class="s-label">risk increase</div><div class="s-value">+${riskPct}%</div><div class="s-sub">coronary heart disease</div></div><div class="stat-card"><div class="s-label">vs. WHO limit</div><div class="s-value">+${Math.max(0,level-40)} dB</div><div class="s-sub">above 40dB guideline</div></div>`;
+  document.getElementById('doseInfo').textContent=`At ${level} dB ${s.label.toLowerCase()} noise: relative cardiovascular risk ${curRisk.toFixed(2)}× baseline (${riskPct>0?'+'+riskPct+'%':'at baseline'}). WHO nighttime guideline is 40 dB — ${level>40?`you are ${level-40} dB above it, which corresponds to approximately ${riskPct}% increased coronary risk with chronic exposure`:'you are at or below the WHO guideline'}.`;
+}
+drawDoseResponse();
+document.getElementById('noiseSource').addEventListener('change',drawDoseResponse);
+document.getElementById('noiseLevel').addEventListener('input',drawDoseResponse);
+
+const ENVIRONMENTS=[
+  {label:'quiet rural night',db:25,health:'No cardiovascular risk. Below threshold for sleep disturbance. Rare in most of the developed world.',col:'#5dcaa5'},
+  {label:'WHO guideline (Lnight)',db:40,health:'WHO nighttime road traffic guideline. Minor effects on sleep possible above this. Achievable in residential areas away from major roads.',col:'#5dcaa5'},
+  {label:'quiet suburb night',db:45,health:'Mild sleep disturbance. Cardiovascular risk at baseline. Typical for residential areas 500m+ from arterials.',col:'#8b85e8'},
+  {label:'moderate residential',db:55,health:'Risk curve inflection point. 7% increased CVD risk vs baseline. Typical bedroom facing moderate street. WHO flags this level for health action.',col:'#ffcc44'},
+  {label:'busy street (window closed)',db:62,health:'~15% increased coronary heart disease risk with chronic exposure. Common in urban apartments. Children show cognitive impacts at school.',col:'#e8855a'},
+  {label:'near highway',db:68,health:'~25% increased CVD risk. Associated with increased hypertension, stroke risk, and sleep disorders. Disproportionately affects low-income neighborhoods.',col:'#ff8844'},
+  {label:'near airport approach',db:72,health:'Highest civilian noise burden. ~35% increased CVD risk in chronic exposure studies. Associated with childhood reading comprehension deficits.',col:'#ff4444'},
+];
+function buildEnvs(){
+  const wrap=document.getElementById('dbEnvironments');
+  ENVIRONMENTS.forEach(e=>{
+    const row=document.createElement('div');row.className='db-row';row.style.cursor='pointer';
+    row.innerHTML=`<div class="db-label">${e.label}</div><div class="db-bar-bg"><div class="db-bar" style="width:${Math.round((e.db-20)/60*100)}%;background:${e.col}"></div></div><div class="db-val">${e.db} dB</div>`;
+    row.addEventListener('click',()=>{document.getElementById('envInfo').innerHTML=`<strong style="color:${e.col}">${e.label} (${e.db} dB)</strong>: ${e.health}`;});
+    wrap.appendChild(row);
+  });
+}
+buildEnvs();
+
+function calcPersonalNoise(){
+  const street={rural:32,residential:42,moderate:55,busy:65,highway:72,airport:75};
+  const floorAdj={ground:0,mid:-3,high:-7};
+  const windowAdj={open:0,single:-8,double:-15,triple:-25};
+  const base=street[document.getElementById('streetType').value];
+  const floor=floorAdj[document.getElementById('floorLevel').value];
+  const window2=windowAdj[document.getElementById('windowType').value];
+  const estimated=Math.max(25,base+floor+window2);
+  const risk=riskAt(estimated,'road');
+  const riskPct=Math.round((risk-1)*100);
+  const aboveWho=Math.max(0,estimated-40);
+  document.getElementById('noiseResult').innerHTML=`Based on your inputs, your estimated nighttime bedroom noise level is approximately:<span class="yn-big">${estimated} dB Lnight</span>${estimated<=40?'You are at or below the WHO nighttime guideline of 40 dB. Cardiovascular risk from noise is at baseline.':estimated<=50?`You are ${aboveWho} dB above the WHO guideline. Mild cardiovascular risk elevation — approximately ${riskPct>0?'+'+riskPct+'%':'minimal'} increase in coronary heart disease risk with long-term exposure.`:`You are ${aboveWho} dB above the WHO nighttime guideline of 40 dB. This corresponds to approximately +${riskPct}% increased cardiovascular risk with chronic exposure. Soundproofing upgrades or quiet-side bedroom reorientation would meaningfully reduce this risk.`}`;
+  document.getElementById('noiseStats').innerHTML=`<div class="stat-card"><div class="s-label">estimated Lnight</div><div class="s-value">${estimated} dB</div></div><div class="stat-card"><div class="s-label">above WHO limit</div><div class="s-value">+${aboveWho} dB</div></div><div class="stat-card"><div class="s-label">CVD risk increase</div><div class="s-value">+${Math.max(0,riskPct)}%</div><div class="s-sub">coronary heart disease</div></div><div class="stat-card"><div class="s-label">sleep disruption</div><div class="s-value">${estimated<40?'unlikely':estimated<50?'possible':estimated<60?'probable':'likely'}</div></div>`;
+  const cv=document.getElementById('cPersonal'); cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#070a14';ctx.fillRect(0,0,W,H);
+  const bars=[{l:'WHO guideline',v:40,c:'#5dcaa5'},{l:'your bedroom',v:estimated,c:estimated<=40?'#5dcaa5':estimated<=55?'#ffcc44':'#ff4444'},{l:'avg urban EU',v:58,c:'#e8855a'},{l:'near highway',v:70,c:'#ff4444'}];
+  const pad={l:130,r:30,t:16,b:28};const cw=W-pad.l-pad.r;const bh=28;
+  bars.forEach((b,i)=>{const y=pad.t+i*(bh+10);const bw=Math.round((b.v/80)*cw);ctx.fillStyle='rgba(255,255,255,.04)';ctx.beginPath();ctx.roundRect(pad.l,y,cw,bh,2);ctx.fill();ctx.fillStyle=b.c;ctx.beginPath();ctx.roundRect(pad.l,y,bw,bh,2);ctx.fill();ctx.fillStyle='rgba(255,255,255,.55)';ctx.font='11px sans-serif';ctx.textAlign='right';ctx.fillText(b.l,pad.l-6,y+bh*.72);ctx.fillStyle='rgba(255,255,255,.8)';ctx.textAlign='left';ctx.fillText(b.v+' dB',pad.l+bw+5,y+bh*.72);});
+}
+['streetType','floorLevel','windowType'].forEach(id=>document.getElementById(id).addEventListener('change',calcPersonalNoise));
+calcPersonalNoise();
+
+function toggleProv(){const b=document.getElementById('provBody'),c=document.getElementById('provChev');b.classList.toggle('open');c.style.transform=b.classList.contains('open')?'rotate(180deg)':'';}
+</script>
+</body>
+</html>

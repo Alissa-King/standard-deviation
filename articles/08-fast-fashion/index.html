@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>a t-shirt's journey from design to landfill — standard deviation</title>
+  <meta name="description" content="Zara goes from design to store shelf in two weeks. The average fast fashion garment is worn seven times before disposal. Here is every step, every carbon cost, every day elapsed.">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>canvas{display:block;max-width:100%}.stage-btn{font-size:11px;padding:3px 10px}</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container inner">
+    <a class="wordmark" href="/standard-deviation/"><span class="sigma">σ</span> standard deviation</a>
+    <nav class="site-nav"><a href="/standard-deviation/">archive</a><a href="https://standardlydeviated.substack.com/about">about</a><a href="https://standardlydeviated.substack.com">substack</a></nav>
+  </div>
+</header>
+<main><div class="container">
+
+  <header class="article-header reveal">
+    <div class="kicker">supply chain · vol. 08</div>
+    <h1 class="article-title">a t-shirt's journey from design to landfill</h1>
+    <p class="article-dek">Zara goes from design decision to store shelf in two weeks. The average fast fashion garment is worn seven times before disposal. Here is every step, every carbon cost, and every day elapsed between concept and landfill.</p>
+    <div class="article-byline">
+      <span>standard deviation</span><span class="byline-dot"></span>
+      <span>~9 min read</span><span class="byline-dot"></span>
+      <span>Sankey supply chain · carbon cost calculator · wears-per-wear</span><span class="byline-dot"></span>
+      <a href="https://standardlydeviated.substack.com" style="color:var(--color-accent);text-decoration:none">subscribe</a>
+    </div>
+  </header>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The t-shirt you are probably wearing right now began as a design decision, possibly made in Spain. The fabric was likely woven in Turkey or China from cotton grown in the United States, India, or Uzbekistan. It was cut and sewn in Bangladesh, Cambodia, or Vietnam by workers earning between $90 and $180 per month. It was shipped in a container to Rotterdam or Los Angeles, warehoused, distributed to a retail location, purchased, worn a statistically average of seven times, washed several of those times with a load that released approximately 700,000 microplastic fibers into the water system, and then donated or discarded. If donated, there is a roughly 15% chance it was resold; an 85% chance it was baled and shipped to a secondary market in Ghana, Chile, or Pakistan, where it may have been resold or dumped in a textile desert that is visible from satellite.</p>
+      <p>The entire lifecycle from design to landfill takes an average of about 14 months for a fast fashion garment. The design phase takes two weeks. The use phase takes five months if you're being generous. The garment then spends 200 years in a landfill, which is not part of the official lifecycle assessment but probably should be.</p>
+    </div>
+    <div class="pull-quote reveal">The speed of fast fashion is real and extraordinary — Zara produces about 10,000 distinct designs per year, Shein reportedly generates thousands per day. But speed is only the visible part. The hidden part is what that speed requires: a supply chain spanning four continents, labor priced below subsistence, and a product engineered to be disposable.</div>
+  </div>
+
+  <!-- INTERACTIVE 1: FULL SUPPLY CHAIN SANKEY -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">01 — the full supply chain: days, miles, and carbon</div></div>
+    <div class="interactive-body">
+      <div class="ctrl-row">
+        <label>brand type</label>
+        <select id="brandType" onchange="drawSupplyChain()" style="font-size:13px;padding:5px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary)">
+          <option value="fast">ultra-fast fashion (Shein model)</option>
+          <option value="mid" selected>fast fashion (Zara model)</option>
+          <option value="trad">traditional fashion (6-month lead)</option>
+          <option value="slow">slow fashion / sustainable brand</option>
+        </select>
+      </div>
+      <canvas id="cSupply" height="340" style="width:100%;border-radius:8px;background:#070a0f" role="img" aria-label="Supply chain flow diagram showing a garment's journey from design through manufacturing, shipping, retail, use, and disposal — with carbon emissions and days elapsed at each stage"></canvas>
+      <div class="stat-row" id="supplyStats"></div>
+      <div class="info-box" id="supplyInfo" style="margin-top:.75rem">Each stage shows days elapsed and kg CO₂ emitted. The use phase (washing) often generates more emissions than manufacturing for garments worn many times — but fast fashion garments are worn so few times that manufacturing dominates per-wear.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The carbon footprint of a single cotton t-shirt has been studied extensively, and the estimates converge on a range of about 5–7 kg CO₂ equivalent across the full lifecycle. That number requires unpacking. About 40% of it comes from cotton cultivation — the pesticides, fertilizer, and most significantly the irrigation, since cotton is a thirsty crop that consumes about 10,000 liters of water per kilogram of fiber. About 30% comes from manufacturing, spinning, weaving, dyeing, and finishing. About 20% comes from consumer use — primarily washing and tumble drying. About 10% comes from transportation across the supply chain.</p>
+      <p>The per-wear carbon cost is where fast fashion's math breaks down completely. A garment with a 6 kg CO₂ footprint worn 200 times (a quality item worn twice a week for two years) has a per-wear cost of 30 grams. The same garment worn 7 times has a per-wear cost of 857 grams. The environmental cost is not primarily the product — it's the product's relationship to its use.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 2: COST PER WEAR CALCULATOR -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">02 — the real cost: carbon per wear</div></div>
+    <div class="interactive-body">
+      <div class="ctrl-row"><label>times worn</label><input type="range" id="wornSlider" min="1" max="300" step="1" value="7" oninput="calcCostPerWear()"><span class="ctrl-val" id="wornVal">7 times</span></div>
+      <div class="ctrl-row"><label>garment carbon (kg CO₂)</label><input type="range" id="carbonSlider" min="2" max="30" step="0.5" value="6" oninput="calcCostPerWear()"><span class="ctrl-val" id="carbonVal">6 kg</span></div>
+      <div class="ctrl-row"><label>washing temp</label>
+        <select id="washTemp" onchange="calcCostPerWear()" style="font-size:13px;padding:5px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary)">
+          <option value="cold">cold (30°C)</option><option value="warm" selected>warm (40°C)</option><option value="hot">hot (60°C)</option>
+        </select>
+      </div>
+      <div class="stat-row" id="wearStats"></div>
+      <canvas id="cWear" height="200" style="width:100%;border-radius:8px;background:#070a0f;margin-top:.75rem" role="img" aria-label="Bar chart comparing carbon per wear across different usage scenarios — fast fashion vs traditional vs sustainable"></canvas>
+      <div class="info-box" id="wearInfo" style="margin-top:.75rem">The crossover point is around 30 wears — below that, fast fashion's per-wear cost exceeds buying and wearing a higher-quality item. Above 100 wears, the use phase (washing) becomes the dominant carbon source.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The destination of discarded clothing is a story that gets less attention than it deserves. The donation economy in wealthy countries functions as a sorting mechanism: high-quality and branded secondhand items are resold domestically; everything else is baled and exported. The top destinations for used clothing exports from the United States include Ghana, Kenya, Pakistan, and Chile. Ghana's Kantamanto market in Accra receives an estimated 15 million garments per week. About 40% of them are too degraded to be sold and go directly to landfill or are burned. The rest are sorted, repaired, and sold — a labor-intensive process that employs thousands of people who are, in effect, managing the waste stream of Western consumption.</p>
+      <p>Atacama Desert in Chile has become the most visually striking symbol of this problem. Satellite images show mountains of discarded clothing — some estimates suggest tens of millions of garments — piled in the desert because there is no infrastructure to process them and they cannot biodegrade in the arid conditions. The clothes have been shipped from Europe and the United States, sorted in Iquique's free trade zone, and dumped when unsaleable. They are, in a very direct sense, the externalized waste of the fashion industry — the part of the lifecycle that doesn't appear in any brand's sustainability report.</p>
+    </div>
+    <div class="pull-quote reveal">The Atacama textile dump is visible on Google Earth. You can zoom in on coordinates 20.2°S, 70.1°W and see the mountains of clothing from space. The garments are there permanently. The desert is too dry for them to decompose. They will be there for hundreds of years.</div>
+  </div>
+
+  <!-- INTERACTIVE 3: LIFECYCLE TIMELINE -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">03 — a garment's full timeline, to scale</div></div>
+    <div class="interactive-body">
+      <div class="ctrl-row">
+        <label>brand model</label>
+        <select id="timelineType" onchange="drawTimeline()" style="font-size:13px;padding:5px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary)">
+          <option value="fast">ultra-fast (avg 4 wears)</option>
+          <option value="mid" selected>fast fashion (avg 7 wears)</option>
+          <option value="quality">quality item (avg 50 wears)</option>
+        </select>
+      </div>
+      <canvas id="cTimeline" height="180" style="width:100%;border-radius:8px;background:#070a0f" role="img" aria-label="Timeline bar chart showing proportional time spent in each lifecycle phase — design, manufacturing, shipping, retail, use, and landfill — for different fashion models"></canvas>
+      <div class="info-box" id="timelineInfo" style="margin-top:.75rem">The landfill phase (200 years) dwarfs everything else. At this scale the use phase is nearly invisible. The garment spends 99.9% of its existence as waste.</div>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 4: YOUR NUMBER -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">04 — your number</div></div>
+    <div class="interactive-body">
+      <div class="your-number">
+        <div class="yn-label">your wardrobe's footprint</div>
+        <div class="yn-prompt">Enter how many new garments you buy per year to see your fashion carbon footprint.</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:.85rem">
+          <input type="number" id="garmentsPerYear" min="1" max="500" value="30" style="width:90px;font-size:14px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-mono)">
+          <select id="fashionType" style="font-size:13px;padding:5px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary)">
+            <option value="fast">mostly fast fashion</option>
+            <option value="mix" selected>mix of fast and quality</option>
+            <option value="quality">mostly quality / secondhand</option>
+          </select>
+        </div>
+        <div class="yn-result" id="fashionResult"></div>
+      </div>
+      <div class="stat-row" id="fashionStats"></div>
+    </div>
+  </div>
+
+  <hr class="article-divider reveal">
+  <div class="reveal">
+    <div class="provenance">
+      <div class="prov-toggle" onclick="toggleProv()"><span><i class="ti ti-database" aria-hidden="true" style="font-size:15px;margin-right:6px"></i>data provenance</span><i class="ti ti-chevron-down" id="provChev" style="font-size:15px;transition:transform .2s"></i></div>
+      <div class="prov-body" id="provBody">
+        <div class="prov-row"><div class="prov-key">garment lifecycle CO₂</div><div class="prov-val">WRAP (2012) Valuing our Clothes. 6–8 kg CO₂e per cotton garment lifecycle. UK methodology.</div></div>
+        <div class="prov-row"><div class="prov-key">average wears</div><div class="prov-val">Ellen MacArthur Foundation (2017) A New Textiles Economy. Global average: ~7 wears per garment before disposal.</div></div>
+        <div class="prov-row"><div class="prov-key">microplastics</div><div class="prov-val">Browne et al. (2011). ~700,000 fibers released per wash of synthetic garment. Nature.</div></div>
+        <div class="prov-row"><div class="prov-key">Kantamanto market</div><div class="prov-val">Or Foundation (2021). 15M garments/week import estimate, 40% landfill rate.</div></div>
+        <div class="prov-row"><div class="prov-key">Atacama dumping</div><div class="prov-val">Reuters (2021) investigative report. Iquique free-trade zone textile waste estimates.</div></div>
+        <div class="prov-row"><div class="prov-key">last verified</div><div class="prov-val">June 2026</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="reveal" style="margin-top:1.5rem">
+    <div class="section-label">what this made me wonder next</div>
+    <div class="related-questions">
+      <div class="related-item"><div class="related-q">What fraction of the clothing donated to Goodwill and Salvation Army actually gets resold, and what happens to the rest?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+      <div class="related-item"><div class="related-q">Shein reportedly generates thousands of new designs per day using algorithmic trend detection. What data is it using, and how does that compare to traditional fashion forecasting?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+      <div class="related-item"><div class="related-q">Natural fibers decompose but synthetic fibers don't — so what is the Atacama textile dump made of, and which brands are most represented in it?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+    </div>
+  </div>
+  <div class="substack-cta reveal" style="margin-top:2rem"><span>next: how much of the internet is real?</span><a href="https://standardlydeviated.substack.com">subscribe →</a></div>
+</div></main>
+<footer class="site-footer"><div class="container footer-inner"><span>σ standard deviation · <a href="https://standardlydeviated.substack.com">@standardlydeviated</a></span><span><a href="/standard-deviation/">← all articles</a></span></div></footer>
+<script src="../../assets/js/scroll-reveal.js"></script>
+<script>
+const BRANDS={
+  fast:{label:'Ultra-fast (Shein)',leadDays:7,mfgCarbon:8,shippingCarbon:2,avgWears:4,col:'#ff4444'},
+  mid:{label:'Fast fashion (Zara)',leadDays:14,mfgCarbon:6,shippingCarbon:1.5,avgWears:7,col:'#e8855a'},
+  trad:{label:'Traditional (6-month)',leadDays:180,mfgCarbon:6,shippingCarbon:1.2,avgWears:30,col:'#ffcc44'},
+  slow:{label:'Slow/sustainable',leadDays:180,mfgCarbon:3,shippingCarbon:0.8,avgWears:100,col:'#5dcaa5'},
+};
+const STAGES=[
+  {name:'design',pctDays:0.01,pctCarbon:0.02,col:'#8b85e8'},
+  {name:'cotton/fiber',pctDays:0.08,pctCarbon:0.40,col:'#5dcaa5'},
+  {name:'spinning & weaving',pctDays:0.06,pctCarbon:0.18,col:'#5dcaa5'},
+  {name:'dyeing & finishing',pctDays:0.04,pctCarbon:0.12,col:'#ffcc44'},
+  {name:'cut & sew (mfg)',pctDays:0.05,pctCarbon:0.08,col:'#ffcc44'},
+  {name:'shipping (ocean)',pctDays:0.08,pctCarbon:0.10,col:'#e8855a'},
+  {name:'retail / warehouse',pctDays:0.05,pctCarbon:0.03,col:'#e8855a'},
+  {name:'use & washing',pctDays:0.55,pctCarbon:0.07,col:'#ff8844'},
+];
+function drawSupplyChain(){
+  const b=BRANDS[document.getElementById('brandType').value];
+  const totalCarbon=b.mfgCarbon+b.shippingCarbon+b.avgWears*0.1;
+  const totalDays=Math.round(b.leadDays+b.avgWears*22);
+  const cv=document.getElementById('cSupply'); cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#070a0f';ctx.fillRect(0,0,W,H);
+  const pad={l:120,r:20,t:20,b:28};
+  const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  const bh=Math.floor(ch/STAGES.length)-3;
+  STAGES.forEach((s,i)=>{
+    const y=pad.t+i*(bh+3);
+    const carbonBw=Math.round(s.pctCarbon*cw*0.6);
+    const daysBw=Math.round(s.pctDays*cw*0.4);
+    ctx.fillStyle='rgba(255,255,255,.04)';ctx.beginPath();ctx.roundRect(pad.l,y,cw,bh,2);ctx.fill();
+    ctx.fillStyle=s.col+'66';ctx.beginPath();ctx.roundRect(pad.l,y,carbonBw,bh,2);ctx.fill();
+    ctx.fillStyle=s.col+'33';ctx.beginPath();ctx.roundRect(pad.l+carbonBw,y,daysBw,bh,2);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.55)';ctx.font='11px sans-serif';ctx.textAlign='right';ctx.fillText(s.name,pad.l-6,y+bh*.72);
+    ctx.fillStyle='rgba(255,255,255,.7)';ctx.textAlign='left';ctx.font='10px sans-serif';
+    ctx.fillText((s.pctCarbon*totalCarbon).toFixed(1)+'kg CO₂',pad.l+carbonBw+daysBw+6,y+bh*.72);
+  });
+  ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='10px sans-serif';ctx.textAlign='left';ctx.fillText('← carbon (60%)  days (40%) →',pad.l,H-6);
+  document.getElementById('supplyStats').innerHTML=`<div class="stat-card"><div class="s-label">lead time</div><div class="s-value">${b.leadDays} days</div><div class="s-sub">design to shelf</div></div><div class="stat-card"><div class="s-label">total carbon</div><div class="s-value">${totalCarbon.toFixed(1)} kg</div><div class="s-sub">CO₂ equivalent</div></div><div class="stat-card"><div class="s-label">avg wears</div><div class="s-value">${b.avgWears}</div><div class="s-sub">before disposal</div></div><div class="stat-card"><div class="s-label">carbon per wear</div><div class="s-value">${Math.round(totalCarbon/b.avgWears*1000)}g</div><div class="s-sub">CO₂ per use</div></div>`;
+  document.getElementById('supplyInfo').textContent=`${b.label}: ${b.leadDays}-day lead time, ${totalCarbon.toFixed(1)}kg CO₂ total, ${b.avgWears} average wears. Per-wear carbon: ${Math.round(totalCarbon/b.avgWears*1000)}g — ${b.avgWears<10?'about the same as driving 3 miles':'lower than a mile of driving'}.`;
+}
+drawSupplyChain();
+
+function calcCostPerWear(){
+  const wears=+document.getElementById('wornSlider').value;
+  const carbon=+document.getElementById('carbonSlider').value;
+  const washTemp=document.getElementById('washTemp').value;
+  const washCarbon={cold:0.06,warm:0.12,hot:0.22}[washTemp];
+  const totalCarbon=carbon+wears*washCarbon*0.7;
+  const perWear=Math.round(totalCarbon/wears*1000);
+  document.getElementById('wornVal').textContent=wears+' times';
+  document.getElementById('carbonVal').textContent=carbon+' kg';
+  document.getElementById('wearStats').innerHTML=`<div class="stat-card"><div class="s-label">carbon per wear</div><div class="s-value">${perWear}g</div><div class="s-sub">CO₂ per use</div></div><div class="stat-card"><div class="s-label">total lifetime CO₂</div><div class="s-value">${totalCarbon.toFixed(1)} kg</div><div class="s-sub">mfg + washing</div></div><div class="stat-card"><div class="s-label">washing CO₂</div><div class="s-value">${(wears*washCarbon*0.7).toFixed(1)} kg</div><div class="s-sub">${Math.round(wears*washCarbon*0.7/totalCarbon*100)}% of total</div></div><div class="stat-card"><div class="s-label">vs avg fast fashion</div><div class="s-value">${wears>=7?Math.round((perWear/(carbon/7*1000)-1)*100)+'%':'+'+Math.round((carbon/7*1000/perWear-1)*100)+'%'}</div><div class="s-sub">${wears>=7?'lower':'higher'} per wear</div></div>`;
+  const cv=document.getElementById('cWear'); cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#070a0f';ctx.fillRect(0,0,W,H);
+  const scenarios=[{l:'this garment',v:perWear,c:perWear<300?'#5dcaa5':perWear<600?'#ffcc44':'#ff4444'},{l:'fast fashion avg (7 wears)',v:Math.round(carbon/7*1000),c:'#e8855a'},{l:'quality item (100 wears)',v:Math.round(carbon/100*1000+100*washCarbon*0.7*10),c:'#5dcaa5'},{l:'secondhand (0 mfg cost)',v:Math.round(wears*washCarbon*0.7/wears*1000),c:'#8b85e8'}];
+  const max=Math.max(...scenarios.map(s=>s.v));
+  const pad={l:180,r:60,t:16,b:16};const bh=32,gap=10;
+  scenarios.forEach((s,i)=>{const y=pad.t+i*(bh+gap);const bw=Math.round((s.v/max)*(W-pad.l-pad.r));ctx.fillStyle='rgba(255,255,255,.04)';ctx.beginPath();ctx.roundRect(pad.l,y,W-pad.l-pad.r,bh,2);ctx.fill();ctx.fillStyle=s.c;ctx.beginPath();ctx.roundRect(pad.l,y,bw,bh,2);ctx.fill();ctx.fillStyle='rgba(255,255,255,.55)';ctx.font='11px sans-serif';ctx.textAlign='right';ctx.fillText(s.l,pad.l-6,y+bh*.72);ctx.fillStyle='rgba(255,255,255,.8)';ctx.textAlign='left';ctx.fillText(s.v+'g CO₂/wear',pad.l+bw+6,y+bh*.72);});
+  document.getElementById('wearInfo').textContent=`At ${wears} wears: ${perWear}g CO₂ per use. ${wears<30?`Below 30 wears, fast fashion's per-wear cost is significantly higher than buying quality. You need ${Math.round(carbon/perWear*1000/300)} more wears to break even with a quality alternative.`:'Above 30 wears, the per-wear cost drops dramatically. Washing becomes the dominant carbon source.'}`;
+}
+calcCostPerWear();
+
+function drawTimeline(){
+  const type=document.getElementById('timelineType').value;
+  const configs={fast:{useMonths:1.5,wears:4,col:'#ff4444'},mid:{useMonths:5,wears:7,col:'#e8855a'},quality:{useMonths:24,wears:50,col:'#5dcaa5'}};
+  const c=configs[type];
+  const LANDFILL_YEARS=200;
+  const totalMonths=0.5+1.5+c.useMonths+LANDFILL_YEARS*12;
+  const phases=[{name:'design + mfg',months:0.5,col:'#8b85e8'},{name:'shipping + retail',months:1.5,col:'#ffcc44'},{name:'use phase',months:c.useMonths,col:c.col},{name:'landfill (200 years)',months:LANDFILL_YEARS*12,col:'rgba(100,100,100,.5)'}];
+  const cv=document.getElementById('cTimeline'); cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#070a0f';ctx.fillRect(0,0,W,H);
+  const pad={l:20,r:20,t:40,b:28};const bh=38;const cw=W-pad.l-pad.r;
+  let x=pad.l;
+  phases.forEach(p=>{const pw=Math.round((p.months/totalMonths)*cw);ctx.fillStyle=p.col;ctx.beginPath();ctx.roundRect(x,pad.t,pw,bh,2);ctx.fill();if(pw>30){ctx.fillStyle='rgba(255,255,255,.75)';ctx.font='10px sans-serif';ctx.textAlign='center';const label=p.months<1?Math.round(p.months*30)+'d':p.months<24?Math.round(p.months)+'mo':Math.round(p.months/12)+'yr';ctx.fillText(label,x+pw/2,pad.t+bh*.65);}x+=pw;});
+  const legend=[{label:'design+mfg',col:'#8b85e8'},{label:'shipping',col:'#ffcc44'},{label:'use',col:c.col},{label:'landfill',col:'rgba(100,100,100,.5)'}];
+  legend.forEach((l,i)=>{const lx=pad.l+i*(W-pad.l*2)/4;ctx.fillStyle=l.col;ctx.fillRect(lx,pad.t-18,10,10);ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='10px sans-serif';ctx.textAlign='left';ctx.fillText(l.label,lx+13,pad.t-10);});
+  document.getElementById('timelineInfo').textContent=`${type==='fast'?'Ultra-fast fashion':type==='mid'?'Fast fashion':'Quality garment'}: ${c.wears} average wears over ${c.useMonths} months, then ${LANDFILL_YEARS} years in landfill. The landfill phase is ${Math.round(LANDFILL_YEARS*12/totalMonths*100)}% of the garment's total existence.`;
+}
+drawTimeline();
+
+function calcFashion(){
+  const n=+document.getElementById('garmentsPerYear').value||30;
+  const type=document.getElementById('fashionType').value;
+  const carbonPerItem={fast:7.5,mix:5.5,quality:3};
+  const wearsPerItem={fast:5,mix:15,quality:60};
+  const annual=n*carbonPerItem[type];
+  const compare={fast:'3× higher than EU average',mix:'similar to EU average (27kg/yr)',quality:'below EU average — in the top 15% of consumers'};
+  document.getElementById('fashionResult').innerHTML=`Buying <strong>${n} garments per year</strong> (${type.replace('mix','mixed quality')} fashion) generates approximately:<span class="yn-big">${Math.round(annual)} kg CO₂/year</span>from clothing manufacturing alone. Each garment averages ${wearsPerItem[type]} wears. Your per-wear cost is ${Math.round(carbonPerItem[type]/wearsPerItem[type]*1000)}g CO₂. That's ${compare[type]}.`;
+  document.getElementById('fashionStats').innerHTML=`<div class="stat-card"><div class="s-label">annual CO₂</div><div class="s-value">${Math.round(annual)} kg</div><div class="s-sub">from clothing</div></div><div class="stat-card"><div class="s-label">per garment</div><div class="s-value">${carbonPerItem[type]} kg</div><div class="s-sub">avg lifecycle</div></div><div class="stat-card"><div class="s-label">per wear</div><div class="s-value">${Math.round(carbonPerItem[type]/wearsPerItem[type]*1000)}g</div><div class="s-sub">CO₂ per use</div></div><div class="stat-card"><div class="s-label">garments/week</div><div class="s-value">${(n/52).toFixed(1)}</div><div class="s-sub">avg purchase rate</div></div>`;
+}
+document.getElementById('garmentsPerYear').addEventListener('input',calcFashion);
+document.getElementById('fashionType').addEventListener('change',calcFashion);
+calcFashion();
+
+function toggleProv(){const b=document.getElementById('provBody'),c=document.getElementById('provChev');b.classList.toggle('open');c.style.transform=b.classList.contains('open')?'rotate(180deg)':'';}
+</script>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>how your brain isolates one voice in a room full of noise — standard deviation</title>
+  <meta name="description" content="The cocktail party problem: your auditory cortex solves in milliseconds what took engineers fifty years to crack. Here's the physics, and here's an interactive wave interference demo.">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    canvas{display:block;max-width:100%}
+    .wave-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:.85rem}
+    .speaker-card{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:.75rem 1rem;margin:.4rem 0}
+    .speaker-header{display:flex;align-items:center;gap:10px;margin-bottom:.5rem}
+    .speaker-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+    .speaker-name{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container inner">
+    <a class="wordmark" href="/standard-deviation/"><span class="sigma">σ</span> standard deviation</a>
+    <nav class="site-nav">
+      <a href="/standard-deviation/">archive</a>
+      <a href="https://standardlydeviated.substack.com/about">about</a>
+      <a href="https://standardlydeviated.substack.com">substack</a>
+    </nav>
+  </div>
+</header>
+<main><div class="container">
+
+  <header class="article-header reveal">
+    <div class="kicker">sound &amp; perception · vol. 07</div>
+    <h1 class="article-title">how your brain isolates one voice in a room full of noise</h1>
+    <p class="article-dek">The cocktail party problem: your auditory cortex solves in real time what took engineers fifty years to approximate. The solution involves physics, neuroscience, and a kind of listening that happens entirely below the level of consciousness.</p>
+    <div class="article-byline">
+      <span>standard deviation</span><span class="byline-dot"></span>
+      <span>~9 min read</span><span class="byline-dot"></span>
+      <span>live wave interference · binaural demo</span><span class="byline-dot"></span>
+      <a href="https://standardlydeviated.substack.com" style="color:var(--color-accent);text-decoration:none">subscribe</a>
+    </div>
+  </header>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>You are at a party. There are thirty people in the room and most of them are talking. The ambient noise level is somewhere around 70 decibels — roughly the sound pressure of a vacuum cleaner running. Somewhere across the room, someone says your name. You hear it. Immediately, without effort, without instruction, without knowing you were doing it, your auditory system pulled one signal out of thirty competing signals and flagged it as relevant.</p>
+      <p>This is the cocktail party problem, named by Colin Cherry in 1953. Cherry was trying to understand how people selectively attend to one audio stream while suppressing others, and he was working at a time when no machine could do anything remotely similar. Fifty years later, the engineers had made progress but still couldn't match the performance of a sleeping infant. Your brain solves this problem continuously, in real time, using mechanisms that are still not fully understood.</p>
+    </div>
+    <div class="pull-quote reveal">The microphone in your phone captures everything in the room with equal fidelity. Your ear does something completely different — it listens with intent, prioritizing some signals over others based on criteria that are partly learned, partly hardwired, and partly just the physics of having two ears on opposite sides of a head.</div>
+    <div class="reveal">
+      <p>The foundation of the solution is spatial. Sound from a source to your left reaches your left ear slightly before it reaches your right ear — a difference measured in microseconds, but one your auditory system is exquisitely sensitive to. This interaural time difference, combined with subtle differences in the sound's amplitude between ears and frequency-dependent filtering by the shape of your outer ear, allows your brain to localize a sound source with impressive precision. Once localized, the auditory cortex can apply focused attention to signals from that direction and suppress signals from others — a process called spatial filtering, and the most powerful tool your brain has for the cocktail party problem.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 1: WAVE INTERFERENCE -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">01 — constructive and destructive interference: the raw physics</div>
+    </div>
+    <div class="interactive-body">
+      <div class="speaker-card">
+        <div class="speaker-header"><div class="speaker-dot" style="background:#8b85e8"></div><span class="speaker-name">voice A (target)</span></div>
+        <div class="ctrl-row"><label>frequency</label><input type="range" id="freqA" min="80" max="400" step="5" value="180" oninput="drawWaves()"><span class="ctrl-val" id="freqAVal">180 Hz</span></div>
+        <div class="ctrl-row"><label>amplitude</label><input type="range" id="ampA" min="0.1" max="1" step="0.05" value="0.9" oninput="drawWaves()"><span class="ctrl-val" id="ampAVal">0.9</span></div>
+      </div>
+      <div class="speaker-card">
+        <div class="speaker-header"><div class="speaker-dot" style="background:#e8855a"></div><span class="speaker-name">voice B (noise)</span></div>
+        <div class="ctrl-row"><label>frequency</label><input type="range" id="freqB" min="80" max="400" step="5" value="260" oninput="drawWaves()"><span class="ctrl-val" id="freqBVal">260 Hz</span></div>
+        <div class="ctrl-row"><label>amplitude</label><input type="range" id="ampB" min="0.1" max="1" step="0.05" value="0.7" oninput="drawWaves()"><span class="ctrl-val" id="ampBVal">0.7</span></div>
+      </div>
+      <div class="ctrl-row"><label>phase offset (B)</label><input type="range" id="phaseB" min="0" max="360" step="5" value="0" oninput="drawWaves()"><span class="ctrl-val" id="phaseBVal">0°</span></div>
+      <canvas id="cWaves" height="260" style="width:100%;border-radius:8px;background:#070714" role="img" aria-label="Three waveforms: voice A, voice B, and their combined signal — showing how different frequencies combine and interfere"></canvas>
+      <div class="info-box" id="waveInfo" style="margin-top:.75rem">The combined signal (white) is what a microphone hears. Your brain hears the same mixture but reconstructs the individual sources. Try setting both to the same frequency and shifting the phase — destructive interference cancels the signal entirely.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>Beyond spatial filtering, the auditory system uses a set of acoustic cues that are collectively called auditory scene analysis — a term coined by Albert Bregman in 1990. The idea is that the brain groups incoming sounds into perceptual streams using rules that are partly bottom-up (driven by the acoustic properties of the sounds themselves) and partly top-down (driven by attention, expectation, and learned patterns). Sounds that share a fundamental frequency and its harmonics tend to be grouped together. Sounds that start and stop at the same time tend to be grouped together. Sounds that have consistent spatial location tend to be grouped together. Your brain is running these grouping algorithms continuously on every sound in the environment, and you experience the output as a coherent auditory scene rather than a chaotic soup of pressure waves.</p>
+      <p>The interaural time difference that your brain uses to localize sound is remarkably precise. Human listeners can detect differences as small as 10 microseconds — one ten-thousandth of a millisecond. The speed of sound in air is about 343 meters per second, which means a 10-microsecond difference corresponds to a source displacement of about 3.4 millimeters at the level of your head. You can tell that a sound is coming from slightly to your left with a precision measured in millimeters, using a timing difference that is smaller than the duration of a single cycle of a 100,000 Hz tone.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 2: BINAURAL TIME DELAY DEMO -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">02 — interaural time difference: how your brain finds the source</div>
+    </div>
+    <div class="interactive-body">
+      <div class="ctrl-row">
+        <label>sound source angle</label>
+        <input type="range" id="sourceAngle" min="-90" max="90" step="5" value="0" oninput="drawBinaural(+this.value)">
+        <span class="ctrl-val" id="angleVal">center (0°)</span>
+      </div>
+      <canvas id="cBinaural" height="300" style="width:100%;border-radius:8px;background:#070714" role="img" aria-label="Diagram showing a head with two ears and a sound source at adjustable angle — arrows and waveforms show the interaural time difference as the source moves"></canvas>
+      <div class="stat-row" id="binauralStats"></div>
+      <div class="info-box" id="binauralInfo" style="margin-top:.75rem">Drag the slider to move the sound source. The time difference between ears is what your brain uses to locate sounds — sensitive to changes as small as 10 microseconds.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>Engineers working on the problem discovered in the 1990s that beamforming — using an array of microphones and processing the signals to emphasize one spatial direction while suppressing others — could replicate some of what the auditory system does, but only in relatively controlled conditions. The problem is that rooms create reflections, and reflections mean that the sound arriving at each microphone is a mixture of direct sound and reflected sound from multiple directions. The auditory system handles reflections through a mechanism called the precedence effect: when a direct sound and its reflection arrive within about 30 milliseconds of each other, the brain fuses them into a single percept and localizes it based on the first-arriving wavefront. This is why concert halls sound rich rather than confusing, and why you can understand speech in a reverberant bathroom even though the reflections are arriving from every direction.</p>
+      <p>Modern machine learning approaches to the cocktail party problem — neural networks trained on thousands of hours of mixed audio — have gotten significantly better in the past decade, to the point where voice assistants can function in moderately noisy environments. But they still fail in ways that a human listener would not: they struggle with moving sources, with unfamiliar acoustic environments, with very high noise levels, and with the kind of rapid switching between talkers that humans handle effortlessly in normal conversation. The problem is not solved. Your brain is still running faster code.</p>
+    </div>
+    <div class="pull-quote reveal">The sound your brain is analyzing right now — whatever is in your environment — is a single pressure wave arriving at each eardrum simultaneously from every source in the room. The decomposition of that wave back into its constituent sources is something your auditory cortex does in under 100 milliseconds. No algorithm does it as well.</div>
+  </div>
+
+  <!-- INTERACTIVE 3: SCENE SEPARATION DEMO -->
+  <div class="interactive reveal">
+    <div class="interactive-header">
+      <div class="section-label">03 — auditory scene analysis: what the brain groups together</div>
+    </div>
+    <div class="interactive-body">
+      <div class="wave-controls">
+        <button class="btn active" id="scene-all" onclick="setScene('all')">mixed signal</button>
+        <button class="btn" id="scene-voice" onclick="setScene('voice')">voice stream only</button>
+        <button class="btn" id="scene-music" onclick="setScene('music')">music stream only</button>
+        <button class="btn" id="scene-noise" onclick="setScene('noise')">ambient noise only</button>
+      </div>
+      <canvas id="cScene" height="220" style="width:100%;border-radius:8px;background:#070714" role="img" aria-label="Frequency spectrum visualization showing how acoustic signals are grouped into perceptual streams — voice, music, and ambient noise bands"></canvas>
+      <div class="info-box" id="sceneInfo" style="margin-top:.75rem">Each stream occupies different frequency bands and has different temporal patterns. The brain identifies these patterns and groups sounds into streams — a process called primitive auditory scene analysis. Switch between views to see what each stream looks like in isolation.</div>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 4: YOUR NUMBER -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">04 — your number</div></div>
+    <div class="interactive-body">
+      <div class="your-number">
+        <div class="yn-label">your number</div>
+        <div class="yn-prompt">Enter your age and hearing status to find your interaural time difference sensitivity and what that means.</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:.85rem">
+          <input type="number" id="hearingAge" min="5" max="90" value="35" style="width:80px;font-size:14px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-mono)">
+          <select id="hearingStatus" style="font-size:13px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary)">
+            <option value="normal">normal hearing</option>
+            <option value="mild">mild hearing loss</option>
+            <option value="moderate">moderate hearing loss</option>
+          </select>
+        </div>
+        <div class="yn-result" id="hearingResult"></div>
+      </div>
+      <div class="stat-row" id="hearingStats"></div>
+    </div>
+  </div>
+
+  <hr class="article-divider reveal">
+  <div class="reveal">
+    <div class="provenance">
+      <div class="prov-toggle" onclick="toggleProv()"><span><i class="ti ti-database" aria-hidden="true" style="font-size:15px;margin-right:6px"></i>data provenance</span><i class="ti ti-chevron-down" id="provChev" style="font-size:15px;transition:transform .2s"></i></div>
+      <div class="prov-body" id="provBody">
+        <div class="prov-row"><div class="prov-key">cocktail party problem</div><div class="prov-val">Cherry, E.C. (1953). "Some experiments on the recognition of speech." JASA 25(5):975–979</div></div>
+        <div class="prov-row"><div class="prov-key">auditory scene analysis</div><div class="prov-val">Bregman, A.S. (1990). Auditory Scene Analysis. MIT Press.</div></div>
+        <div class="prov-row"><div class="prov-key">ITD sensitivity</div><div class="prov-val">Klumpp & Eady (1956). 10 μs minimum ITD threshold. JASA 28(5):859–860</div></div>
+        <div class="prov-row"><div class="prov-key">precedence effect</div><div class="prov-val">Wallach, Newman & Rosenzweig (1949). 30ms fusion threshold. American Journal of Psychology.</div></div>
+        <div class="prov-row"><div class="prov-key">last verified</div><div class="prov-val">June 2026</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reveal" style="margin-top:1.5rem">
+    <div class="section-label">what this made me wonder next</div>
+    <div class="related-questions">
+      <div class="related-item"><div class="related-q">Hearing aids have gotten dramatically better at the cocktail party problem in the last decade — what changed, and why did it take so long?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+      <div class="related-item"><div class="related-q">What do people with single-sided deafness actually experience in a noisy room — and what compensatory strategies does the brain develop?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+      <div class="related-item"><div class="related-q">The precedence effect fuses sounds within 30ms — but music deliberately uses echoes and reverb that arrive much later. Why doesn't that confuse the system?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+    </div>
+  </div>
+  <div class="substack-cta reveal" style="margin-top:2rem"><span>next: fast fashion's real lifecycle.</span><a href="https://standardlydeviated.substack.com">subscribe →</a></div>
+</div></main>
+<footer class="site-footer"><div class="container footer-inner"><span>σ standard deviation · <a href="https://standardlydeviated.substack.com">@standardlydeviated</a></span><span><a href="/standard-deviation/">← all articles</a></span></div></footer>
+<script src="../../assets/js/scroll-reveal.js"></script>
+<script>
+function drawWaves(){
+  const fA=+document.getElementById('freqA').value,aA=+document.getElementById('ampA').value;
+  const fB=+document.getElementById('freqB').value,aB=+document.getElementById('ampB').value;
+  const ph=+document.getElementById('phaseB').value*Math.PI/180;
+  document.getElementById('freqAVal').textContent=fA+' Hz';
+  document.getElementById('ampAVal').textContent=aA.toFixed(2);
+  document.getElementById('freqBVal').textContent=fB+' Hz';
+  document.getElementById('ampBVal').textContent=aB.toFixed(2);
+  document.getElementById('phaseBVal').textContent=document.getElementById('phaseB').value+'°';
+  const cv=document.getElementById('cWaves'); cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#070714';ctx.fillRect(0,0,W,H);
+  const rows=[{col:'#8b85e8',fn:x=>aA*Math.sin(2*Math.PI*fA*x/W*4)},{col:'#e8855a',fn:x=>aB*Math.sin(2*Math.PI*fB*x/W*4+ph)},{col:'rgba(255,255,255,.85)',fn:x=>aA*Math.sin(2*Math.PI*fA*x/W*4)+aB*Math.sin(2*Math.PI*fB*x/W*4+ph)}];
+  const rowH=H/3;
+  rows.forEach((r,i)=>{
+    const cy=(i+0.5)*rowH;
+    ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(0,cy);ctx.lineTo(W,cy);ctx.stroke();
+    ctx.strokeStyle=r.col;ctx.lineWidth=i===2?2:1.5;ctx.beginPath();
+    for(let x=0;x<W;x++){const y=cy-r.fn(x)*(rowH*0.42);x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+    ctx.stroke();
+    const labels=['voice A','voice B','combined (what a mic hears)'];
+    ctx.fillStyle=r.col;ctx.font='10px sans-serif';ctx.textAlign='left';ctx.fillText(labels[i],6,cy-rowH*0.35);
+  });
+  const cancelPct=Math.round((1-Math.abs(Math.cos(ph/2)))*100);
+  document.getElementById('waveInfo').textContent=fA===fB?`Same frequency, phase offset ${Math.round(ph*180/Math.PI)}°. Cancellation: ~${cancelPct}%. At 180° the signals cancel completely — destructive interference.`:`Voice A at ${fA}Hz and B at ${fB}Hz combine into a complex waveform. Your brain separates these based on their different fundamental frequencies, temporal patterns, and spatial origin.`;
+}
+drawWaves();
+
+function drawBinaural(angle){
+  const angleRad=angle*Math.PI/180;
+  const HEAD_R=0.085,SOUND_SPEED=343,ITD=HEAD_R*Math.sin(angleRad)/SOUND_SPEED*1e6;
+  document.getElementById('angleVal').textContent=angle===0?'center (0°)':(angle>0?angle+'° right':Math.abs(angle)+'° left');
+  document.getElementById('binauralStats').innerHTML=`<div class="stat-card"><div class="s-label">source angle</div><div class="s-value">${angle}°</div><div class="s-sub">${angle>0?'right':angle<0?'left':'center'}</div></div><div class="stat-card"><div class="s-label">time difference (ITD)</div><div class="s-value">${Math.abs(ITD).toFixed(0)} μs</div><div class="s-sub">${ITD>0?'left ear first':ITD<0?'right ear first':'simultaneous'}</div></div><div class="stat-card"><div class="s-label">distance difference</div><div class="s-value">${(Math.abs(ITD)/1e6*343*100).toFixed(1)} cm</div><div class="s-sub">extra path length</div></div><div class="stat-card"><div class="s-label">detectable?</div><div class="s-value">${Math.abs(ITD)>10?'yes':'~limit'}</div><div class="s-sub">threshold ~10 μs</div></div>`;
+  document.getElementById('binauralInfo').textContent=Math.abs(angle)<5?'Sound arrives at both ears simultaneously. No ITD — the brain perceives the source as centered.':`Sound from ${Math.abs(angle)}° ${angle>0?'right':'left'} reaches the ${angle>0?'right':'left'} ear ${Math.abs(ITD).toFixed(0)} microseconds earlier. Your auditory system uses this ${Math.abs(ITD).toFixed(0)}μs gap — smaller than a single cycle of a 100Hz tone — to pinpoint the source direction.`;
+  const cv=document.getElementById('cBinaural'); cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#070714';ctx.fillRect(0,0,W,H);
+  const cx=W/2,cy=H*0.55,hr=60;
+  ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,hr,0,Math.PI*2);ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,.08)';ctx.beginPath();ctx.arc(cx,cy,hr,0,Math.PI*2);ctx.fill();
+  [[cx-hr*0.7,cy+hr*0.1,'L'],[cx+hr*0.7,cy+hr*0.1,'R']].forEach(([ex,ey,label])=>{
+    ctx.fillStyle='rgba(255,255,255,.6)';ctx.beginPath();ctx.arc(ex,ey,7,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(0,0,0,.7)';ctx.font='500 9px sans-serif';ctx.textAlign='center';ctx.fillText(label,ex,ey+3);
+  });
+  const srcDist=130,srcX=cx+Math.sin(angleRad)*srcDist,srcY=cy-Math.cos(angleRad)*srcDist;
+  ctx.fillStyle='#ffcc44';ctx.beginPath();ctx.arc(srcX,srcY,8,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(255,204,68,.7)';ctx.font='500 10px sans-serif';ctx.textAlign=angle>20?'left':angle<-20?'right':'center';ctx.fillText('sound source',srcX+(angle>20?12:angle<-20?-12:0),srcY-12);
+  [[cx-hr*0.7,cy+hr*0.1,'#8b85e8',angle<=0],[cx+hr*0.7,cy+hr*0.1,'#e8855a',angle>=0]].forEach(([ex,ey,col,first])=>{
+    ctx.strokeStyle=first?col+'cc':col+'44';ctx.lineWidth=first?2:1;ctx.setLineDash(first?[]:[4,4]);
+    ctx.beginPath();ctx.moveTo(srcX,srcY);ctx.lineTo(ex,ey);ctx.stroke();ctx.setLineDash([]);
+  });
+  const waveY=H*0.12;
+  [[cx-W*0.28,'#8b85e8',0,'left ear'],[cx+W*0.08,'#e8855a',ITD>0?-ITD:Math.abs(ITD),'right ear']].forEach(([wx,col,delay,lbl])=>{
+    const ww=W*0.22;ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.beginPath();
+    for(let x=0;x<ww;x++){const t=x/ww*4*Math.PI+delay*0.02;const y=waveY+Math.sin(t)*16;x===0?ctx.moveTo(wx+x,y):ctx.lineTo(wx+x,y);}
+    ctx.stroke();
+    ctx.fillStyle=col;ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText(lbl,wx+ww/2,waveY-22);
+  });
+  if(Math.abs(ITD)>5){
+    ctx.fillStyle='rgba(255,255,255,.45)';ctx.font='10px sans-serif';ctx.textAlign='center';
+    ctx.fillText('ITD = '+Math.abs(ITD).toFixed(0)+'μs',cx,waveY+36);
+  }
+}
+drawBinaural(0);
+document.getElementById('sourceAngle').addEventListener('input',e=>drawBinaural(+e.target.value));
+
+let currentScene='all';
+function setScene(s){
+  currentScene=s;
+  ['all','voice','music','noise'].forEach(k=>document.getElementById('scene-'+k).classList.toggle('active',k===s));
+  drawScene();
+}
+function drawScene(){
+  const cv=document.getElementById('cScene'); cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#070714';ctx.fillRect(0,0,W,H);
+  const pad={l:40,r:20,t:20,b:30};
+  const streams={
+    voice:{col:'#8b85e8',bands:[[80,300,0.9],[300,800,0.6],[800,2000,0.4]],label:'voice (80–2000 Hz, harmonic structure)'},
+    music:{col:'#5dcaa5',bands:[[40,200,0.7],[200,600,0.8],[600,4000,0.5],[4000,8000,0.3]],label:'music (40–8000 Hz, harmonic + broadband)'},
+    noise:{col:'#e8855a',bands:[[20,20000,0.3]],label:'ambient noise (broadband, all frequencies)'},
+  };
+  const maxFreq=8000,cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  function freqX(f){return pad.l+Math.log10(f/20)/Math.log10(20000/20)*cw;}
+  [20,50,100,200,500,1000,2000,5000,8000].forEach(f=>{
+    const x=freqX(f);
+    ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,H-pad.b);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='9px sans-serif';ctx.textAlign='center';
+    ctx.fillText(f>=1000?Math.round(f/1000)+'k':f,x,H-pad.b+12);
+  });
+  const toShow=currentScene==='all'?Object.keys(streams):[currentScene];
+  toShow.forEach(key=>{
+    const st=streams[key];
+    st.bands.forEach(([f0,f1,amp])=>{
+      const x0=freqX(f0),x1=freqX(f1);
+      ctx.fillStyle=st.col+(currentScene==='all'?'55':'88');
+      ctx.strokeStyle=st.col+(currentScene==='all'?'99':'cc');
+      ctx.lineWidth=1.5;
+      const bh=amp*ch*0.85;
+      const variation=12;
+      ctx.beginPath();ctx.moveTo(x0,H-pad.b);
+      for(let x=x0;x<=x1;x+=2){
+        const progress=(x-x0)/(x1-x0);
+        const envelope=Math.sin(progress*Math.PI);
+        const noise=(Math.random()-0.5)*variation;
+        const y=H-pad.b-bh*envelope+noise;
+        ctx.lineTo(x,y);
+      }
+      ctx.lineTo(x1,H-pad.b);ctx.closePath();ctx.fill();ctx.stroke();
+    });
+    if(currentScene!=='all'){
+      ctx.fillStyle=st.col;ctx.font='11px sans-serif';ctx.textAlign='left';ctx.fillText(st.label,pad.l+4,pad.t+14);
+    }
+  });
+  ctx.fillStyle='rgba(255,255,255,.35)';ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText('frequency (Hz)',pad.l+cw/2,H-2);
+  const descs={all:'All three streams arriving simultaneously — what a microphone captures. Your brain separates them into distinct auditory streams using frequency content, temporal patterns, and spatial location.',voice:'The voice stream: energy concentrated in the fundamental (80–300 Hz) and formant regions (300–3000 Hz). The harmonic structure is the key cue the brain uses to separate voices from noise.',music:'Music spans a wider frequency range and has both harmonic structure (from instruments) and broadband content (percussion, room acoustics).',noise:'Ambient noise is broadband — energy spread across all frequencies. Because it lacks harmonic structure and consistent spatial origin, the brain suppresses it during focused listening.'};
+  document.getElementById('sceneInfo').textContent=descs[currentScene];
+}
+drawScene();
+
+function calcHearing(){
+  const age=+document.getElementById('hearingAge').value||35;
+  const status=document.getElementById('hearingStatus').value;
+  const baseITD=10,ageFactor=age>60?1+(age-60)*0.04:1;
+  const statusFactor=status==='normal'?1:status==='mild'?1.4:2.2;
+  const effectiveITD=Math.round(baseITD*ageFactor*statusFactor);
+  const anglePrecision=Math.round(Math.asin(effectiveITD/1e6*343/0.085)*180/Math.PI*10)/10;
+  const voicesSimult=status==='normal'?(age<40?4:age<60?3:2):status==='mild'?2:1;
+  document.getElementById('hearingResult').innerHTML=`At age <strong>${age}</strong> with ${status.replace('-',' ')}, your estimated minimum ITD sensitivity is approximately:<span class="yn-big">~${effectiveITD} microseconds</span>That corresponds to angular precision of about <strong>${anglePrecision}°</strong> — meaning you can distinguish sound sources separated by roughly ${anglePrecision}° of arc. In a noisy room, you can likely follow <strong>${voicesSimult} simultaneous voice${voicesSimult>1?'s':''}</strong> with effort.`;
+  document.getElementById('hearingStats').innerHTML=`<div class="stat-card"><div class="s-label">ITD threshold</div><div class="s-value">~${effectiveITD}μs</div><div class="s-sub">min detectable</div></div><div class="stat-card"><div class="s-label">angular precision</div><div class="s-value">${anglePrecision}°</div><div class="s-sub">source localization</div></div><div class="stat-card"><div class="s-label">voices trackable</div><div class="s-value">${voicesSimult}</div><div class="s-sub">simultaneously</div></div><div class="stat-card"><div class="s-label">high-freq limit</div><div class="s-value">${status==='normal'?Math.max(8,20-age*0.15).toFixed(0)+'kHz':status==='mild'?'~10kHz':'~6kHz'}</div><div class="s-sub">estimated cutoff</div></div>`;
+}
+document.getElementById('hearingAge').addEventListener('input',calcHearing);
+document.getElementById('hearingStatus').addEventListener('change',calcHearing);
+calcHearing();
+
+function toggleProv(){const b=document.getElementById('provBody'),c=document.getElementById('provChev');b.classList.toggle('open');c.style.transform=b.classList.contains('open')?'rotate(180deg)':'';}
+</script>
+</body>
+</html>

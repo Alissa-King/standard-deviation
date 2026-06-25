@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>how much of the internet is real — standard deviation</title>
+  <meta name="description" content="A measurable percentage of internet traffic is bots. A measurable percentage of social followers are fake. A measurable percentage of reviews are fabricated. The numbers are worse than you assumed.">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>canvas{display:block;max-width:100%}.meter-row{display:flex;align-items:center;gap:10px;padding:.55rem 0;border-bottom:0.5px solid var(--color-border)}.meter-row:last-child{border-bottom:none}.meter-label{font-size:13px;min-width:160px;color:var(--color-text-primary)}.meter-bg{flex:1;height:14px;background:rgba(255,255,255,.06);border-radius:7px;overflow:hidden}.meter-fill{height:100%;border-radius:7px;transition:width .4s}.meter-pct{font-size:12px;font-family:var(--font-mono);min-width:40px;text-align:right;color:var(--color-text-secondary)}</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container inner">
+    <a class="wordmark" href="/standard-deviation/"><span class="sigma">σ</span> standard deviation</a>
+    <nav class="site-nav"><a href="/standard-deviation/">archive</a><a href="https://standardlydeviated.substack.com/about">about</a><a href="https://standardlydeviated.substack.com">substack</a></nav>
+  </div>
+</header>
+<main><div class="container">
+
+  <header class="article-header reveal">
+    <div class="kicker">internet &amp; society · vol. 09</div>
+    <h1 class="article-title">how much of the internet is real</h1>
+    <p class="article-dek">A measurable percentage of web traffic is bots. A measurable percentage of social followers are fake. A measurable percentage of product reviews are fabricated. The numbers have been estimated. They are worse than you assumed.</p>
+    <div class="article-byline">
+      <span>standard deviation</span><span class="byline-dot"></span>
+      <span>~9 min read</span><span class="byline-dot"></span>
+      <span>bot traffic estimator · follower audit calculator</span><span class="byline-dot"></span>
+      <a href="https://standardlydeviated.substack.com" style="color:var(--color-accent);text-decoration:none">subscribe</a>
+    </div>
+  </header>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>In 2023, Imperva released its annual Bad Bot Report, which estimated that 49.6% of all internet traffic was automated — bots, scrapers, crawlers, account checkers, credential stuffers, and other non-human agents. For the first time in the report's history, automated traffic exceeded human traffic. This number requires interpretation: not all bots are malicious (search engine crawlers are bots; web monitors are bots; the thing that generates your link preview is a bot), and Imperva has an obvious commercial interest in alarming estimates. But even the more conservative estimates from independent researchers place non-human traffic at 35–45% of the total. The internet is substantially talking to itself.</p>
+      <p>The dead internet theory — a loosely defined idea that circulated on conspiracy forums starting around 2021 — claimed that the internet had become a ghost town of AI-generated content, bot interactions, and corporate astroturfing, with genuine human activity reduced to a tiny fraction of what appears to be organic engagement. This is too dramatic as stated. But the underlying data, when you look at it, suggests a more uncomfortable version of the same concern: not that the internet is dead, but that the parts of it that look most alive are often the parts that aren't.</p>
+    </div>
+    <div class="pull-quote reveal">The engagement metrics that determine what content gets amplified — likes, shares, comments, follower counts, view counts — are all gameable, and all gamed, at scales large enough to meaningfully distort what the internet thinks is popular versus what is actually popular.</div>
+  </div>
+
+  <!-- INTERACTIVE 1: TRAFFIC BREAKDOWN -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">01 — what's actually in a billion page requests</div></div>
+    <div class="interactive-body">
+      <div class="ctrl-row">
+        <label>website type</label>
+        <select id="siteType" onchange="drawTraffic()" style="font-size:13px;padding:5px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary)">
+          <option value="news">news / media site</option>
+          <option value="ecom">e-commerce</option>
+          <option value="finance">financial services</option>
+          <option value="social" selected>social platform</option>
+          <option value="gaming">online gaming</option>
+        </select>
+      </div>
+      <canvas id="cTraffic" height="280" style="width:100%;border-radius:8px;background:#070a14" role="img" aria-label="Donut chart showing breakdown of web traffic by type — human users, good bots, bad bots, and ambiguous traffic — for different website categories"></canvas>
+      <div class="stat-row" id="trafficStats"></div>
+      <div class="info-box" id="trafficInfo" style="margin-top:.75rem">Not all bot traffic is malicious — search crawlers, monitoring tools, and link previewers are all bots. But the "bad bot" category (scrapers, credential stuffers, fake account creators) is substantial in every sector.</div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The follower economy is perhaps the most legible manifestation of the problem. Instagram's own internal estimates, disclosed in SEC filings from the Meta era, suggested that between 5% and 10% of monthly active accounts were fake or duplicate at any given time. External researchers, using behavioral analysis of posting patterns, engagement ratios, and account creation metadata, have estimated the figure to be higher — somewhere between 10% and 30% depending on the account type and platform. Accounts with very high follower counts and very low engagement rates are a statistical signature of purchased followers. The ratio of followers to engagement is an imperfect but measurable indicator of inauthenticity.</p>
+      <p>The review economy has its own version of this problem. A 2022 study by Fakespot, which analyzes product review authenticity, found that approximately 31% of reviews on Amazon were fake or unreliable. The percentage was higher in certain categories: electronics (45%), beauty products (52%), supplements (60%). The fake reviews are not always obviously fake. They are written by humans — via platforms like Mechanical Turk or, increasingly, by language models — following specific instructions about length, specificity, and the star rating required to maintain a seller's algorithmic ranking.</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 2: FOLLOWER AUDIT -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">02 — estimate real vs. fake followers</div></div>
+    <div class="interactive-body">
+      <div class="ctrl-row"><label>platform</label>
+        <select id="platform" onchange="calcFollowers()" style="font-size:13px;padding:5px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary)">
+          <option value="instagram">Instagram</option><option value="twitter">X / Twitter</option><option value="tiktok">TikTok</option><option value="youtube">YouTube</option>
+        </select>
+      </div>
+      <div class="ctrl-row"><label>follower count</label><input type="range" id="followerCount" min="1000" max="10000000" step="1000" value="100000" oninput="calcFollowers()"><span class="ctrl-val" id="followerVal">100K</span></div>
+      <div class="ctrl-row"><label>avg likes per post</label><input type="range" id="avgLikes" min="10" max="500000" step="100" value="2000" oninput="calcFollowers()"><span class="ctrl-val" id="likesVal">2,000</span></div>
+      <div class="your-number" style="margin:.75rem 0">
+        <div class="yn-result" id="followerResult"></div>
+      </div>
+      <div class="stat-row" id="followerStats"></div>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <div class="reveal">
+      <p>The content side of the dead internet concern has become more acute since 2022. The cost of generating text content dropped to near-zero with the proliferation of large language models, and the web has responded accordingly. Researchers at NewsGuard, which tracks unreliable news sites, identified over 1,000 websites in 2024 that were largely or entirely AI-generated — producing dozens of articles per day on topics ranging from politics to celebrity news, monetized through programmatic advertising, with no meaningful editorial oversight. The content is coherent, SEO-optimized, and devoid of the kind of original reporting or genuine perspective that would distinguish it from authentic journalism. It is readable. It is not real.</p>
+      <p>What makes this particularly difficult to measure is that the line between "automated" and "human" content has never been clear. Press release journalism has always existed. Content farms filled with low-paid human writers have always existed. The question is not whether the internet contains inauthentic content — it always has — but whether the proportion has crossed a threshold that changes how the network functions. If the content people share and engage with is substantially generated by systems optimizing for engagement rather than truth, the feedback loop between what is popular and what is real gets severed, and the mechanism by which the internet is supposed to surface good information breaks down.</p>
+    </div>
+    <div class="pull-quote reveal">The internet runs on engagement metrics. Engagement metrics are gameable. They have been gamed, at scale, for long enough that the platforms that depend on them have partially internalized the distortion and partially failed to notice it. The number of humans paying attention at any given moment is lower than every dashboard shows.</div>
+  </div>
+
+  <!-- INTERACTIVE 3: THE REALNESS METER -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">03 — estimated authenticity by platform and content type</div></div>
+    <div class="interactive-body">
+      <div id="meterRows"></div>
+      <div class="info-box" id="meterInfo" style="margin-top:.75rem">Click any row to see the methodology and data sources behind that estimate. These are ranges from multiple research sources, not precise figures — but the direction is consistent across methodologies.</div>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 4: YOUR NUMBER -->
+  <div class="interactive reveal">
+    <div class="interactive-header"><div class="section-label">04 — your number</div></div>
+    <div class="interactive-body">
+      <div class="your-number">
+        <div class="yn-label">your feed</div>
+        <div class="yn-prompt">Estimate how many posts you see per day and what you think is authentic.</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:.85rem">
+          <input type="number" id="postsPerDay" min="10" max="2000" value="200" style="width:90px;font-size:14px;padding:6px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-mono)">
+          <select id="mainPlatform" style="font-size:13px;padding:5px 10px;border-radius:6px;border:0.5px solid var(--color-border,rgba(0,0,0,.15));background:var(--color-background-secondary);color:var(--color-text-primary)">
+            <option value="instagram">Instagram</option><option value="twitter" selected>X / Twitter</option><option value="tiktok">TikTok</option><option value="reddit">Reddit</option>
+          </select>
+        </div>
+        <div class="yn-result" id="feedResult"></div>
+      </div>
+      <div class="stat-row" id="feedStats"></div>
+    </div>
+  </div>
+
+  <hr class="article-divider reveal">
+  <div class="reveal">
+    <div class="provenance">
+      <div class="prov-toggle" onclick="toggleProv()"><span><i class="ti ti-database" aria-hidden="true" style="font-size:15px;margin-right:6px"></i>data provenance</span><i class="ti ti-chevron-down" id="provChev" style="font-size:15px;transition:transform .2s"></i></div>
+      <div class="prov-body" id="provBody">
+        <div class="prov-row"><div class="prov-key">bot traffic estimates</div><div class="prov-val">Imperva Bad Bot Report 2023. Independent validation: Distil Networks (Radware) annual reports. Range 35–50%.</div></div>
+        <div class="prov-row"><div class="prov-key">fake social accounts</div><div class="prov-val">Meta SEC filings (2022): 5–10% MAU estimate. Sparktoro / SparkScore independent analysis: 10–25%.</div></div>
+        <div class="prov-row"><div class="prov-key">fake reviews</div><div class="prov-val">Fakespot (2022) Amazon review analysis. FTC enforcement actions 2023–2024. BrightLocal Consumer Survey 2023.</div></div>
+        <div class="prov-row"><div class="prov-key">AI content farms</div><div class="prov-val">NewsGuard AI Content Farm Tracker (2024). 1,000+ identified sites, 400M+ monthly impressions estimated.</div></div>
+        <div class="prov-row"><div class="prov-key">last verified</div><div class="prov-val">June 2026</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="reveal" style="margin-top:1.5rem">
+    <div class="section-label">what this made me wonder next</div>
+    <div class="related-questions">
+      <div class="related-item"><div class="related-q">If AI models are trained on internet text, and an increasing percentage of internet text is AI-generated, what happens to the next generation of models trained on that data?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+      <div class="related-item"><div class="related-q">Is there a measurable difference in the quality of recommendations from platforms with high vs. low bot contamination in their training data?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+      <div class="related-item"><div class="related-q">What does search engine traffic look like after you strip out bots — and has organic human search traffic been growing or shrinking as a share of total web traffic?</div><i class="ti ti-arrow-right related-arrow" aria-hidden="true"></i></div>
+    </div>
+  </div>
+  <div class="substack-cta reveal" style="margin-top:2rem"><span>next: the sound that's shortening your life.</span><a href="https://standardlydeviated.substack.com">subscribe →</a></div>
+</div></main>
+<footer class="site-footer"><div class="container footer-inner"><span>σ standard deviation · <a href="https://standardlydeviated.substack.com">@standardlydeviated</a></span><span><a href="/standard-deviation/">← all articles</a></span></div></footer>
+<script src="../../assets/js/scroll-reveal.js"></script>
+<script>
+const TRAFFIC={
+  news:{human:58,goodBot:22,badBot:15,ambiguous:5,label:'News / media sites attract heavy scraping and crawling.'},
+  ecom:{human:62,goodBot:15,badBot:20,ambiguous:3,label:'E-commerce has high bad-bot rates from price scrapers, inventory checkers, and credential stuffers.'},
+  finance:{human:55,goodBot:12,badBot:28,ambiguous:5,label:'Financial sites have the highest bad bot rates — credential stuffing, account takeover, and trading bots.'},
+  social:{human:65,goodBot:10,badBot:20,ambiguous:5,label:'Social platforms: fake account creation, like/follow farming, and automated engagement bots.'},
+  gaming:{human:70,goodBot:8,badBot:18,ambiguous:4,label:'Gaming: item farming bots, account selling operations, and matchmaking manipulation.'},
+};
+function drawTraffic(){
+  const t=TRAFFIC[document.getElementById('siteType').value];
+  const cv=document.getElementById('cTraffic'); cv.width=cv.parentElement.offsetWidth||640;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.fillStyle='#070a14';ctx.fillRect(0,0,W,H);
+  const segments=[{label:'human users',val:t.human,col:'#5dcaa5'},{label:'good bots\n(crawlers, monitors)',val:t.goodBot,col:'#8b85e8'},{label:'bad bots\n(scrapers, spammers)',val:t.badBot,col:'#ff4444'},{label:'ambiguous',val:t.ambiguous,col:'rgba(150,150,150,.6)'}];
+  const cx=W*0.38,cy=H*0.5,outer=Math.min(cx,cy)*0.8,inner=outer*0.52;
+  let startAngle=-Math.PI/2;
+  segments.forEach(s=>{
+    const sweep=(s.val/100)*Math.PI*2;
+    ctx.fillStyle=s.col;ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,outer,startAngle,startAngle+sweep);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#070a14';ctx.beginPath();ctx.arc(cx,cy,inner,0,Math.PI*2);ctx.fill();
+    const mid=startAngle+sweep/2;
+    if(s.val>6){ctx.fillStyle='rgba(255,255,255,.85)';ctx.font='500 12px sans-serif';ctx.textAlign='center';ctx.fillText(s.val+'%',cx+Math.cos(mid)*(outer+inner)/2,cy+Math.sin(mid)*(outer+inner)/2+4);}
+    startAngle+=sweep;
+  });
+  ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='500 22px sans-serif';ctx.textAlign='center';ctx.fillText(t.human+'%',cx,cy-4);
+  ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='11px sans-serif';ctx.fillText('human',cx,cy+12);
+  const lx=W*0.67;let ly=H*0.2;
+  segments.forEach(s=>{
+    ctx.fillStyle=s.col;ctx.fillRect(lx,ly,12,12);
+    ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='12px sans-serif';ctx.textAlign='left';
+    const lines=s.label.split('\n');lines.forEach((ln,i)=>ctx.fillText(ln,lx+18,ly+10+i*14));
+    ly+=lines.length*14+12;
+  });
+  document.getElementById('trafficStats').innerHTML=`<div class="stat-card"><div class="s-label">human traffic</div><div class="s-value">${t.human}%</div></div><div class="stat-card"><div class="s-label">good bots</div><div class="s-value">${t.goodBot}%</div></div><div class="stat-card"><div class="s-label">bad bots</div><div class="s-value">${t.badBot}%</div><div class="s-sub">malicious / fake</div></div><div class="stat-card"><div class="s-label">non-human total</div><div class="s-value">${100-t.human}%</div></div>`;
+  document.getElementById('trafficInfo').textContent=t.label+` Overall: ${t.human}% of requests from real humans, ${100-t.human}% automated.`;
+}
+drawTraffic();
+
+function calcFollowers(){
+  const count=+document.getElementById('followerCount').value;
+  const likes=+document.getElementById('avgLikes').value;
+  const platform=document.getElementById('platform').value;
+  const engRate=(likes/count)*100;
+  const expectedRates={instagram:{low:1,med:3,high:6},twitter:{low:0.5,med:1.5,high:3},tiktok:{low:2,med:5,high:10},youtube:{low:1,med:3,high:6}};
+  const exp=expectedRates[platform];
+  let fakePct,verdict;
+  if(engRate>=exp.high){fakePct=5;verdict='unusually high engagement — likely very authentic or niche community';}
+  else if(engRate>=exp.med){fakePct=15;verdict='normal engagement — likely authentic with some inactive followers';}
+  else if(engRate>=exp.low){fakePct=35;verdict='below-average engagement — significant inactive or fake followers probable';}
+  else{fakePct=60;verdict='very low engagement — strong indicator of purchased followers';}
+  const fmt=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1000?(n/1000).toFixed(0)+'K':n;
+  document.getElementById('followerVal').textContent=fmt(count);
+  document.getElementById('likesVal').textContent=likes.toLocaleString();
+  document.getElementById('followerResult').innerHTML=`Engagement rate: <strong>${engRate.toFixed(2)}%</strong>. Expected range for ${platform}: ${exp.low}–${exp.high}%.<span class="yn-big">~${fakePct}% potentially fake</span>Verdict: ${verdict}. Estimated real engaged followers: ~${fmt(Math.round(count*(1-fakePct/100)))} out of ${fmt(count)}.`;
+  document.getElementById('followerStats').innerHTML=`<div class="stat-card"><div class="s-label">engagement rate</div><div class="s-value">${engRate.toFixed(2)}%</div></div><div class="stat-card"><div class="s-label">est. fake followers</div><div class="s-value">~${fakePct}%</div><div class="s-sub">${fmt(Math.round(count*fakePct/100))} accounts</div></div><div class="stat-card"><div class="s-label">real engaged</div><div class="s-value">${fmt(Math.round(count*(1-fakePct/100)))}</div></div><div class="stat-card"><div class="s-label">expected rate</div><div class="s-value">${exp.low}–${exp.high}%</div><div class="s-sub">for ${platform}</div></div>`;
+}
+document.getElementById('followerCount').addEventListener('input',calcFollowers);
+document.getElementById('avgLikes').addEventListener('input',calcFollowers);
+document.getElementById('platform').addEventListener('change',calcFollowers);
+calcFollowers();
+
+const METERS=[
+  {label:'Amazon reviews (real)',pct:69,col:'#5dcaa5',detail:'Fakespot (2022) analysis of 720M reviews. 31% classified as unreliable. Beauty/supplements worst-hit categories.'},
+  {label:'Twitter/X accounts (real)',pct:75,col:'#8b85e8',detail:'Estimated 25% fake or bot accounts. Twitter\'s own 2022 acquisition dispute filings disclosed ~5% but independent analysis suggests higher.'},
+  {label:'Web traffic (human)',pct:58,col:'#ffcc44',detail:'Imperva 2023: 42% non-human. Conservative estimates from Cloudflare data suggest 35-40%. Varies heavily by site type.'},
+  {label:'LinkedIn endorsements (earned)',pct:55,col:'#ffcc44',detail:'Endorsement exchange networks inflate skill endorsements. Estimated 30-45% of endorsements from reciprocal or paid exchanges.'},
+  {label:'YouTube views (real humans)',pct:85,col:'#5dcaa5',detail:'YouTube has invested heavily in view count auditing. Estimated 10-15% view inflation from bots — better than most platforms.'},
+  {label:'Instagram followers (real)',pct:78,col:'#8b85e8',detail:'Meta SEC filings: 5-10% fake MAUs. Third-party audits of large accounts suggest 15-25% fake followers common.'},
+  {label:'News articles (human-written)',pct:72,col:'#ffcc44',detail:'NewsGuard 2024: 1,000+ AI content farm sites with 400M+ monthly impressions. Growing share of indexed content is AI-generated.'},
+  {label:'Google search results (original)',pct:60,col:'#e8855a',detail:'Growing percentage of top search results are aggregator/AI pages rather than original content. Exact figure disputed.'},
+];
+function buildMeters(){
+  const wrap=document.getElementById('meterRows');
+  METERS.forEach(m=>{
+    const row=document.createElement('div');row.className='meter-row';row.style.cursor='pointer';
+    row.innerHTML=`<div class="meter-label">${m.label}</div><div class="meter-bg"><div class="meter-fill" style="width:${m.pct}%;background:${m.col}"></div></div><div class="meter-pct">${m.pct}%</div>`;
+    row.addEventListener('click',()=>{document.getElementById('meterInfo').innerHTML=`<strong style="color:${m.col}">${m.label}: ${m.pct}% authentic</strong><br>${m.detail}`;});
+    wrap.appendChild(row);
+  });
+}
+buildMeters();
+
+function calcFeed(){
+  const posts=+document.getElementById('postsPerDay').value||200;
+  const platform=document.getElementById('mainPlatform').value;
+  const fakePct={instagram:22,twitter:25,tiktok:18,reddit:15}[platform];
+  const fakePosts=Math.round(posts*fakePct/100);
+  const botInteractions=Math.round(fakePosts*3.2);
+  document.getElementById('feedResult').innerHTML=`Seeing <strong>${posts} posts/day</strong> on ${platform.replace('twitter','X/Twitter')}: approximately:<span class="yn-big">${fakePosts} posts from non-humans</span>That's ${fakePct}% of your feed — roughly ${fakePosts} posts per day from bots, AI content farms, fake accounts, or coordinated inauthentic behavior. Each of those posts has likely received an estimated ${botInteractions.toLocaleString()} bot interactions (likes, shares, comments) before reaching you.`;
+  document.getElementById('feedStats').innerHTML=`<div class="stat-card"><div class="s-label">posts per day</div><div class="s-value">${posts}</div></div><div class="stat-card"><div class="s-label">non-human posts</div><div class="s-value">~${fakePosts}</div><div class="s-sub">${fakePct}% of feed</div></div><div class="stat-card"><div class="s-label">bot interactions</div><div class="s-value">~${botInteractions.toLocaleString()}</div><div class="s-sub">on those posts</div></div><div class="stat-card"><div class="s-label">genuinely human</div><div class="s-value">${posts-fakePosts}</div><div class="s-sub">estimated posts/day</div></div>`;
+}
+document.getElementById('postsPerDay').addEventListener('input',calcFeed);
+document.getElementById('mainPlatform').addEventListener('change',calcFeed);
+calcFeed();
+
+function toggleProv(){const b=document.getElementById('provBody'),c=document.getElementById('provChev');b.classList.toggle('open');c.style.transform=b.classList.contains('open')?'rotate(180deg)':'';}
+</script>
+</body>
+</html>
