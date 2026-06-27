@@ -1,0 +1,199 @@
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --ink: #1a1814;
+  --ink-faint: #6b6560;
+  --paper: #faf8f4;
+  --paper-warm: #f3f0ea;
+  --accent: #8b6f5e;
+  --max-width: 640px;
+}
+
+html {
+  font-size: 18px;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'EB Garamond', 'Georgia', serif;
+  min-height: 100vh;
+  padding: 0 1.5rem;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Layout */
+
+.site-header {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 3.5rem 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px solid var(--paper-warm);
+}
+
+.site-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.site-name a:hover {
+  color: var(--ink);
+}
+
+.site-nav {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
+}
+
+.site-nav a:hover {
+  color: var(--ink);
+}
+
+main {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.site-footer {
+  max-width: var(--max-width);
+  margin: 5rem auto 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--paper-warm);
+  font-size: 0.8rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.03em;
+}
+
+/* Index page */
+
+.index-intro {
+  padding: 4rem 0 3rem;
+}
+
+.index-intro p {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--ink-faint);
+  font-style: italic;
+  max-width: 480px;
+}
+
+.poem-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.poem-list-item {
+  border-top: 1px solid var(--paper-warm);
+}
+
+.poem-list-item:last-child {
+  border-bottom: 1px solid var(--paper-warm);
+}
+
+.poem-list-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 1.4rem 0;
+  transition: color 0.15s ease;
+  gap: 1rem;
+}
+
+.poem-list-link:hover {
+  color: var(--accent);
+}
+
+.poem-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.poem-meta {
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Poem page */
+
+.poem-page {
+  padding: 4rem 0 2rem;
+}
+
+.poem-page-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  font-style: italic;
+  margin-bottom: 0.4rem;
+  line-height: 1.3;
+}
+
+.poem-page-date {
+  font-size: 0.8rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.05em;
+  margin-bottom: 3.5rem;
+}
+
+.poem-body {
+  font-size: 1.05rem;
+  line-height: 1.85;
+}
+
+.poem-body p {
+  margin-bottom: 1.4em;
+  white-space: pre-wrap;
+}
+
+.poem-body p:last-child {
+  margin-bottom: 0;
+}
+
+.poem-nav {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--paper-warm);
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+}
+
+.poem-nav a:hover {
+  color: var(--ink);
+}
+
+@media (max-width: 480px) {
+  html { font-size: 16px; }
+  .site-header { padding: 2rem 0 1.5rem; }
+  .poem-list-link { flex-direction: column; gap: 0.25rem; }
+}

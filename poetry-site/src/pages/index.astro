@@ -1,0 +1,33 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const poems = [
+  {
+    slug: 'fluent-in-fine',
+    title: 'Fluent in Fine',
+    date: '2026',
+  },
+  {
+    slug: 'the-other-door',
+    title: 'The Other Door',
+    date: '2026',
+  },
+];
+---
+
+<Layout title="your name — poems" description="A collection of poems.">
+  <div class="index-intro">
+    <p>poems about what it costs to stay, and what it means to go.</p>
+  </div>
+
+  <ul class="poem-list">
+    {poems.map((poem) => (
+      <li class="poem-list-item">
+        <a class="poem-list-link" href={`/poems/${poem.slug}`}>
+          <span class="poem-title">{poem.title}</span>
+          <span class="poem-meta">{poem.date}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</Layout>
